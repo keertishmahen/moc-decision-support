@@ -1,0 +1,52 @@
+# secrets
+.env
+.env.*
+!.env.example
+ingest/.dlt/secrets.toml
+dbt_moc/profiles.yml
+azure/local.settings.json
+.dlt/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# node
+node_modules/
+frontend/dist/
+
+# data stores & artefacts
+chroma_db/
+saved_models/
+*.pkl
+neo4j_query_table_data_*.json
+
+# dbt
+**/target/
+**/dbt_packages/
+**/logs/
+
+# build & deploy artefacts
+*.zip
+*.tgz
+deploy.zip
+.azure/
+.azure-logs*/
+.azure-docker-logs/
+.azure-trace/
+azure-logs/
+
+# scratch
+_*.py
+*.log
+*_out.txt
+.DS_Store
+.superdesign/
+.kiro/
+
+# CI workflows (omitted from the public repo)
+.github/

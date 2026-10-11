@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_moc
+    columns:
+      - name: moc_id
+        tests: [unique, not_null]
+      - name: asset_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('stg_asset')
+              field: asset_id
+      - name: change_type
+        tests:
+          - not_null
+      - name: risk_level
+        tests:
+          - accepted_values:
+              values: ['Low', 'Medium', 'High']
+  - name: stg_asset
+    columns:
+      - name: asset_id
+        tests: [unique, not_null]
+  - name: stg_work_order
+    columns:
+      - name: wo_id
+        tests: [unique, not_null]

@@ -1,0 +1,31 @@
+{{ config(materialized='view') }}
+
+select
+  moc_id,
+  id,
+  title,
+  description,
+  reason,
+  change_type,
+  asset_id,
+  risk_level,
+  overall_risk_score,
+  risk_people,
+  risk_asset,
+  risk_community,
+  risk_env,
+  risk_likelihood,
+  hazop_required,
+  pssr_required,
+  estimated_cost,
+  actual_cost,
+  estimated_downtime,
+  actual_downtime,
+  incident_occurred,
+  incident_description,
+  lessons_learned,
+  hazard_description,
+  approver_role,
+  date_initiated,
+  work_order_ids
+from {{ source('bronze', 'raw_moc') }}

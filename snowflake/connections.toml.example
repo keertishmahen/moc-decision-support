@@ -1,0 +1,11 @@
+# Snowflake connection for MoC pipeline (SnowSQL / Snowflake CLI)
+# Password: set via env SNOWFLAKE_PASSWORD, do not store here.
+
+[connections.moc]
+account = "YOUR_SNOWFLAKE_ACCOUNT"
+user = "YOUR_SNOWFLAKE_USER"
+password = ""
+role = "ACCOUNTADMIN"
+warehouse = "MOC_WH"
+database = "MOC_DEV"
+schema = "BRONZE"

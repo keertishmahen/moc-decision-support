@@ -1,0 +1,12 @@
+version: 2
+
+seeds:
+  - name: moc_ml_labels
+    description: Curated MoC ML labels (cost/downtime/shutdown) matching train_predictor GROUND_TRUTH
+    columns:
+      - name: moc_id
+        tests: [unique, not_null]
+      - name: cost
+        tests: [not_null]
+      - name: downtime
+        tests: [not_null]

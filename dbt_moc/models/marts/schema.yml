@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: mart_graph_nodes
+    columns:
+      - name: node_id
+        tests: [not_null]
+      - name: node_label
+        tests: [not_null]
+  - name: mart_graph_edges
+    columns:
+      - name: src_id
+        tests: [not_null]
+      - name: dst_id
+        tests: [not_null]
+      - name: rel_type
+        tests: [not_null]
+  - name: mart_ml_moc_features
+    columns:
+      - name: moc_id
+        tests: [unique, not_null]
+      - name: cost
+        tests: [not_null]
+      - name: downtime
+        tests: [not_null]

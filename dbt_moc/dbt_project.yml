@@ -1,0 +1,38 @@
+name: moc
+version: 1.0.0
+config-version: 2
+profile: moc
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - target
+  - dbt_packages
+  - logs
+
+seeds:
+  moc:
+    +schema: SILVER
+
+models:
+  moc:
+    staging:
+      +schema: SILVER
+      +materialized: view
+    intermediate:
+      +schema: SILVER
+      +materialized: view
+    marts:
+      +schema: GOLD
+      +materialized: table
+      analytics:
+        +schema: GOLD
+      ml:
+        +schema: GOLD
+      graph:
+        +schema: GOLD

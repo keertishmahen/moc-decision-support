@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: bronze
+    database: "{{ env_var('SNOWFLAKE_DATABASE', 'MOC_DEV') }}"
+    schema: BRONZE
+    tables:
+      - name: raw_moc
+      - name: raw_asset
+      - name: raw_work_order
+      - name: raw_dependency
+      - name: raw_hazard
+      - name: raw_area
+      - name: raw_plant
+      - name: raw_process_unit
+      - name: raw_graph_nodes
+      - name: raw_graph_edges

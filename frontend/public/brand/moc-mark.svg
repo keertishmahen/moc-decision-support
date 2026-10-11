@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+  <!-- MoC Brand Mark  connected knowledge-graph nodes (#4f8ef7) -->
+  <line x1="7" y1="16.5" x2="12" y2="9" stroke="#4f8ef7" stroke-width="1.75" stroke-linecap="round" opacity="0.85"/>
+  <line x1="17" y1="16.5" x2="12" y2="9" stroke="#4f8ef7" stroke-width="1.75" stroke-linecap="round" opacity="0.85"/>
+  <circle cx="7" cy="16.5" r="2.6" fill="#4f8ef7"/>
+  <circle cx="17" cy="16.5" r="2.6" fill="#4f8ef7"/>
+  <circle cx="12" cy="8.2" r="3.35" fill="#4f8ef7"/>
+  <circle cx="12" cy="8.2" r="1.35" fill="#0a1020" opacity="0.55"/>
+</svg>
