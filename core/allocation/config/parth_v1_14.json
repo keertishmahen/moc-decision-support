@@ -1,0 +1,79 @@
+{
+  "model_id": "moc-human-ai-decision-allocation",
+  "version": "1.14",
+  "title": "Human–AI Decision Allocation in Knowledge-Driven Management of Change (MoC)",
+  "attribution": {
+    "author": "Parth Pandit Atiwadkar",
+    "work": "MSc thesis, Engineering and Management of Manufacturing Systems, Cranfield University, August 2026",
+    "supervisor": "Dr Jelena Milisavljevic Syed",
+    "source_figures": "Weights: Fig. 5. Thresholds: Fig. 7. Factor matrix: Fig. 8. Allocation rule: Section 6.3.",
+    "note": "Values transcribed from the thesis instrument (V1.14). The weights are placeholder magnitudes justified from literature, not empirically derived (thesis Section 8.3)."
+  },
+  "dimensions": [
+    {"id": "R", "name": "Risk", "low": 0.495, "high": 0.667,
+     "definition": "Effect of uncertainty on objectives: likelihood and consequence."},
+    {"id": "C", "name": "Complexity", "low": 0.370, "high": 0.620,
+     "definition": "How the parts of a system are related: differentiation, integration, procedural decisions."},
+    {"id": "U", "name": "Uncertainty", "low": 0.240, "high": 0.495,
+     "definition": "Incomplete information or inability to predict outcomes: aleatory and epistemic."},
+    {"id": "I", "name": "Impact", "low": 0.295, "high": 0.595,
+     "definition": "Propagating consequence of a change. Shared axis against which the other three are read."}
+  ],
+  "axes": [
+    {"id": "A1", "name": "Nature of change", "hint": "level of hierarchy",
+     "categories": [
+       {"id": "operational", "name": "Operational", "weights": {}},
+       {"id": "tactical", "name": "Tactical", "weights": {"R": 0.5, "I": 0.5}},
+       {"id": "strategic", "name": "Strategic", "weights": {"R": 1, "I": 1}}
+     ]},
+    {"id": "A2", "name": "System level", "hint": "reach within the plant",
+     "categories": [
+       {"id": "unit", "name": "Unit level", "weights": {}},
+       {"id": "sub_system", "name": "Sub-system level", "weights": {"C": 0.5, "I": 0.5}},
+       {"id": "system", "name": "System level", "weights": {"C": 1, "I": 1}}
+     ]},
+    {"id": "A3", "name": "Duration of change", "hint": "persistence",
+     "categories": [
+       {"id": "temporary", "name": "Temporary/Periodic change", "weights": {}},
+       {"id": "undefined_duration", "name": "Undefined durational change", "weights": {"R": 0.5, "I": 0.5}},
+       {"id": "permanent", "name": "Permanent change", "weights": {"R": 1, "I": 1}}
+     ]},
+    {"id": "A4", "name": "Scope of change", "hint": "breadth",
+     "categories": [
+       {"id": "local", "name": "Local", "weights": {}},
+       {"id": "general", "name": "General", "weights": {"C": 1, "I": 1}}
+     ]},
+    {"id": "A5", "name": "Acceptance of change", "hint": "method of acceptance",
+     "categories": [
+       {"id": "individual", "name": "Individual", "weights": {}},
+       {"id": "collective", "name": "Collective", "weights": {"C": 1}}
+     ]},
+    {"id": "A6", "name": "Change occurrence", "hint": "nature of occurrence",
+     "categories": [
+       {"id": "by_procedure", "name": "By procedure", "weights": {}},
+       {"id": "situational", "name": "Situational", "weights": {"C": 1, "U": 1}}
+     ]},
+    {"id": "A7", "name": "Availability of information", "hint": "epistemic state",
+     "categories": [
+       {"id": "deterministic", "name": "Deterministic", "weights": {}},
+       {"id": "partially_defined", "name": "Partially defined", "weights": {"U": 0.5}},
+       {"id": "undefined", "name": "Undefined", "weights": {"U": 1}}
+     ]},
+    {"id": "A8", "name": "Change impact type", "hint": "domain of consequence",
+     "categories": [
+       {"id": "social", "name": "Social", "weights": {"R": 0.5, "I": 0.5}},
+       {"id": "organisational", "name": "Organisational", "weights": {"R": 1, "I": 1}},
+       {"id": "technical", "name": "Technical", "weights": {"R": 0.5, "I": 0.5}},
+       {"id": "economic", "name": "Economic", "weights": {"R": 1, "I": 1}}
+     ]}
+  ],
+  "factor_matrix": {
+    "HIGH": {"LOW": "II", "MED": "III", "HIGH": "III"},
+    "MED": {"LOW": "I", "MED": "II", "HIGH": "III"},
+    "LOW": {"LOW": "I", "MED": "I", "HIGH": "II"}
+  },
+  "allocation_rule": {
+    "id": "any-III-human__all-I-ai__else-supported",
+    "text": "A factor of III on any dimension returns human-led; a factor of I on all three returns AI-led; any other signature returns AI-supported."
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "source": "Thesis Table 2 (Framework output for the ten Appendix F cases), Parth Pandit Atiwadkar, Cranfield University, August 2026.",
+  "reconstruction_note": "The thesis publishes the four scores, levels, signature and allocation for each case but not the eight axis selections. The selections below are RECONSTRUCTED: they are characterisations that reproduce the published scores exactly. System level, scope, acceptance, occurrence and information are fixed by the scores; nature of change and impact type are chosen among the combinations the scores allow (alternatives listed per case); duration is taken as permanent because the MoC records carry no duration field. Status stays 'reconstructed-pending-confirmation' until confirmed against the author's instrument.",
+  "cases": [
+    {
+      "case_id": "MOC-F01", "moc_id": "MoC-001", "title": "Feed Pump Replacement",
+      "selection": {"A1": "operational", "A2": "unit", "A3": "permanent", "A4": "local", "A5": "individual", "A6": "situational", "A7": "deterministic", "A8": "technical"},
+      "expected": {"scores": {"R": 1.5, "C": 1, "U": 1, "I": 1.5}, "levels": {"R": "MED", "C": "LOW", "U": "HIGH", "I": "MED"}, "signature": "II/I/III", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "20 characterisations reproduce the scores. Chosen: like-for-like replacement after a failure (situational, deterministic information), matching the selection recorded for Interviewee01 in Appendix G."
+    },
+    {
+      "case_id": "MOC-F02", "moc_id": "MoC-002", "title": "Feed Heater Control Valve Upgrade",
+      "selection": {"A1": "tactical", "A2": "sub_system", "A3": "permanent", "A4": "local", "A5": "collective", "A6": "by_procedure", "A7": "partially_defined", "A8": "technical"},
+      "expected": {"scores": {"R": 2, "C": 1.5, "U": 0.5, "I": 2.5}, "levels": {"R": "MED", "C": "MED", "U": "MED", "I": "MED"}, "signature": "II/II/II", "allocation": "AI_SUPPORTED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "10 characterisations reproduce the scores. Structure is fixed (sub-system, local, collective, by procedure, partially defined). Risk 2 could also be operational + permanent + economic/organisational."
+    },
+    {
+      "case_id": "MOC-F03", "moc_id": "MoC-003", "title": "Reactor Temperature Setpoint Adjustment",
+      "selection": {"A1": "strategic", "A2": "system", "A3": "permanent", "A4": "general", "A5": "collective", "A6": "by_procedure", "A7": "partially_defined", "A8": "technical"},
+      "expected": {"scores": {"R": 2.5, "C": 3, "U": 0.5, "I": 4.5}, "levels": {"R": "HIGH", "C": "HIGH", "U": "MED", "I": "HIGH"}, "signature": "III/III/III", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "6 characterisations reproduce the scores. Risk 2.5 could also be tactical + permanent + economic/organisational. The thesis states MOC-F03 and MOC-F05 characterise identically."
+    },
+    {
+      "case_id": "MOC-F04", "moc_id": "MoC-004", "title": "Cyclone Separator Inspection and Repair",
+      "selection": {"A1": "operational", "A2": "unit", "A3": "permanent", "A4": "local", "A5": "individual", "A6": "situational", "A7": "partially_defined", "A8": "technical"},
+      "expected": {"scores": {"R": 1.5, "C": 1, "U": 1.5, "I": 1.5}, "levels": {"R": "MED", "C": "LOW", "U": "HIGH", "I": "MED"}, "signature": "II/I/III", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "10 characterisations reproduce the scores. Structure is fixed (unit, local, individual, situational, partially defined)."
+    },
+    {
+      "case_id": "MOC-F05", "moc_id": "MoC-005", "title": "Catalyst Control Valve System Upgrade",
+      "selection": {"A1": "strategic", "A2": "system", "A3": "permanent", "A4": "general", "A5": "collective", "A6": "by_procedure", "A7": "partially_defined", "A8": "technical"},
+      "expected": {"scores": {"R": 2.5, "C": 3, "U": 0.5, "I": 4.5}, "levels": {"R": "HIGH", "C": "HIGH", "U": "MED", "I": "HIGH"}, "signature": "III/III/III", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "Kept identical to MOC-F03, as the thesis reports (Section 7.3)."
+    },
+    {
+      "case_id": "MOC-F06", "moc_id": "MoC-006", "title": "Catalyst Stripper Steam Injection Optimisation",
+      "selection": {"A1": "tactical", "A2": "sub_system", "A3": "permanent", "A4": "general", "A5": "collective", "A6": "by_procedure", "A7": "partially_defined", "A8": "technical"},
+      "expected": {"scores": {"R": 2, "C": 2.5, "U": 0.5, "I": 3.5}, "levels": {"R": "MED", "C": "HIGH", "U": "MED", "I": "HIGH"}, "signature": "III/III/III", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "10 characterisations reproduce the scores. Structure is fixed (sub-system, general, collective, by procedure, partially defined)."
+    },
+    {
+      "case_id": "MOC-F07", "moc_id": "MoC-007", "title": "Flue Gas Expander Performance Upgrade",
+      "selection": {"A1": "tactical", "A2": "unit", "A3": "permanent", "A4": "local", "A5": "individual", "A6": "by_procedure", "A7": "deterministic", "A8": "economic"},
+      "expected": {"scores": {"R": 2.5, "C": 0, "U": 0, "I": 2.5}, "levels": {"R": "HIGH", "C": "LOW", "U": "LOW", "I": "MED"}, "signature": "III/I/I", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "6 characterisations reproduce the scores. Chosen tactical + economic (an efficiency and energy-recovery upgrade); strategic + technical/social is the other reading."
+    },
+    {
+      "case_id": "MOC-F08", "moc_id": "MoC-008", "title": "Fractionator Reflux Pump Replacement",
+      "selection": {"A1": "tactical", "A2": "sub_system", "A3": "permanent", "A4": "local", "A5": "collective", "A6": "situational", "A7": "partially_defined", "A8": "economic"},
+      "expected": {"scores": {"R": 2.5, "C": 2.5, "U": 1.5, "I": 3}, "levels": {"R": "HIGH", "C": "HIGH", "U": "HIGH", "I": "HIGH"}, "signature": "III/III/III", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "6 characterisations reproduce the scores. Chosen tactical + economic; strategic + technical/social is the other reading."
+    },
+    {
+      "case_id": "MOC-F09", "moc_id": "MoC-009", "title": "Emergency Shutdown Procedure Update",
+      "selection": {"A1": "strategic", "A2": "system", "A3": "permanent", "A4": "general", "A5": "collective", "A6": "situational", "A7": "undefined", "A8": "organisational"},
+      "expected": {"scores": {"R": 3, "C": 4, "U": 2, "I": 5}, "levels": {"R": "HIGH", "C": "HIGH", "U": "HIGH", "I": "HIGH"}, "signature": "III/III/III", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "2 characterisations reproduce the scores (every axis at its maximum); impact type is organisational or economic. Chosen organisational for a procedure update."
+    },
+    {
+      "case_id": "MOC-F10", "moc_id": "MoC-010", "title": "Catalyst Transfer Line Reinforcement",
+      "selection": {"A1": "tactical", "A2": "system", "A3": "permanent", "A4": "general", "A5": "collective", "A6": "by_procedure", "A7": "partially_defined", "A8": "technical"},
+      "expected": {"scores": {"R": 2, "C": 3, "U": 0.5, "I": 4}, "levels": {"R": "MED", "C": "HIGH", "U": "MED", "I": "HIGH"}, "signature": "III/III/III", "allocation": "HUMAN_LED"},
+      "status": "reconstructed-pending-confirmation",
+      "alternatives": "10 characterisations reproduce the scores. Structure is fixed (system, general, collective, by procedure, partially defined)."
+    }
+  ]
+}

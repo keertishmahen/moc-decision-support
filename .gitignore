@@ -53,3 +53,6 @@ _*.py
 # CI workflows: only the GitHub Pages + Render ones are published
 .github/workflows/azure-docker.yml
 .github/workflows/dbt-moc.yml
+
+# local database backups
+backups/
