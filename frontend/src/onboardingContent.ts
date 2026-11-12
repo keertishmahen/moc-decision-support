@@ -22,6 +22,8 @@ export const CAPABILITIES = [
   { icon: 'risk' as const, title: 'Risk & Impact', body: 'Surface hazards, severity, and downstream effects from the living graph.' },
   { icon: 'cost' as const, title: 'Cost Predictor', body: 'Estimate change cost with models trained on plant maintenance patterns.' },
   { icon: 'bot' as const, title: 'MoCBot', body: 'Ask grounded questions across MoCs, HAZOP, PSSR, and lessons learned.' },
+  { icon: 'process' as const, title: 'Process Intelligence', body: 'Trace asset connectivity and propagate downtime through the unit topology.' },
+  { icon: 'allocation' as const, title: 'Decision Allocation', body: 'Score risk, complexity, uncertainty and impact to recommend AI-led, AI-supported or human-led decisions.' },
 ]
 
 export const PROCESS = {
@@ -52,7 +54,7 @@ export const WHO_WE_ARE = {
     },
     {
       title: 'Designed around real workflows',
-      body: 'Smart Form, Risk & Impact, Cost Predictor, MoCBot, and Process Intelligence mirror how MoC decisions are made on site.',
+      body: 'Smart Form, Risk & Impact, Cost Predictor, MoCBot, Process Intelligence, and Decision Allocation mirror how MoC decisions are made on site.',
     },
   ],
 }

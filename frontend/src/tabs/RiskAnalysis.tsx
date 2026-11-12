@@ -1,21 +1,37 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { analyseRisk } from '../api'
-import { Card, KpiCard, RiskBadge, SectionLabel, Btn, Select, Textarea, Gauge } from '../components/ui'
+import { Card, KpiCard, RiskBadge, SectionLabel, Btn, Select, Textarea, Gauge, ErrorBox } from '../components/ui'
 import { CHANGE_TYPES, ASSET_IDS } from '../constants'
-import { RadialBarChart, RadialBar, PieChart, Pie, Cell, BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
+import { useStore } from '../store'
+import { navigate, pathForTab, TAB_PATHS } from '../navigation'
+
+const yesNo = (v: unknown): boolean | null => (v === 'Yes' ? true : v === 'No' ? false : null)
+const ALLOCATION_TAB = TAB_PATHS.indexOf('/app/allocation')
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
 const SEV_COLOR: Record<string, string> = { High: '#f87171', Critical: '#ef4444', Medium: '#fbbf24', Low: '#34d399' }
 const RISK_SCORE: Record<string, number> = { Low: 22, Medium: 50, High: 76, Critical: 95 }
 
 export default function RiskAnalysis() {
-  const [ct, setCt]   = useState(CHANGE_TYPES[0])
-  const [aid, setAid] = useState(ASSET_IDS[0])
-  const [desc, setDesc] = useState('')
+  const { currentChange, setCurrentChange, setActiveTab, setAllocationIntent } = useStore()
+  const ct = currentChange.changeType
+  const aid = currentChange.assetId
+  const desc = currentChange.description
+  const setCt = (v: string) => setCurrentChange({ changeType: v })
+  const setAid = (v: string) => setCurrentChange({ assetId: v })
+  const setDesc = (v: string) => setCurrentChange({ description: v })
 
-  const { mutate, data: r, isPending } = useMutation({
+  const { mutate, data: r, isPending, error } = useMutation({
     mutationFn: () => analyseRisk({ change_type: ct, asset_id: aid, description: desc }),
+    onSuccess: d => setCurrentChange({ hazopRequired: yesNo(d?.hazop_triggered), pssrRequired: yesNo(d?.pssr_required) }),
   })
+
+  const continueToAllocation = () => {
+    setAllocationIntent('proposed')
+    setActiveTab(ALLOCATION_TAB)
+    navigate(pathForTab(ALLOCATION_TAB))
+  }
 
   const direct   = r?.direct_assets   ?? []
   const indirect = r?.indirect_assets ?? []
@@ -44,9 +60,18 @@ export default function RiskAnalysis() {
         placeholder="e.g. Upgrade catalyst slide valve SV-204 actuator to advanced feedback control…" />
       <Btn onClick={() => desc.trim() && mutate()} loading={isPending}>🔬 Analyse Risks</Btn>
 
+      <ErrorBox error={error} title="Risk analysis failed" />
+
       {r && (
         <div className="space-y-4">
           <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+          <div className="moc-glass-card rounded-xl border-[#4f8ef7]/25 p-4 flex flex-wrap items-center justify-between gap-3">
+            <p className="text-sm text-white/70">
+              Next: who should decide this change? The HAZOP and PSSR findings carry over.
+            </p>
+            <Btn variant="ghost" onClick={continueToAllocation}>Continue to Decision Allocation →</Btn>
+          </div>
 
           {/* KPI row */}
           <div className="grid grid-cols-4 gap-3">

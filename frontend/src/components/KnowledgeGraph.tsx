@@ -5,6 +5,7 @@ const NODE_COLORS: Record<string, string> = {
   MoC: '#4f8ef7', Asset: '#34d399', Hazard: '#f87171',
   WorkOrder: '#fbbf24', Personnel: '#a78bfa', RiskAssessment: '#fb923c',
   LessonsLearned: '#38bdf8', HAZOP: '#e879f9', PSSR: '#4ade80',
+  DecisionCharacterisation: '#f472b6', AxisCategory: '#22d3ee', AllocationMode: '#facc15', Dimension: '#c084fc',
   Query: '#94a3b8', default: '#64748b',
 }
 

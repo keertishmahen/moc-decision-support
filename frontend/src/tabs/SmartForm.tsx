@@ -1,17 +1,29 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { Search } from 'lucide-react'
 import { prefillForm } from '../api'
-import { Card, KpiCard, RiskBadge, SectionLabel, Btn, Select, Textarea } from '../components/ui'
+import { Card, KpiCard, RiskBadge, SectionLabel, Btn, Select, Textarea, ErrorBox } from '../components/ui'
 import { CHANGE_TYPES, ASSET_IDS } from '../constants'
+import { useStore } from '../store'
+
+const yesNo = (v: unknown): boolean | null => (v === 'Yes' ? true : v === 'No' ? false : null)
 
 export default function SmartForm() {
-  const [ct, setCt]   = useState(CHANGE_TYPES[0])
-  const [aid, setAid] = useState(ASSET_IDS[0])
-  const [desc, setDesc] = useState('')
+  const { currentChange, setCurrentChange } = useStore()
+  const ct = currentChange.changeType
+  const aid = currentChange.assetId
+  const desc = currentChange.description
+  const setCt = (v: string) => setCurrentChange({ changeType: v })
+  const setAid = (v: string) => setCurrentChange({ assetId: v })
+  const setDesc = (v: string) => setCurrentChange({ description: v })
 
-  const { mutate, data, isPending } = useMutation({
+  const { mutate, data, isPending, error } = useMutation({
     mutationFn: () => prefillForm({ change_type: ct, asset_id: aid, description: desc }),
+    // Carry what the assessment found into the other tabs (Decision Allocation uses the HAZOP need).
+    onSuccess: d => setCurrentChange({
+      hazopRequired: yesNo(d?.suggestions?.hazop_required),
+      pssrRequired: yesNo(d?.suggestions?.pssr_required),
+    }),
   })
 
   const s = data?.suggestions
@@ -45,6 +57,8 @@ export default function SmartForm() {
           <p><b className="text-white/80">3.</b> GPT-4o synthesises both sources into structured form suggestions.</p>
         </Card>
       </div>
+
+      <ErrorBox error={error} title="Could not get suggestions" />
 
       {s && (
         <div className="space-y-4">

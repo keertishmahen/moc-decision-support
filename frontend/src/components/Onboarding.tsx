@@ -6,9 +6,11 @@ import {
   Check,
   ClipboardList,
   DollarSign,
+  GitBranch,
   Handshake,
   Lightbulb,
   Rocket,
+  Scale,
   ShieldAlert,
   Users,
   X,
@@ -40,6 +42,8 @@ const CAP_ICONS = {
   risk: ShieldAlert,
   cost: DollarSign,
   bot: Bot,
+  process: GitBranch,
+  allocation: Scale,
 } as const
 
 const ease = [0.22, 1, 0.36, 1] as const
@@ -333,10 +337,10 @@ export default function Onboarding({ onEnter }: Props) {
           <Pill>Platform</Pill>
           <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">Everything in one intelligence surface</h2>
           <p className="mt-4 text-base leading-relaxed text-white/55">
-            Five connected workspaces — each grounded in the same FCC Unit knowledge graph.
+            Six connected workspaces — each grounded in the same FCC Unit knowledge graph.
           </p>
         </motion.div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {CAPABILITIES.map((cap, i) => {
             const Icon = CAP_ICONS[cap.icon]
             return (

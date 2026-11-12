@@ -6,6 +6,7 @@ import {
   CircleDollarSign,
   ClipboardList,
   GitBranch,
+  Scale,
   TriangleAlert,
   type LucideIcon,
 } from 'lucide-react'
@@ -28,6 +29,7 @@ import RiskAnalysis from './tabs/RiskAnalysis'
 import CostPredictor from './tabs/CostPredictor'
 import MoCBot       from './tabs/MoCBot'
 import ProcessIntelligence from './tabs/ProcessIntelligence'
+import DecisionAllocation from './tabs/DecisionAllocation'
 
 const TABS: { icon: LucideIcon; label: string }[] = [
   { icon: ClipboardList, label: 'Smart Form' },
@@ -35,6 +37,7 @@ const TABS: { icon: LucideIcon; label: string }[] = [
   { icon: CircleDollarSign, label: 'Cost Predictor' },
   { icon: Bot, label: 'MoCBot' },
   { icon: GitBranch, label: 'Process Intelligence' },
+  { icon: Scale, label: 'Decision Allocation' },
 ]
 
 const DATASET = [
@@ -70,7 +73,7 @@ export default function App() {
   const { data: health, refetch, isError: healthError } = useQuery({ queryKey: ['health'], queryFn: getHealth, refetchInterval: 30_000 })
   const [showOnboarding, setShowOnboarding] = useState(true)
 
-  const panels = [<SmartForm />, <RiskAnalysis />, <CostPredictor />, <MoCBot />, <ProcessIntelligence />]
+  const panels = [<SmartForm />, <RiskAnalysis />, <CostPredictor />, <MoCBot />, <ProcessIntelligence />, <DecisionAllocation />]
 
   const syncFromLocation = useCallback(() => {
     const seen = readOnboardingSeen()

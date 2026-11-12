@@ -1,17 +1,22 @@
 import React, { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { predictCost } from '../api'
-import { Card, KpiCard, SectionLabel, Btn, Select, Textarea, Gauge, CIBar } from '../components/ui'
+import { Card, KpiCard, SectionLabel, Btn, Select, Textarea, Gauge, CIBar, ErrorBox } from '../components/ui'
 import { CHANGE_TYPES, ASSET_IDS, ASSET_CATS, RISK_LEVELS } from '../constants'
+import { useStore } from '../store'
 
 export default function CostPredictor() {
-  const [ct, setCt]     = useState(CHANGE_TYPES[0])
-  const [aid, setAid]   = useState(ASSET_IDS[0])
+  const { currentChange, setCurrentChange } = useStore()
+  const ct = currentChange.changeType
+  const aid = currentChange.assetId
+  const desc = currentChange.description
+  const setCt = (v: string) => setCurrentChange({ changeType: v })
+  const setAid = (v: string) => setCurrentChange({ assetId: v })
+  const setDesc = (v: string) => setCurrentChange({ description: v })
   const [acat, setAcat] = useState(ASSET_CATS[0])
   const [rl, setRl]     = useState(RISK_LEVELS[2])
-  const [desc, setDesc] = useState('')
 
-  const { mutate, data: r, isPending } = useMutation({
+  const { mutate, data: r, isPending, error } = useMutation({
     mutationFn: () => predictCost({ change_type: ct, asset_id: aid, asset_category: acat, risk_level: rl, description: desc }),
   })
 
@@ -46,6 +51,8 @@ export default function CostPredictor() {
           ))}
         </Card>
       </div>
+
+      <ErrorBox error={error} title="Prediction failed" />
 
       {r && (
         <div className="space-y-4">

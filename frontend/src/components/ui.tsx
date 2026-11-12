@@ -92,6 +92,18 @@ export const Input = ({ value, onChange, placeholder, onKeyDown }: {
     className="moc-input-glass w-full rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/25 focus:outline-none transition-colors" />
 )
 
+// ── Error box ─────────────────────────────────────────────────────────────
+export const ErrorBox = ({ error, title = 'Something went wrong' }: { error: unknown; title?: string }) => {
+  if (!error) return null
+  const message = error instanceof Error ? error.message : String(error)
+  return (
+    <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
+      <div className="font-semibold text-red-200">{title}</div>
+      <div className="mt-0.5 text-red-300/90 break-words">{message}</div>
+    </div>
+  )
+}
+
 // ── Spinner ───────────────────────────────────────────────────────────────
 export const Spinner = ({ text = 'Loading…' }: { text?: string }) => (
   <div className="flex items-center gap-3 text-white/50 text-sm py-6 justify-center">

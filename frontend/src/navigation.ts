@@ -10,6 +10,7 @@ export const TAB_PATHS = [
   '/app/cost',
   '/app/mocbot',
   '/app/process',
+  '/app/allocation',
 ] as const
 
 export type AppRoute =
