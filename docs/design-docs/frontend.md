@@ -19,6 +19,10 @@ src/
 
 ## Conventions
 
+- **One logo component.** `components/SymmetraLogo.tsx` is the only place the Symmetra
+  Systems logo is defined (icon from `assets/symmetra-mark.png`, wordmark as text). It is
+  used in the landing-page header, hero and footer and in the sidebar of every app page.
+  The browser-tab icon is `public/brand/symmetra-icon.png`.
 - **Tabs are registered by index.** `TABS` and `panels` in `App.tsx` and `TAB_PATHS` in
   `navigation.ts` must stay in the same order.
 - **Hash routing** so GitHub Pages needs no fallback page; `base: './'` in `vite.config.ts`.

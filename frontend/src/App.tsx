@@ -23,7 +23,7 @@ import {
   PATH_SMART_FORM,
 } from './navigation'
 import Onboarding from './components/Onboarding'
-import BrandMark from './components/BrandMark'
+import SymmetraLogo from './components/SymmetraLogo'
 import SmartForm    from './tabs/SmartForm'
 import RiskAnalysis from './tabs/RiskAnalysis'
 import CostPredictor from './tabs/CostPredictor'
@@ -138,13 +138,8 @@ export default function App() {
           {/* ── Sidebar ── */}
           <aside className="moc-sidebar relative z-10 w-56 flex-shrink-0 flex flex-col p-4 gap-4">
             <div className="pt-1">
-              <div className="flex items-center gap-2.5">
-                <BrandMark size={32} />
-                <div>
-                  <div className="text-[15px] font-semibold text-white tracking-tight">MoC Platform</div>
-                  <div className="text-[10px] text-white/40 mt-0.5">FCC Unit · AI Decision Support</div>
-                </div>
-              </div>
+              <SymmetraLogo size={30} />
+              <div className="mt-2 text-[10px] text-white/40">MoC Intelligence Platform · FCC Unit</div>
               <button
                 type="button"
                 onClick={reopenAbout}

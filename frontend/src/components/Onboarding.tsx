@@ -24,7 +24,7 @@ import {
   WHO_WE_ARE,
   WHY_US,
 } from '../onboardingContent'
-import BrandMark from './BrandMark'
+import SymmetraLogo from './SymmetraLogo'
 
 type Props = {
   onEnter: () => void
@@ -88,15 +88,16 @@ const cardMotion = (reduce: boolean | null, delay = 0, from: 'up' | 'left' | 'ri
 function BrandLockup({ compact = false }: { compact?: boolean }) {
   return (
     <div className="flex items-center gap-3">
-      <BrandMark size={compact ? 34 : 40} />
-      <div className="text-left leading-tight">
+      <SymmetraLogo size={compact ? 30 : 36} />
+      {/* Product name beside the company logo; hidden on very narrow screens to keep the header on one line */}
+      <div className="hidden border-l border-white/15 pl-3 text-left leading-tight sm:block">
         <div
-          className={`font-semibold tracking-tight text-white ${compact ? 'text-[15px]' : 'text-base'}`}
+          className={`font-medium tracking-tight text-white/85 ${compact ? 'text-[12px]' : 'text-[13px]'}`}
           style={{ fontFamily: 'Outfit, Inter, sans-serif' }}
         >
           {HERO.brand}
         </div>
-        <div className={`text-white/45 ${compact ? 'text-[10px]' : 'text-[11px]'}`}>{HERO.tagline}</div>
+        <div className="text-[10px] text-white/45">{HERO.tagline}</div>
       </div>
     </div>
   )
@@ -265,10 +266,10 @@ export default function Onboarding({ onEnter }: Props) {
             className="mb-8 flex justify-center"
             {...(reduce ? {} : { initial: { scale: 0.92, opacity: 0 }, animate: { scale: 1, opacity: 1 }, transition: { duration: 0.7, ease } })}
           >
-            <div className="moc-hero-brand inline-flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0b1020]/70 px-4 py-3 backdrop-blur-xl">
-              <BrandMark size={44} />
-              <div className="text-left">
-                <div className="text-lg font-semibold tracking-tight text-white">{HERO.brand}</div>
+            <div className="moc-hero-brand inline-flex max-w-full flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-[#0b1020]/70 px-4 py-3 backdrop-blur-xl">
+              <SymmetraLogo size={40} />
+              <div className="text-left sm:border-l sm:border-white/15 sm:pl-3">
+                <div className="text-base font-semibold tracking-tight text-white">{HERO.brand}</div>
                 <div className="text-xs text-white/45">{HERO.tagline}</div>
               </div>
             </div>
@@ -491,7 +492,7 @@ export default function Onboarding({ onEnter }: Props) {
         >
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b1020]/80 to-black/90" aria-hidden />
           <div className="relative">
-            <BrandMark size={48} />
+            <SymmetraLogo size={44} />
             <h2 className="mt-5 text-2xl font-semibold text-white md:text-3xl">Ready to explore the platform?</h2>
             <p className="mx-auto mt-3 max-w-lg text-sm text-white/50">
               Enter Smart Form, Risk & Impact, Cost Predictor, MoCBot, and Process Intelligence — all grounded in your FCC Unit graph.
@@ -501,7 +502,7 @@ export default function Onboarding({ onEnter }: Props) {
             </div>
           </div>
         </motion.div>
-        <p className="mt-8 text-center text-[11px] text-white/25">MoC Intelligence Platform · FCC Unit</p>
+        <p className="mt-8 text-center text-[11px] text-white/25">MoC Intelligence Platform · FCC Unit · Symmetra Systems</p>
       </footer>
     </div>
   )

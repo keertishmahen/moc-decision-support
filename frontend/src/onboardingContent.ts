@@ -1,7 +1,7 @@
 export const ONBOARDING_STORAGE_KEY = 'moc-onboarding-seen'
 
 export const HERO = {
-  brand: 'MoC Platform',
+  brand: 'MoC Intelligence Platform',
   tagline: 'FCC Unit · AI Decision Support',
   headline: 'Management of Change intelligence in one place',
   subhead:
