@@ -1,0 +1,46 @@
+# Render Blueprint — MoC Intelligence API (FastAPI backend).
+# The frontend is served by GitHub Pages; see .github/workflows/deploy-frontend.yml.
+services:
+  - type: web
+    name: moc-intelligence-api
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/healthz
+    # Deploy only after the GitHub "Backend tests" check passes.
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - api/**
+        - core/**
+        - modules/**
+        - saved_models/**
+        - chroma_db/**
+        - requirements-docker.txt
+        - Dockerfile
+        - render.yaml
+    envVars:
+      # Secrets: entered in the Render dashboard, never stored in Git.
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: NEO4J_URI
+        sync: false
+      - key: NEO4J_USER
+        sync: false
+      - key: NEO4J_PASSWORD
+        sync: false
+      - key: NEO4J_DATABASE
+        value: neo4j
+      - key: LLM_PROVIDER
+        value: openai
+      - key: OPENAI_MODEL
+        value: gpt-4o
+      - key: RAG_EMBEDDING_PROVIDER
+        value: openai
+      - key: RAG_MULTIQUERY
+        value: "true"
+      # Which site may call the API (the GitHub Pages origin).
+      - key: CORS_ORIGINS
+        value: https://keertishmahen.github.io

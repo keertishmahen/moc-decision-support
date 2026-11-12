@@ -1,4 +1,4 @@
-/** Path-based navigation via History API (no react-router). */
+/** Hash-based navigation (#/app/...) via History API (no react-router). Hash routes work under any base path, e.g. GitHub Pages. */
 
 export const PATH_ONBOARDING = '/'
 export const PATH_APP_ROOT = '/app'
@@ -51,17 +51,22 @@ export function pathForRoute(route: AppRoute): string {
   return pathForTab(route.tab)
 }
 
+/** Current route path, read from the URL hash ("#/app/risk" → "/app/risk"). */
+export function currentPath(): string {
+  return window.location.hash.replace(/^#/, '') || '/'
+}
+
 export function navigate(path: string) {
-  const current = window.location.pathname.replace(/\/+$/, '') || '/'
+  const current = currentPath().replace(/\/+$/, '') || '/'
   const next = path.replace(/\/+$/, '') || '/'
   if (current === next) return
-  window.history.pushState({ moc: true }, '', next)
+  window.history.pushState({ moc: true }, '', `#${next}`)
   window.dispatchEvent(new PopStateEvent('popstate'))
 }
 
 export function replace(path: string) {
   const next = path.replace(/\/+$/, '') || '/'
-  window.history.replaceState({ moc: true }, '', next)
+  window.history.replaceState({ moc: true }, '', `#${next}`)
 }
 
 /**

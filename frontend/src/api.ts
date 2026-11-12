@@ -1,6 +1,9 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: '/api', timeout: 180_000 })
+// VITE_API_URL is set at build time for GitHub Pages (backend on Render); unset = same-origin /api.
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
+
+const api = axios.create({ baseURL: `${API_ORIGIN}/api`, timeout: 180_000 })
 
 // Add response interceptor to surface errors clearly
 api.interceptors.response.use(

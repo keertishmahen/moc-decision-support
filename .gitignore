@@ -20,10 +20,9 @@ node_modules/
 frontend/dist/
 
 # data stores & artefacts
-chroma_db/
-saved_models/
-*.pkl
+# chroma_db/ and saved_models/ are tracked: Render builds the backend image from the repo
 neo4j_query_table_data_*.json
+*.pdf
 
 # dbt
 **/target/
@@ -34,7 +33,10 @@ neo4j_query_table_data_*.json
 *.zip
 *.tgz
 deploy.zip
+docker-build.log
 .azure/
+.azure-startup-body.json
+azure-*.json
 .azure-logs*/
 .azure-docker-logs/
 .azure-trace/
@@ -48,5 +50,6 @@ _*.py
 .superdesign/
 .kiro/
 
-# CI workflows (omitted from the public repo)
-.github/
+# CI workflows: only the GitHub Pages + Render ones are published
+.github/workflows/azure-docker.yml
+.github/workflows/dbt-moc.yml

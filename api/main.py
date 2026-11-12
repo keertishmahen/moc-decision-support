@@ -125,6 +125,11 @@ def version():
     has_pid = hasattr(m.MoCChatbot, '_handle_pid_query')
     return {"pid_handler": has_pid, "version": "2.1.1-incident-fix"}
 
+@app.get("/api/healthz")
+def healthz():
+    """Liveness probe for the hosting platform — no external calls."""
+    return {"status": "ok"}
+
 @app.get("/api/health")
 def health():
     status = {"neo4j": {"ok": False, "message": "Not checked"},

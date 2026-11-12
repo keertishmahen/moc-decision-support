@@ -13,6 +13,7 @@ import { getHealth } from './api'
 import { useStore } from './store'
 import { ONBOARDING_STORAGE_KEY } from './onboardingContent'
 import {
+  currentPath,
   navigate,
   parsePath,
   pathForTab,
@@ -73,7 +74,7 @@ export default function App() {
 
   const syncFromLocation = useCallback(() => {
     const seen = readOnboardingSeen()
-    applyRoute(window.location.pathname, seen, setShowOnboarding, setActiveTab)
+    applyRoute(currentPath(), seen, setShowOnboarding, setActiveTab)
   }, [setActiveTab])
 
   // Every fresh load opens onboarding; Enter Platform / tabs / Back–Forward update history after that
