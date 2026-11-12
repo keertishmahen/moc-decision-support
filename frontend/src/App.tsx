@@ -67,7 +67,7 @@ function applyRoute(
 
 export default function App() {
   const { activeTab, setActiveTab } = useStore()
-  const { data: health, refetch } = useQuery({ queryKey: ['health'], queryFn: getHealth, refetchInterval: 30_000 })
+  const { data: health, refetch, isError: healthError } = useQuery({ queryKey: ['health'], queryFn: getHealth, refetchInterval: 30_000 })
   const [showOnboarding, setShowOnboarding] = useState(true)
 
   const panels = [<SmartForm />, <RiskAnalysis />, <CostPredictor />, <MoCBot />, <ProcessIntelligence />]
@@ -155,13 +155,16 @@ export default function App() {
               <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-2">System Status</div>
               <button onClick={() => refetch()} className="text-[11px] text-[#4f8ef7] hover:text-blue-300 mb-2 transition-colors">↺ Refresh</button>
               {(['neo4j','openai'] as const).map(svc => {
-                const info = health?.[svc]
+                // A failed health request means the backend itself is down or still waking up,
+                // not that Neo4j/OpenAI are at fault — say so instead of showing stale or blank status.
+                const info = healthError ? undefined : health?.[svc]
                 const ok = info?.ok ?? false
+                const fallback = healthError ? 'Backend unreachable — may be waking up, retrying' : 'Connecting…'
                 return (
                   <div key={svc} className="moc-status-row flex items-center gap-2 p-2 rounded-xl mb-1.5 last:mb-0">
                     <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ok ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]' : 'bg-red-400 shadow-[0_0_6px_#f87171]'}`} />
                     <span className="text-[11px] font-semibold text-white/80 w-12">{svc === 'neo4j' ? 'Neo4j' : 'OpenAI'}</span>
-                    <span className="text-[10px] text-white/40 truncate">{info?.message ?? '…'}</span>
+                    <span className="text-[10px] text-white/40 truncate" title={info?.message ?? fallback}>{info?.message ?? fallback}</span>
                   </div>
                 )
               })}
