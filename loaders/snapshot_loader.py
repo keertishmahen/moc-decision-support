@@ -138,7 +138,9 @@ def main() -> None:
     mode.add_argument("--apply", action="store_true", help="write to the database configured in .env")
     args = parser.parse_args()
 
-    from core.neo4j_client import Neo4jClient          # imported late so --help works without a database
+    from core.neo4j_client import (
+        Neo4jClient,  # imported late so --help works without a database
+    )
 
     doc = load_graph_file()
     client = Neo4jClient()

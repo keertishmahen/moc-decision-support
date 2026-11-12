@@ -2,6 +2,24 @@
 
 **Date of change:** 12 November 2026 · **Repository:** [keertishmahen/moc-decision-support](https://github.com/keertishmahen/moc-decision-support)
 
+## Update — version 3.0 (12 November 2026)
+
+Decision allocation, the model gateway and the repository harness were added. For deployment:
+
+- **No new environment variables or services.** The same Render service and Pages site are used.
+- **Backend checks now also lint and check the documents.** A push that touches `docs/`,
+  `AGENTS.md`, `data/`, `loaders/` or `scripts/` runs the backend workflow as well.
+- **The knowledge graph is loaded from the repository**, not by hand:
+  `python -m loaders.snapshot_loader --dry-run | --apply`, then
+  `python -m loaders.allocation_loader --apply`. Both are additive and safe to repeat. They
+  run from a developer machine with `.env`; nothing in the deployment runs them.
+- **The vector store** (`chroma_db/`) now holds all ten MoCs and ships in the image as before.
+- **Failures surface as 502 / 503** with a plain message instead of 500; the UI shows them.
+- `/api/version` reports `3.0.0`.
+
+How the code is organised: [AGENTS.md](../AGENTS.md). What changed and why:
+[exec-plans/completed/2026-11-decision-allocation-and-harness.md](exec-plans/completed/2026-11-decision-allocation-and-harness.md).
+
 ## Summary
 
 The MoC Intelligence Platform no longer needs a manual Azure deployment. The React frontend is served by **GitHub Pages** and the FastAPI backend runs on **Render's free tier**. Both deploy automatically from the public GitHub repository whenever `main` changes.

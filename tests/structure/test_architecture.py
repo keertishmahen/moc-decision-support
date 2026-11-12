@@ -98,3 +98,37 @@ def test_model_numbers_live_only_in_the_config_file():
         "Model numbers must come from core/allocation/config/parth_v1_14.json via the API "
         "(GET /api/allocation/model), not be copied: " + "; ".join(offenders)
     )
+
+
+def test_no_source_file_is_git_ignored():
+    """A file that exists locally but is ignored by git never reaches CI or production.
+
+    (`_*.py` once ignored every `__init__.py`: tests passed locally and failed on GitHub.)
+    """
+    import shutil
+    import subprocess
+
+    if not shutil.which("git") or not (ROOT / ".git").exists():
+        pytest.skip("not a git checkout")
+    sources = [p.relative_to(ROOT).as_posix()
+               for folder in ("api", "core", "modules", "loaders", "tests", "scripts")
+               for p in _python_files(ROOT / folder)]
+    sources += [p.relative_to(ROOT).as_posix() for p in (ROOT / "core" / "allocation" / "config").glob("*.json")]
+    sources.append("data/graph/fcc_graph.json")
+    result = subprocess.run(["git", "check-ignore", "--no-index", *sources], capture_output=True, text=True, cwd=ROOT)
+    ignored = [line for line in result.stdout.splitlines() if line.strip()]
+    assert not ignored, (
+        f"These source files are ignored by .gitignore and will not be committed: {ignored}. "
+        "Add an exception (for example `!__init__.py`) or rename the file."
+    )
+
+
+def test_every_package_has_an_init_file():
+    missing = []
+    for folder in ("api", "core", "modules", "loaders"):
+        for directory in [ROOT / folder, *[d for d in (ROOT / folder).rglob("*") if d.is_dir()]]:
+            if "__pycache__" in directory.parts or directory.name == "config":
+                continue
+            if any(directory.glob("*.py")) and not (directory / "__init__.py").exists():
+                missing.append(directory.relative_to(ROOT).as_posix())
+    assert not missing, f"Add an __init__.py to: {missing} (names exported from a package live there)."

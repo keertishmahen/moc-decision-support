@@ -64,6 +64,12 @@ export default function SmartForm() {
         <div className="space-y-4">
           <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
+          {s?.llm_status === 'unavailable' && (
+            <div role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+              The AI service is unavailable right now. These values come from historical MoCs in the knowledge graph only.
+            </div>
+          )}
+
           <div className="flex items-center gap-3">
             <h3 className="font-bold text-white">AI Suggestions</h3>
             <RiskBadge rating={s.risk_level ?? 'Unknown'} />

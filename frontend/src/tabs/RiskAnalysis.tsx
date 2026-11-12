@@ -66,6 +66,12 @@ export default function RiskAnalysis() {
         <div className="space-y-4">
           <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
+          {r?.llm_status === 'unavailable' && (
+            <div role="status" className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-200">
+              The AI service is unavailable right now. Hazards and affected assets below come from the knowledge graph; no overall rating was assigned.
+            </div>
+          )}
+
           <div className="moc-glass-card rounded-xl border-[#4f8ef7]/25 p-4 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-white/70">
               Next: who should decide this change? The HAZOP and PSSR findings carry over.

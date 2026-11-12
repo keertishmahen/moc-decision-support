@@ -9,6 +9,9 @@ const NODE_COLORS: Record<string, string> = {
   Query: '#94a3b8', default: '#64748b',
 }
 
+const escapeHtml = (text: unknown) =>
+  String(text ?? '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] as string))
+
 interface GraphNode { id: string; label: string; type: string; detail: string }
 interface GraphLink { source: string; target: string; label: string }
 
@@ -189,8 +192,9 @@ export default function KnowledgeGraph({ context, query }: { context: Record<str
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         nodeLabel={(n: any) => {
           const node = n as GraphNode
+          // The tooltip is rendered as HTML, and these strings come from the database: escape them.
           return `<div style="background:#0d1220;border:1px solid rgba(79,142,247,0.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#e8eeff;max-width:200px">
-            <b>${node.label}</b><br/><i style="color:#94a3b8">${node.type}</i><br/>${node.detail.replace(/\n/g,'<br/>')}
+            <b>${escapeHtml(node.label)}</b><br/><i style="color:#94a3b8">${escapeHtml(node.type)}</i><br/>${escapeHtml(node.detail).replace(/\n/g,'<br/>')}
           </div>`
         }}
       />

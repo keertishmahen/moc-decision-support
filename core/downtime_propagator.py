@@ -155,12 +155,6 @@ class DowntimePropagator:
             # Risk level based on propagated hours
             risk_level = self._classify_risk(propagated, criticality)
 
-            # Build propagation path
-            path_nodes = [source_asset_id] + (
-                node.get("relationship_chain") and
-                [asset_id] or [asset_id]
-            )
-
             affected.append(PropagatedDowntime(
                 asset_id=asset_id,
                 asset_name=asset_name,
@@ -181,6 +175,13 @@ class DowntimePropagator:
 
         # Sort by propagated hours descending
         affected.sort(key=lambda x: x.propagated_hours, reverse=True)
+
+        # The graph query returns one row per PATH, so an asset reachable by several routes
+        # appears several times. Count each asset once, by its strongest route.
+        strongest: dict[str, PropagatedDowntime] = {}
+        for item in affected:
+            strongest.setdefault(item.asset_id, item)
+        affected = list(strongest.values())
 
         total_hours = sum(a.propagated_hours for a in affected)
         summary = self._build_summary(

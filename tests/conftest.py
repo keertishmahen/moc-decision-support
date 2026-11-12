@@ -26,8 +26,6 @@ _KNOWN_FAILURES = {
         "_moc_to_text() does not emit the parameter-change sentence",
     "TestThinEmbeddingText::test_embedding_text_contains_threshold_and_margin":
         "_moc_to_text() does not emit threshold / safety-margin wording",
-    "TestExpandQueryNoOp::test_expand_query_returns_original_for_unknown_terms":
-        "_expand_query() appends work-order terms to queries with no domain keywords",
 }
 
 

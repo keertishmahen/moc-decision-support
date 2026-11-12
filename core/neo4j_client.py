@@ -123,6 +123,15 @@ def _reset_shared_driver():
             _driver = None
 
 
+def _bounded_depth(depth, default: int, maximum: int = 6) -> int:
+    """Traversal depth as a safe integer literal for a variable-length pattern."""
+    try:
+        value = int(depth)
+    except (TypeError, ValueError):
+        value = default
+    return max(1, min(value, maximum))
+
+
 def _session_kwargs() -> dict:
     db = (NEO4J_DATABASE or "").strip()
     # Aura Free uses the server default; explicit database="neo4j" often fails routing.
@@ -228,13 +237,16 @@ class Neo4jClient:
     # ── Risk Engine ────────────────────────────────────────────────────────
 
     def get_impact_chain(self, asset_id: str, depth: int = 3):
-        query = """
-        MATCH path = (a:Asset {asset_id: $asset_id})
-                     -[:UPSTREAM_OF|DEPENDS_ON|IMPACTS|CONTROLS_FLOW_TO*1..3]->
+        hops = _bounded_depth(depth, default=3)
+        query = f"""
+        MATCH path = (a:Asset {{asset_id: $asset_id}})
+                     -[:UPSTREAM_OF|DEPENDS_ON|IMPACTS|CONTROLS_FLOW_TO*1..{hops}]->
                      (b:Asset)
-        RETURN DISTINCT b.asset_id AS node_id, b.name AS node_name,
-               b.equipment_type AS node_type, length(path) AS hop_distance
-        ORDER BY hop_distance
+        WHERE b.asset_id <> $asset_id
+        WITH b, min(length(path)) AS hop_distance
+        RETURN b.asset_id AS node_id, b.name AS node_name,
+               b.equipment_type AS node_type, hop_distance
+        ORDER BY hop_distance, node_id
         """
         return self._run(query, {"asset_id": asset_id})
 
@@ -609,7 +621,7 @@ class Neo4jClient:
                wo.actual_cost AS actual_cost, wo.delay_reason AS delay_reason,
                wo.failure_mode AS failure_mode, wo.equipment_status AS equipment_status,
                a.asset_id AS asset_id, d.name AS department,
-               act.title AS activity, act.safety_req AS safety_req
+               act.title AS activity, null AS safety_req
         ORDER BY wo.date_issued
         """
         return self._run(query, {"moc_id": moc_id})
@@ -851,6 +863,7 @@ class Neo4jClient:
         MATCH (m:MoC)-[:TARGETS]->(a:Asset)
         OPTIONAL MATCH (m)-[:IDENTIFIES]->(h:Hazard)
         OPTIONAL MATCH (m)-[:CHANGES_PARAMETER]->(p:Parameter)
+        WITH m, a, h, p
         WHERE toLower(m.title) CONTAINS toLower($concept)
            OR toLower(m.description) CONTAINS toLower($concept)
            OR toLower(m.parameter_name) CONTAINS toLower($concept)
@@ -1005,7 +1018,8 @@ class Neo4jClient:
         WHERE type(r_in) IN ['UPSTREAM_OF','FEEDS','CONTROLS_FLOW_TO',
                                'DEPENDS_ON','IMPACTS','CONNECTS']
         OPTIONAL MATCH (m:MoC)-[:TARGETS]->(a)
-        OPTIONAL MATCH (m2:MoC)-[:TARGETS]->(a)-[:IDENTIFIES]->(h:Hazard)
+        OPTIONAL MATCH (m2:MoC)-[:TARGETS]->(a)
+        OPTIONAL MATCH (m2)-[:IDENTIFIES]->(h:Hazard)
         OPTIONAL MATCH (esd:Asset {asset_id: 'ESD-SYS'})-[:SHUTS_DOWN]->(a)
         RETURN a.asset_id AS asset_id,
                a.name AS name,
@@ -1049,10 +1063,11 @@ class Neo4jClient:
         criticality scores, and whether each downstream asset has active MoCs.
         Used by the downtime propagator and agent.
         """
-        query = """
-        MATCH path = (a:Asset {asset_id: $asset_id})
+        hops = _bounded_depth(depth, default=4)
+        query = f"""
+        MATCH path = (a:Asset {{asset_id: $asset_id}})
                      -[:UPSTREAM_OF|DEPENDS_ON|IMPACTS|CONTROLS_FLOW_TO|
-                        FEEDS|CONNECTS|CIRCULATES_TO*1..4]->
+                        FEEDS|CONNECTS|CIRCULATES_TO*1..{hops}]->
                      (b:Asset)
         WITH b, path, length(path) AS hops
         OPTIONAL MATCH (m:MoC)-[:TARGETS]->(b)

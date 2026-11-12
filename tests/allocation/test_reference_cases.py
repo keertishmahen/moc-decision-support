@@ -6,7 +6,11 @@ Offline: no database, no network.
 import pytest
 
 from core.allocation import score
-from core.allocation.reference_cases import compare_all, reference_case_for_moc, reference_cases
+from core.allocation.reference_cases import (
+    compare_all,
+    reference_case_for_moc,
+    reference_cases,
+)
 from core.allocation.types import Allocation
 
 # Thesis Table 2: case -> (R, C, U, I, signature, allocation)
@@ -34,8 +38,8 @@ def test_there_are_ten_reference_cases_mapped_to_the_ten_mocs():
 def test_engine_reproduces_thesis_table_2(case_id):
     case = next(c for c in reference_cases() if c.case_id == case_id)
     r = score(case.selection)
-    R, C, U, I, signature, allocation = TABLE_2[case_id]
-    assert {d: r.dimensions[d].score for d in "RCUI"} == {"R": R, "C": C, "U": U, "I": I}
+    risk, complexity, uncertainty, impact, signature, allocation = TABLE_2[case_id]
+    assert {d: r.dimensions[d].score for d in "RCUI"} == {"R": risk, "C": complexity, "U": uncertainty, "I": impact}
     assert r.signature == signature
     assert r.allocation is allocation
 

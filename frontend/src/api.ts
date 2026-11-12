@@ -32,10 +32,25 @@ export const predictCost = (body: {
   risk_level: string; description: string
 }) => api.post('/cost/predict', body).then(r => r.data)
 
-export const sendChat = (body: { message: string; asset_id?: string }) =>
-  api.post('/chat', body).then(r => r.data)
+/** One conversation per browser tab: the backend keeps chat memory per session id. */
+const chatSessionId = (() => {
+  const key = 'moc-chat-session'
+  const fresh = () => (globalThis.crypto?.randomUUID?.() ?? `s-${Date.now()}-${Math.random().toString(36).slice(2)}`)
+  try {
+    const existing = sessionStorage.getItem(key)
+    if (existing) return existing
+    const id = fresh()
+    sessionStorage.setItem(key, id)
+    return id
+  } catch {
+    return fresh()
+  }
+})()
 
-export const resetChat = () => api.post('/chat/reset').then(r => r.data)
+export const sendChat = (body: { message: string; asset_id?: string }) =>
+  api.post('/chat', { ...body, session_id: chatSessionId }).then(r => r.data)
+
+export const resetChat = () => api.post('/chat/reset', { session_id: chatSessionId }).then(r => r.data)
 
 export const getGraphContext = (body: { query: string; asset_id?: string; moc_id?: string }) =>
   api.post('/graph/context', body).then(r => r.data)

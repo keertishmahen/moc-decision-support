@@ -44,6 +44,7 @@ azure-logs/
 
 # scratch
 _*.py
+!__init__.py
 *.log
 *_out.txt
 .DS_Store
@@ -56,3 +57,6 @@ _*.py
 
 # local database backups
 backups/
+
+# tool caches
+.ruff_cache/

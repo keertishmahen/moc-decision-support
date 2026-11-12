@@ -21,9 +21,9 @@ like "What would happen if R-201 goes offline for 48 hours?" or
 from __future__ import annotations
 import json
 from typing import Any
-from openai import OpenAI
 
-from core.config import OPENAI_API_KEY, OPENAI_MODEL
+from core.allocation_lookup import allocation_summary
+from core.llm import get_gateway
 from core.neo4j_client import Neo4jClient
 from core.downtime_propagator import DowntimePropagator, propagation_result_to_dict
 from core.vector_store import VectorStore
@@ -243,6 +243,27 @@ AGENT_TOOLS = [
             }
         }
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_decision_allocation",
+            "description": (
+                "Get the recommended Human-AI decision allocation for an MoC (AI-led, AI-supported "
+                "or Human-led) with its Risk, Complexity, Uncertainty and Impact scores, the factor "
+                "signature and the reasons. Use for questions about who should decide a change."
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "moc_id": {
+                        "type": "string",
+                        "description": "MoC ID e.g. MoC-002"
+                    }
+                },
+                "required": ["moc_id"]
+            }
+        }
+    },
 ]
 
 # ── Agent system prompt ────────────────────────────────────────────────────
@@ -275,6 +296,9 @@ STRICT RULES:
 """
 
 
+MAX_AGENT_ITERATIONS = 8      # each iteration is a paid model call; callers cannot raise this
+
+
 class MoCAgent:
     """
     Agent-based execution engine for advanced MoC reasoning.
@@ -289,11 +313,11 @@ class MoCAgent:
     """
 
     def __init__(self, max_iterations: int = 6):
-        self.client     = OpenAI(api_key=OPENAI_API_KEY)
+        self.gateway    = get_gateway()
         self.neo4j      = Neo4jClient()
         self.propagator = DowntimePropagator(self.neo4j)
         self.vector     = VectorStore()
-        self.max_iter   = max_iterations
+        self.max_iter   = max(1, min(int(max_iterations or 6), MAX_AGENT_ITERATIONS))
 
     def run(self, user_query: str) -> dict:
         """
@@ -313,8 +337,7 @@ class MoCAgent:
         while iterations < self.max_iter:
             iterations += 1
 
-            response = self.client.chat.completions.create(
-                model=OPENAI_MODEL,
+            response = self.gateway.chat_raw(
                 messages=messages,
                 tools=AGENT_TOOLS,
                 tool_choice="auto",
@@ -376,8 +399,7 @@ class MoCAgent:
             "role":    "user",
             "content": "Please provide your final answer based on the tool results above.",
         })
-        final = self.client.chat.completions.create(
-            model=OPENAI_MODEL,
+        final = self.gateway.chat_raw(
             messages=messages,
             temperature=0.1,
         )
@@ -445,6 +467,9 @@ class MoCAgent:
             elif tool_name == "get_hazards_for_asset":
                 hazards = self.neo4j.get_hazards_for_asset(args["asset_id"])
                 return {"hazards": hazards, "count": len(hazards)}
+
+            elif tool_name == "get_decision_allocation":
+                return allocation_summary(self.neo4j, args["moc_id"])
 
             else:
                 return {"error": f"Unknown tool: {tool_name}"}

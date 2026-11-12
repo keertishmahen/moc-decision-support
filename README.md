@@ -57,14 +57,37 @@ source systems ──dlt──▶ Snowflake BRONZE ──dbt──▶ SILVER / G
 |---|---|
 | Ingestion (dlt → Snowflake) | `ingest/` |
 | Transformation (dbt) | `dbt_moc/` |
-| Graph loading | `loaders/`, `core/seed_neo4j.py` |
+| Graph content and loading | `data/graph/fcc_graph.json`, `loaders/` |
+| Human–AI decision allocation | `core/allocation/` (model), `modules/decision_allocation/` (integration) |
+| Model gateway | `core/llm/` |
 | RAG pipeline & agent | `core/rag_pipeline.py`, `core/moc_agent.py` |
 | Graph & vector clients | `core/neo4j_client.py`, `core/vector_store.py` |
 | Risk, cost, forms, chat | `modules/` |
 | Dependency propagation | `core/downtime_propagator.py` |
-| API | `api/main.py` (FastAPI) |
-| UI | `app.py` (Streamlit), `frontend/` (Vite + React + TS) |
+| API | `api/` (FastAPI) |
+| UI | `frontend/` (Vite + React + TS); `app.py` is an earlier Streamlit interface |
 | Tests | `tests/` (pytest) |
+
+## Human–AI decision allocation
+
+Beyond assessing a change, the platform recommends **who should decide it**: AI-led,
+AI-supported or human-led. A change is characterised on eight axes, scored for risk,
+complexity, uncertainty and impact, and mapped to an allocation by a fixed, inspectable
+model. The knowledge graph suggests the characterisation with its evidence; an engineer
+confirms it; no language model takes part in the scoring.
+
+The model is the work of **Parth Pandit Atiwadkar** (*Human–AI Decision Allocation in
+Knowledge-Driven Management of Change*, MSc thesis, Cranfield University, 2026; supervisor
+Dr Jelena Milisavljevic Syed). This repository reimplements it from the thesis and
+reproduces its published results as tests. See
+[docs/references/decision-allocation-model.md](docs/references/decision-allocation-model.md)
+and [docs/reports/reproduction-report.md](docs/reports/reproduction-report.md).
+
+## Working in this repository
+
+Start with [AGENTS.md](AGENTS.md), a short map of the code and documents.
+[ARCHITECTURE.md](ARCHITECTURE.md) describes the layers and request flows; `docs/` holds
+design decisions, product specs, reports and the backlog.
 
 ## Running it
 
@@ -72,18 +95,16 @@ Requires Python 3.11+, a Neo4j instance (Aura or local) and an OpenAI API key. S
 full ingestion pipeline — the demo runs without it.
 
 ```bash
-pip install -r requirements.txt
-cp .env.example .env          # fill in your own credentials
-python core/seed_neo4j.py     # load the synthetic graph
-python seed_vector_store.py   # build the vector index
-streamlit run app.py          # UI on :8501
+pip install -r requirements-docker.txt pytest ruff
+cp .env.example .env                          # fill in your own credentials
+python -m loaders.snapshot_loader --apply     # load the synthetic graph (additive, repeatable)
+python -m loaders.allocation_loader --apply   # add the decision-allocation layer
+python seed_vector_store.py                   # build the vector index
+uvicorn api.main:app --reload --port 8000     # API on :8000
+cd frontend && npm install && npm run dev     # UI on :5173
 ```
 
-API only:
-
-```bash
-uvicorn api.main:app --reload --port 8000
-```
+`make help` lists the everyday commands; `make check` runs what CI runs.
 
 Full data pipeline (needs Snowflake):
 
@@ -94,8 +115,10 @@ make pipeline                 # dlt → Snowflake → dbt → Neo4j
 Tests:
 
 ```bash
-pytest tests/
+python -m pytest tests        # offline: no database or API key needed
 ```
+
+Tests that need the live graph and an OpenAI key skip themselves when credentials are absent.
 
 `tests/test_rag_embedding_bug_condition.py` and `tests/test_rag_preservation.py` are regression tests written
 around real retrieval failures found during development — an embedding mismatch that silently returned

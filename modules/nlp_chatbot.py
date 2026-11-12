@@ -4,10 +4,12 @@ Fine-tuned for specific, grounded answers using the full Neo4j schema.
 No generic fallbacks — every answer is anchored to retrieved graph data.
 """
 import re
-from collections import deque
+import threading
+from collections import OrderedDict, deque
 
 from core.rag_pipeline import RAGPipeline, get_llm, _build_messages
 from core.neo4j_client import Neo4jClient
+from core.allocation_lookup import allocation_summary_text
 
 
 def _clip(val, n: int, default: str = "") -> str:
@@ -122,6 +124,16 @@ Conversation so far:
 User: {human_input}
 MoCBot:"""
 
+_ALLOCATION_TERMS = ("ai-led", "ai led", "human-led", "human led", "ai-supported", "ai supported",
+                     "decision allocation", "allocation", "who should decide", "who decides",
+                     "delegate", "delegated to ai", "automate the decision")
+
+
+def _asks_about_allocation(message: str) -> bool:
+    text = (message or "").lower()
+    return any(term in text for term in _ALLOCATION_TERMS)
+
+
 # ── Intent routing ─────────────────────────────────────────────────────────
 INTENTS = {
     "moc_lookup":       ["moc-0", "moc 0", "what happened", "tell me about moc", "details of"],
@@ -184,10 +196,9 @@ class SimpleMemory:
     def add(self, human: str, ai: str):
         self._turns.append((human, ai))
 
-    def format(self) -> str:
-        return "\n".join(
-            f"User: {h}\nMoCBot: {a}" for h, a in self._turns
-        )
+    def turns(self) -> list:
+        """Prior (user, assistant) turns, oldest first."""
+        return list(self._turns)
 
     def clear(self):
         self._turns.clear()
@@ -198,9 +209,26 @@ class MoCChatbot:
         self.pipeline = RAGPipeline()
         self.neo4j    = Neo4jClient()
         self.llm      = get_llm()
-        self.memory   = SimpleMemory(k=8)
+        # One conversation memory per browser session, so users never see each other's history.
+        self._memories: "OrderedDict[str, SimpleMemory]" = OrderedDict()
+        self._memories_lock = threading.Lock()
 
-    def chat(self, user_message: str, asset_id: str = None) -> dict:
+    MAX_SESSIONS = 200
+
+    def _memory_for(self, session_id: str = None) -> SimpleMemory:
+        key = (session_id or "default")[:80]
+        with self._memories_lock:
+            memory = self._memories.get(key)
+            if memory is None:
+                memory = self._memories[key] = SimpleMemory(k=8)
+                while len(self._memories) > self.MAX_SESSIONS:
+                    self._memories.popitem(last=False)          # drop the least recently used session
+            else:
+                self._memories.move_to_end(key)
+            return memory
+
+    def chat(self, user_message: str, asset_id: str = None, session_id: str = None) -> dict:
+        memory = self._memory_for(session_id)
         intent   = _detect_intent(user_message)
         moc_id   = _extract_moc_id(user_message)
         asset_id = asset_id or _extract_asset_id(user_message)
@@ -212,7 +240,7 @@ class MoCChatbot:
         if intent == "pid_query":
             pid_response = self._handle_pid_query(user_message)
             if pid_response:
-                self.memory.add(user_message, pid_response)
+                memory.add(user_message, pid_response)
                 return {
                     "response":      pid_response,
                     "intent":        intent,
@@ -264,6 +292,13 @@ class MoCChatbot:
         # Broad dataset queries
         broad_ctx = self._broad_query_augment(intent, user_message)
 
+        # Decision allocation: who should decide this change (deterministic model, not an LLM opinion)
+        allocation_ctx = ""
+        if _asks_about_allocation(user_message):
+            allocation_ctx = "\n\n".join(
+                allocation_summary_text(self.neo4j, mid) for mid in (all_moc_ids or ([moc_id] if moc_id else []))
+            )
+
         formatted_ctx = self.pipeline.retriever.format_context_for_prompt(context)
         if extra_moc_ctx:
             formatted_ctx = extra_moc_ctx + "\n\n" + formatted_ctx
@@ -271,8 +306,10 @@ class MoCChatbot:
             formatted_ctx = broad_ctx + "\n\n" + formatted_ctx
         if extra_ctx:
             formatted_ctx = extra_ctx + "\n\n" + formatted_ctx
+        if allocation_ctx:
+            formatted_ctx = allocation_ctx + "\n\n" + formatted_ctx
 
-        history  = self.memory.format()
+        history  = memory.turns()
         messages = _build_messages(
             system=SYSTEM_PROMPT.format(context=formatted_ctx),
             history=history,
@@ -280,7 +317,7 @@ class MoCChatbot:
         )
         response = self.llm.invoke(messages)
 
-        self.memory.add(user_message, response)
+        memory.add(user_message, response)
 
         return {
             "response":      response,
@@ -592,7 +629,7 @@ class MoCChatbot:
                         most  = affected[:4]
                         least = affected[-3:] if len(affected) > 4 else []
                         lines = [f"  Source: {resolved_asset} | {source_hours:.0f}h downtime scenario"]
-                        lines.append(f"  MOST AFFECTED (highest propagated downtime):")
+                        lines.append("  MOST AFFECTED (highest propagated downtime):")
                         for a in most:
                             lines.append(
                                 f"    • {a.asset_id} ({a.asset_name}) — "
@@ -603,7 +640,7 @@ class MoCChatbot:
                                 f"via: {' → '.join(a.relationship_chain[:3])}"
                             )
                         if least:
-                            lines.append(f"  LEAST AFFECTED (lowest propagated downtime):")
+                            lines.append("  LEAST AFFECTED (lowest propagated downtime):")
                             for a in least:
                                 lines.append(
                                     f"    • {a.asset_id} ({a.asset_name}) — "
@@ -789,10 +826,10 @@ class MoCChatbot:
                     if prop.affected_assets:
                         lines = [
                             f"  Source: {resolved_asset} | {source_hours:.0f}h downtime",
-                            f"  Method: coupling × hop_decay(0.70) × criticality_amplifier",
+                            "  Method: coupling × hop_decay(0.70) × criticality_amplifier",
                             f"  Total affected: {prop.total_affected} assets | {prop.total_propagated_hours:.2f}h total propagated",
-                            f"",
-                            f"  PROPAGATED DOWNTIME (computed, not estimated):",
+                            "",
+                            "  PROPAGATED DOWNTIME (computed, not estimated):",
                         ]
                         for a in prop.affected_assets[:10]:
                             lines.append(
@@ -804,7 +841,7 @@ class MoCChatbot:
                                 f"risk={a.risk_level}"
                             )
                         sections.append(
-                            f"DOWNTIME PROPAGATION (COMPUTED FROM NEO4J TOPOLOGY):\n"
+                            "DOWNTIME PROPAGATION (COMPUTED FROM NEO4J TOPOLOGY):\n"
                             + "\n".join(lines)
                         )
                 except Exception:
@@ -825,7 +862,7 @@ class MoCChatbot:
                     sections.append(f"HISTORICAL COSTS FOR SIMILAR MoCs (asset {resolved_asset}):\n" + "\n".join(lines))
             # ML cost/downtime prediction
             try:
-                from modules.cost_predictor import CostPredictor, CHANGE_TYPE_MAP, ASSET_CATEGORY_MAP
+                from modules.cost_predictor import CostPredictor
                 predictor = CostPredictor()
                 asset_cat_map = {
                     "P-101": "Pump", "P-502": "Pump", "P-503": "Pump", "P-504": "Pump",
@@ -1036,8 +1073,9 @@ class MoCChatbot:
             )
         return "\n".join(lines)
 
-    def reset_memory(self):
-        self.memory.clear()
+    def reset_memory(self, session_id: str = None):
+        """Clear one session's conversation (the caller's), not everyone's."""
+        self._memory_for(session_id).clear()
 
 
 # ── Utility functions ──────────────────────────────────────────────────────

@@ -1,0 +1,28 @@
+[project]
+name = "moc-decision-support"
+version = "3.0.0"
+description = "Ontology-grounded decision support for Management of Change, with Human-AI decision allocation"
+requires-python = ">=3.11"
+
+# ── Lint ──────────────────────────────────────────────────────────────────────────────────────
+# Two levels, both run by `make lint` and CI:
+#   base   (whole backend)  syntax errors, undefined names, unused imports
+#   strict (code written since v3.0: see STRICT_PATHS in the Makefile)  + style, bugbear, import order
+[tool.ruff]
+target-version = "py311"
+line-length = 145
+extend-exclude = ["frontend", "dbt_moc", "ingest", "snowflake", "azure", "scripts/bootstrap_snowflake.py"]
+
+[tool.ruff.lint]
+select = ["E9", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/test_rag_*.py" = ["F841"]
+
+# ── Tests ─────────────────────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
+markers = [
+    "live: needs a live Neo4j database and an OpenAI key (skipped when credentials are absent)",
+]

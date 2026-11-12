@@ -9,15 +9,18 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
-from typing import Optional, List
+from pydantic import BaseModel, Field
+from typing import Optional
 import sys, os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from core.config import FRONTEND_DIST
+from api.errors import install_error_handlers, json_safe, to_http_error
 
-app = FastAPI(title="MoC Intelligence API", version="1.0.0")
+APP_VERSION = "3.0.0"
+
+app = FastAPI(title="MoC Intelligence API", version=APP_VERSION)
 
 _default_origins = [
     "http://localhost:5173",
@@ -77,6 +80,8 @@ def _is_neo4j_connection_error(exc: Exception) -> bool:
     from core.neo4j_client import _is_transient
     return _is_transient(exc)
 
+install_error_handlers(app)
+
 # ── Routers ────────────────────────────────────────────────────────────────
 from api.routes.allocation import router as allocation_router  # noqa: E402
 
@@ -103,6 +108,10 @@ class CostRequest(BaseModel):
 class ChatRequest(BaseModel):
     message: str
     asset_id: Optional[str] = None
+    session_id: Optional[str] = Field(None, max_length=80)
+
+class ChatResetRequest(BaseModel):
+    session_id: Optional[str] = Field(None, max_length=80)
 
 class GraphContextRequest(BaseModel):
     query: str
@@ -117,7 +126,7 @@ class DowntimePropagationRequest(BaseModel):
 
 class AgentRequest(BaseModel):
     query: str
-    max_iterations: int = 6
+    max_iterations: int = Field(6, ge=1, le=8)
 
 class ConnectivityRequest(BaseModel):
     asset_id: str
@@ -128,7 +137,7 @@ def version():
     """Returns current code version to confirm deployment."""
     import modules.nlp_chatbot as m
     has_pid = hasattr(m.MoCChatbot, '_handle_pid_query')
-    return {"pid_handler": has_pid, "version": "2.1.1-incident-fix"}
+    return {"pid_handler": has_pid, "version": APP_VERSION}
 
 @app.get("/api/healthz")
 def healthz():
@@ -165,14 +174,14 @@ def forms_prefill(req: FormRequest):
         similar     = m.get_similar_mocs_summary(req.change_type, req.asset_id, req.description)
         return {"suggestions": suggestions, "similar_mocs": similar}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 @app.post("/api/risk/analyse")
 def risk_analyse(req: RiskRequest):
     try:
         return get_risk_engine().analyse(req.change_type, req.asset_id, req.description)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 @app.post("/api/cost/predict")
 def cost_predict(req: CostRequest):
@@ -180,28 +189,24 @@ def cost_predict(req: CostRequest):
         return get_cost_predictor().predict(
             req.change_type, req.asset_id, req.asset_category, req.risk_level, req.description)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 @app.post("/api/chat")
 def chat(req: ChatRequest):
     try:
-        return get_chatbot().chat(req.message, asset_id=req.asset_id)
+        return get_chatbot().chat(req.message, asset_id=req.asset_id, session_id=req.session_id)
+    except HTTPException:
+        raise
     except Exception as e:
-        if _is_neo4j_connection_error(e):
-            reset_chatbot()
-            try:
-                return get_chatbot().chat(req.message, asset_id=req.asset_id)
-            except Exception as retry_exc:
-                raise HTTPException(status_code=500, detail=str(retry_exc))
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 @app.post("/api/chat/reset")
-def chat_reset():
+def chat_reset(req: Optional[ChatResetRequest] = None):
     try:
-        get_chatbot().reset_memory()
+        get_chatbot().reset_memory(req.session_id if req else None)
         return {"ok": True}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 @app.post("/api/graph/context")
 def graph_context(req: GraphContextRequest):
@@ -226,7 +231,7 @@ def graph_context(req: GraphContextRequest):
                 return str(obj)
         return clean(ctx)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 @app.get("/api/assets")
 def get_assets():
@@ -237,7 +242,7 @@ def get_assets():
         c.close()
         return assets
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 @app.get("/api/mocs")
 def get_mocs():
@@ -248,7 +253,7 @@ def get_mocs():
         c.close()
         return mocs
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 
 # ── Enhancement 1: Process Asset Connectivity ──────────────────────────────
@@ -263,7 +268,7 @@ def get_topology():
         c.close()
         return {"edges": topology, "edge_count": len(topology)}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 
 @app.post("/api/connectivity")
@@ -281,7 +286,7 @@ def get_connectivity(req: ConnectivityRequest):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 
 @app.get("/api/assets/connectivity")
@@ -294,7 +299,7 @@ def get_all_assets_connectivity():
         c.close()
         return assets
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 
 # ── Enhancement 2: Dynamic Downtime Propagation ────────────────────────────
@@ -315,7 +320,7 @@ def propagate_downtime(req: DowntimePropagationRequest):
         )
         return propagation_result_to_dict(result)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 
 @app.get("/api/downtime/matrix")
@@ -330,7 +335,7 @@ def get_propagation_matrix():
         matrix = propagator.get_propagation_matrix()
         return {"matrix": matrix, "count": len(matrix)}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 
 @app.get("/api/downtime/moc/{moc_id}")
@@ -346,7 +351,7 @@ def propagate_downtime_from_moc(moc_id: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 
 # ── Enhancement 3: Agent-Based Execution ──────────────────────────────────
@@ -361,9 +366,9 @@ def run_agent(req: AgentRequest):
     try:
         from core.moc_agent import run_agent as _run_agent
         result = _run_agent(req.query, max_iterations=req.max_iterations)
-        return result
+        return json_safe(result)       # tool results can hold Neo4j date values
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise to_http_error(e)
 
 
 # ── Production SPA (same-origin with /api) ─────────────────────────────────

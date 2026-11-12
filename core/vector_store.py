@@ -3,6 +3,7 @@ core/vector_store.py
 ChromaDB vector store with enriched semantic embeddings.
 """
 
+import re
 from typing import List, Dict, Any
 
 from core.config import (
@@ -141,7 +142,8 @@ def _expand_query(query_text: str) -> str:
 
     # ── Planned vs actual / downtime / work orders ────────────────────────
     if any(t in q for t in ["planned vs actual", "planned vs", "actual duration",
-                              "downtime", "work order", "wo", "overrun", "delay"]):
+                              "downtime", "work order", "overrun", "delay"]) \
+            or re.search(r"\bwos?\b", q):
         expansions.append(
             "work order planned duration actual duration cost overrun delay reason "
             "maintenance activity corrective modification inspection "
@@ -198,7 +200,6 @@ def _expand_query(query_text: str) -> str:
     if any(t in q for t in ["pid", "p&id", "pid-fc", "pid-fcc", "pid-fc-c",
                               "piping", "instrumentation diagram"]):
         # Extract any PID number from query for targeted expansion
-        import re
         pid_nums = re.findall(r'pid[-\s]?(?:fc[-\s]?c[-\s]?|fcc[-\s]?)(\d+)', q)
         pid_expansion = (
             "P&ID document reference piping instrumentation diagram "
@@ -255,7 +256,6 @@ def _extract_pid_number(query_text: str):
     Handles both PID-FC-C-xxx and PID-FCC-xxx formats.
     Returns the numeric suffix (e.g. '201', '204') or None.
     """
-    import re
     m = re.search(r'pid[-\s]?(?:fc[-\s]?c[-\s]?|fcc[-\s]?)(\d+)', query_text, re.IGNORECASE)
     return m.group(1) if m else None
 

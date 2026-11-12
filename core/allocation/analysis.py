@@ -16,14 +16,22 @@ from typing import Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, 
 
 from .engine import allocation_for, classify, level_for, signature_of
 from .model import AllocationModel, default_model
-from .types import DIMENSION_IDS, FACTOR_DIMENSION_IDS, IMPACT, Allocation, Axis, Category, Level
+from .types import (
+    DIMENSION_IDS,
+    FACTOR_DIMENSION_IDS,
+    IMPACT,
+    Allocation,
+    Axis,
+    Category,
+    Level,
+)
 
 
 def iter_space(model: AllocationModel) -> Iterator[Dict[str, str]]:
     """Every characterisation point, as {axis_id: category_id}."""
     ids = [a.id for a in model.axes]
     for combo in product(*[[c.id for c in a.categories] for a in model.axes]):
-        yield dict(zip(ids, combo))
+        yield dict(zip(ids, combo, strict=True))
 
 
 def enumerate_space(model: Optional[AllocationModel] = None) -> Dict:
@@ -109,7 +117,7 @@ def weight_perturbation(model: Optional[AllocationModel] = None, pct: float = 0.
         flipped_down = flipped_up = either = 0
         down = _scaled_model(model, {(axis_id, dim): 1 - pct})
         up = _scaled_model(model, {(axis_id, dim): 1 + pct})
-        for sel, base in zip(points, baseline):
+        for sel, base in zip(points, baseline, strict=True):
             d = _classify_fixed_boundaries(down, model, sel) is not base
             u = _classify_fixed_boundaries(up, model, sel) is not base
             flipped_down += d

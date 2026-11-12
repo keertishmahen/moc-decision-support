@@ -2,12 +2,12 @@
 modules/cost_predictor.py  —  Module 3: Cost & Downtime Prediction
 """
 import os, joblib
-import numpy as np
 import pandas as pd
 from neo4j.exceptions import ServiceUnavailable, Neo4jError
 
 from core.config import COST_MODEL_PATH, DOWN_MODEL_PATH, SCALER_PATH
 from core.neo4j_client import Neo4jClient
+from core.llm import LLMError
 from core.rag_pipeline import RAGPipeline
 
 PREDICTION_EXPLANATION_PROMPT = """
@@ -36,7 +36,7 @@ Provide:
 
 CHANGE_TYPE_MAP = {
     "Mechanical": 0, "Instrumentation": 1, "Process Parameter": 2,
-    "Mechanical Maintenance": 3, "Process & Instrumentation": 4,
+    "Mechanical Maintenance": 3, "Process & Instrumentation": 4, "Process and Instrumentation": 4,
     "Mechanical Efficiency Improvement": 5, "Procedural": 6,
     "Mechanical Integrity Improvement": 7, "Other": 8,
 }
@@ -97,17 +97,24 @@ class CostPredictor:
             model_label = "Calibrated heuristic (10 MoC ground truth)"
 
         feature_summary = self._format_features(feature_dict)
-        explanation = self.pipeline.run(
-            query=description,
-            prompt_template=PREDICTION_EXPLANATION_PROMPT,
-            asset_id=asset_id,
-            change_type=change_type,
-            extra_vars={
-                "cost_estimate": cost_estimate,
-                "downtime_estimate": downtime_estimate,
-                "feature_summary": feature_summary,
-            }
-        )
+        try:
+            explanation = self.pipeline.run(
+                query=description,
+                prompt_template=PREDICTION_EXPLANATION_PROMPT,
+                asset_id=asset_id,
+                change_type=change_type,
+                extra_vars={
+                    "cost_estimate": cost_estimate,
+                    "downtime_estimate": downtime_estimate,
+                    "feature_summary": feature_summary,
+                }
+            )
+            llm_status = "ok"
+        except LLMError:
+            # The estimate comes from the model above and does not depend on the AI service.
+            explanation = ("The AI explanation is unavailable right now. The cost and downtime estimates above "
+                           "come from the prediction model and are unaffected.")
+            llm_status = "unavailable"
         return {
             "cost_estimate": round(cost_estimate, 2),
             "cost_ci": cost_ci,
@@ -116,6 +123,7 @@ class CostPredictor:
             "features": feature_dict,
             "graph_status": graph_status,
             "explanation": explanation,
+            "llm_status": llm_status,
             "models_used": model_label,
         }
 

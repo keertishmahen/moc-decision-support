@@ -4,39 +4,34 @@ Hybrid RAG: ChromaDB vector search + Neo4j graph traversal → LLM.
 Uses OpenAI SDK directly (no langchain) to avoid import-time hangs.
 """
 
-from core.config import (
-    OPENAI_API_KEY, OPENAI_MODEL, TOP_K_SIMILAR
-)
+from core.config import TOP_K_SIMILAR
+from core.llm import USER_TEXT_NOTICE, fill, get_gateway, quote_user_text
 from core.vector_store import VectorStore
 from core.neo4j_client import Neo4jClient
 
 
 def get_llm():
-    """Return a simple callable wrapper around the OpenAI chat completions API."""
-    from openai import OpenAI
-    client = OpenAI(api_key=OPENAI_API_KEY)
+    """Text completion through the shared gateway: timeout, bounded retries, typed errors."""
+    gateway = get_gateway()
 
     class _LLM:
         def invoke(self, messages: list) -> str:
-            resp = client.chat.completions.create(
-                model=OPENAI_MODEL,
-                messages=messages,
-                temperature=0.1,
-            )
-            return resp.choices[0].message.content
+            return gateway.complete(messages)
 
     return _LLM()
 
 
-def _build_messages(system: str, history: str, human_input: str) -> list:
-    """Build OpenAI messages list from system prompt, history, and user input."""
+def _build_messages(system: str, history, human_input: str) -> list:
+    """Build the OpenAI messages list from the system prompt, prior turns and the new user input.
+
+    `history` is a list of (user_text, assistant_text) turns. Turns are passed as structured
+    messages, so multi-line answers survive intact and a user message cannot forge an
+    assistant turn by embedding "MoCBot: ..." in its text.
+    """
     messages = [{"role": "system", "content": system}]
-    if history:
-        for line in history.strip().split("\n"):
-            if line.startswith("User: "):
-                messages.append({"role": "user", "content": line[6:]})
-            elif line.startswith("MoCBot: "):
-                messages.append({"role": "assistant", "content": line[8:]})
+    for human, ai in history or []:
+        messages.append({"role": "user", "content": human})
+        messages.append({"role": "assistant", "content": ai})
     messages.append({"role": "user", "content": human_input})
     return messages
 
@@ -345,22 +340,31 @@ class RAGPipeline:
     def run(self, query: str, prompt_template: str, asset_id: str = None,
             change_type: str = None, moc_id: str = None,
             extra_vars: dict = None) -> str:
+        filled = self._fill(query, prompt_template, asset_id, change_type, moc_id, extra_vars)
+        return self.llm.invoke([{"role": "user", "content": filled}])
+
+    def run_json(self, query: str, prompt_template: str, schema: dict, name: str,
+                 asset_id: str = None, change_type: str = None, moc_id: str = None,
+                 extra_vars: dict = None, validate=None) -> dict:
+        """Like run(), but the reply is a dict validated against `schema` (see core.llm.gateway)."""
+        filled = self._fill(query, prompt_template, asset_id, change_type, moc_id, extra_vars)
+        return get_gateway().complete_json([{"role": "user", "content": filled}], schema, name, validate)
+
+    def _fill(self, query: str, prompt_template: str, asset_id: str = None,
+              change_type: str = None, moc_id: str = None, extra_vars: dict = None) -> str:
         context   = self.retriever.retrieve(query, asset_id, change_type, moc_id)
         formatted = self.retriever.format_context_for_prompt(context)
-        # Simple template substitution replacing {context}, {query}, etc.
+        # One pass over the template: inserted values are never re-scanned for placeholders,
+        # and the user's text is delimited so the model treats it as data.
         variables = {
             "context":     formatted,
-            "query":       query,
+            "query":       quote_user_text(query),
             "change_type": change_type or "unknown",
             "asset_id":    asset_id or "unknown",
         }
         if extra_vars:
             variables.update(extra_vars)
-        filled = prompt_template
-        for k, v in variables.items():
-            filled = filled.replace("{" + k + "}", str(v))
-        messages = [{"role": "user", "content": filled}]
-        return self.llm.invoke(messages)
+        return USER_TEXT_NOTICE + "\n" + fill(prompt_template, variables)
 
     def get_raw_context(self, query: str, asset_id: str = None,
                         change_type: str = None, moc_id: str = None):

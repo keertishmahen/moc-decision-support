@@ -8,7 +8,7 @@ After the fix is applied, all four sub-checks should PASS.
 Run: pytest tests/test_rag_embedding_bug_condition.py -v
 """
 import pytest
-from unittest.mock import MagicMock, patch, call
+from unittest.mock import MagicMock
 
 
 # ── Test 1a: Missing Neo4j fields ─────────────────────────────────────────
@@ -172,7 +172,7 @@ class TestNoQueryExpansion:
         VectorStore.search() must call encode() with the expanded query string,
         not the raw query. The expanded string must contain domain synonyms.
         """
-        from core.vector_store import VectorStore, _expand_query
+        from core.vector_store import _expand_query
 
         # Verify _expand_query exists and works
         expanded = _expand_query("catalyst circulation instability")

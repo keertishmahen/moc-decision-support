@@ -61,7 +61,7 @@ def allocation_score(req: ScoreRequest):
     try:
         return get_service().score(req.selection)
     except SelectionError as e:
-        raise HTTPException(status_code=422, detail=str(e))
+        raise HTTPException(status_code=422, detail=str(e)) from e
 
 
 @router.get("/cases")
@@ -82,7 +82,7 @@ def allocation_for_moc(moc_id: str):
     try:
         return get_service().assess_moc(moc_id)
     except NotFound as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
 
 
 @router.get("/moc/{moc_id}/graph")
@@ -98,7 +98,7 @@ def allocation_assess(req: AssessRequest):
         return get_service().assess_change(req.change_type, req.asset_id, req.description,
                                            req.hazop_required, req.pssr_required, req.shutdown_required)
     except NotFound as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e)) from e
 
 
 @router.get("/analysis/enumeration")

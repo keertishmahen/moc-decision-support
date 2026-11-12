@@ -6,7 +6,11 @@ Offline: the knowledge graph is replaced by data/graph/fcc_graph.json (see tests
 import pytest
 
 from modules.decision_allocation import NotFound
-from modules.decision_allocation.characteriser import ChangeFacts, facts_from_moc, suggest
+from modules.decision_allocation.characteriser import (
+    ChangeFacts,
+    facts_from_moc,
+    suggest,
+)
 
 LOWEST = {"A1": "operational", "A2": "unit", "A3": "temporary", "A4": "local",
           "A5": "individual", "A6": "by_procedure", "A7": "deterministic", "A8": "technical"}

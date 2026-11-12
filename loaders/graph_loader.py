@@ -19,9 +19,7 @@ from dotenv import load_dotenv
 
 load_dotenv(_ROOT / ".env")
 
-from neo4j import GraphDatabase
 
-from core.config import NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER
 from core.neo4j_client import _create_driver, _create_driver_ssc, _session_kwargs
 from core.snowflake_client import fetch_all
 

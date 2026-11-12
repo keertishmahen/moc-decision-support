@@ -16,8 +16,17 @@ from typing import Dict, List, Mapping, Optional, Tuple
 
 from .model import AllocationModel, default_model
 from .types import (
-    DIMENSION_IDS, FACTOR_DIMENSION_IDS, IMPACT, Allocation, AllocationResult, Contribution,
-    DimensionResult, Factor, FactorResult, Flip, Level,
+    DIMENSION_IDS,
+    FACTOR_DIMENSION_IDS,
+    IMPACT,
+    Allocation,
+    AllocationResult,
+    Contribution,
+    DimensionResult,
+    Factor,
+    FactorResult,
+    Flip,
+    Level,
 )
 
 

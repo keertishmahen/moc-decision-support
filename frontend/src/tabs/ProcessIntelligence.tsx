@@ -6,7 +6,7 @@ import {
   getPropagationMatrix, runAgent,
 } from '../api'
 import {
-  Card, KpiCard, SectionLabel, Btn, Select, Textarea, RiskBadge, Spinner,
+  Card, KpiCard, SectionLabel, Btn, Select, Textarea, RiskBadge, Spinner, ErrorBox,
 } from '../components/ui'
 import { ASSET_IDS } from '../constants'
 import {
@@ -290,21 +290,10 @@ const AGENT_PROMPTS = [
 function AgentPanel() {
   const [query, setQuery] = useState('')
 
-  const { data: result, mutate: runAgentQuery, isPending } = useMutation({
-    mutationFn: () => runAgent({ query, max_iterations: 6 }),
-  })
-
-  const send = (q: string) => {
-    setQuery(q)
-    runAgent({ query: q, max_iterations: 6 })
-  }
-
-  const { mutate: runWithQuery } = useMutation({
+  const { data: result, mutate: runAgentWith, isPending, error: agentError } = useMutation({
     mutationFn: (q: string) => runAgent({ query: q, max_iterations: 6 }),
-    onSuccess: (data) => {
-      // handled by result above — use separate mutation for quick prompts
-    },
   })
+  const runAgentQuery = () => runAgentWith(query)
 
   return (
     <div className="space-y-4">
@@ -320,7 +309,7 @@ function AgentPanel() {
       <div className="flex flex-wrap gap-2">
         {AGENT_PROMPTS.map(p => (
           <button key={p.label}
-            onClick={() => { setQuery(p.msg); runAgentQuery() }}
+            onClick={() => { setQuery(p.msg); runAgentWith(p.msg) }}
             className="px-3 py-1.5 rounded-full text-xs font-medium bg-[#a78bfa]/10 border border-[#a78bfa]/25 text-[#c4b5fd] hover:bg-[#a78bfa]/20 transition-all">
             {p.label}
           </button>
@@ -339,6 +328,8 @@ function AgentPanel() {
           🤖 Run Agent
         </Btn>
       </div>
+
+      <ErrorBox error={agentError} title="The agent could not complete the request" />
 
       {isPending && (
         <div className="moc-glass-card rounded-xl border-[#a78bfa]/25 p-4">

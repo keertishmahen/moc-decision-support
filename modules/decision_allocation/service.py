@@ -18,10 +18,20 @@ from typing import Callable, Dict, List, Mapping, Optional
 from core.allocation import analysis
 from core.allocation.engine import score
 from core.allocation.model import AllocationModel, default_model
-from core.allocation.reference_cases import compare_all, reference_case_for_moc, source_note
+from core.allocation.reference_cases import (
+    compare_all,
+    reference_case_for_moc,
+    source_note,
+)
 
 from . import graph_store
-from .characteriser import ChangeFacts, Suggestion, facts_from_moc, facts_from_proposal, suggest
+from .characteriser import (
+    ChangeFacts,
+    Suggestion,
+    facts_from_moc,
+    facts_from_proposal,
+    suggest,
+)
 
 log = logging.getLogger(__name__)
 
@@ -40,7 +50,9 @@ class DecisionAllocationService:
     # ── graph access ────────────────────────────────────────────────────────────────────────────
     def _client(self):
         if self._client_factory is None:
-            from core.neo4j_client import Neo4jClient          # imported late: scoring needs no database
+            from core.neo4j_client import (
+                Neo4jClient,  # imported late: scoring needs no database
+            )
             self._client_factory = Neo4jClient
         return self._client_factory()
 
