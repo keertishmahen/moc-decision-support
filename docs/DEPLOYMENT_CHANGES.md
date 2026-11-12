@@ -72,12 +72,12 @@ git push origin main
 | `NEO4J_DATABASE`, `LLM_PROVIDER`, `OPENAI_MODEL`, `RAG_EMBEDDING_PROVIDER`, `RAG_MULTIQUERY` | `render.yaml` | `neo4j`, `openai`, `gpt-4o`, `openai`, `true` | Backend settings |
 | `CORS_ORIGINS` | `render.yaml` | `https://keertishmahen.github.io` | Backend: which site may call the API |
 
-## One-time Render setup
+## Render service
 
-1. Sign in at [render.com](https://render.com) with the `keertishmahen` GitHub account.
-2. New → Blueprint → choose `moc-decision-support`. Render reads `render.yaml`.
-3. Enter `OPENAI_API_KEY`, `NEO4J_URI`, `NEO4J_USER` and `NEO4J_PASSWORD` when prompted.
-4. If Render gives the service a different address, update it: `gh variable set API_URL --body <url> --repo keertishmahen/moc-decision-support`, then `gh workflow run deploy-frontend.yml`.
+The service `moc-intelligence-api` was created on 12 November 2026 through Render's API with the same settings as `render.yaml` (Docker, free plan, Frankfurt, health check `/api/healthz`, deploy after GitHub checks pass). It lives in the same Render workspace as `symetra-mia-api`, so the two share the monthly free instance hours.
+
+- Secrets (`OPENAI_API_KEY`, `NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`) are stored in the service's environment on Render. Change them under Render dashboard → `moc-intelligence-api` → Environment.
+- If the service address ever changes: `gh variable set API_URL --body <url> --repo keertishmahen/moc-decision-support`, then `gh workflow run deploy-frontend.yml`.
 
 ## How to deploy and check
 
@@ -104,7 +104,10 @@ python -m pytest tests -q
 
 - Backend tests without credentials: 5 passed, 15 skipped (live), 3 expected failures. `/api/healthz` returns 200 with no credentials set.
 - Frontend: `npm run build` passes; `dist/index.html` references `./assets/...`; the bundle contains the Render address and no API key.
-- Not verified locally: the Docker image build (Docker Desktop was not running). The first Render build is the check.
+- Render: the first build of the Dockerfile succeeded and went live. `/api/healthz` returns 200 and `/api/health` reports Neo4j `Connected` and OpenAI `gpt-4o`.
+- CORS: requests from `https://keertishmahen.github.io` are allowed; other origins get no allow header.
+- Live features: Smart Form prefill, Risk analysis, Cost prediction, MoCBot chat, topology and the downtime matrix all returned 200 from the Render backend.
+- Status panel: a failed health request now shows "Backend unreachable — may be waking up, retrying" instead of a bare "…".
 
 ## Known limitations
 
@@ -117,7 +120,8 @@ python -m pytest tests -q
 
 ## Open follow-ups
 
-- [ ] Complete the one-time Render setup above.
+- [x] Create the Render service.
+- [ ] Replace the Render API key used to create the service (it was shared in a chat) under Render → Account Settings → API Keys.
 - [ ] **Replace the OpenAI API key and the Neo4j password**, then update them in Render and the local `.env`. Both are stored in the local archive `moc-src.tgz`; delete that archive afterwards. It is not in the repository.
 - [ ] Fix the three expected-failure tests listed in `tests/conftest.py` (`_moc_to_text()` and `_expand_query()` in `core/vector_store.py`).
 - [ ] Decide whether to tear down the Azure resources; `azure/` and the Azure workflow remain as a fallback.
