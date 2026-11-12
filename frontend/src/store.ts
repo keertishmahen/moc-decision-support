@@ -38,7 +38,7 @@ export const useStore = create<AppStore>(set => ({
   setAllocationIntent: intent => set({ allocationIntent: intent }),
   messages: [{
     role: 'assistant',
-    content: 'Welcome to MoCBot. I have direct access to the FCC Unit knowledge graph — 10 MoC records, 14+ assets, risk assessments, HAZOP/PSSR, work orders, and lessons learned. Ask me anything specific.',
+    content: 'Welcome to MoCBot. I have direct access to the FCC Unit knowledge graph — 10 MoC records, 22 assets, risk assessments, HAZOP/PSSR, work orders, and lessons learned. Ask me anything specific.',
   }],
   addMessage: m => set(s => ({ messages: [...s.messages, m] })),
   clearMessages: () => set({ messages: [] }),

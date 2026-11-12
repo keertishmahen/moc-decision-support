@@ -42,7 +42,7 @@ const TABS: { icon: LucideIcon; label: string }[] = [
 
 const DATASET = [
   { label: 'MoC Records', value: '10' },
-  { label: 'Assets', value: '14+' },
+  { label: 'Assets', value: '22' },
   { label: 'Work Orders', value: '21' },
   { label: 'Incidents', value: '4' },
 ]

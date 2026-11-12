@@ -7,16 +7,19 @@ import {
   ClipboardList,
   DollarSign,
   GitBranch,
-  Handshake,
-  Lightbulb,
-  Rocket,
+  FileSearch,
+  FlaskConical,
   Scale,
   ShieldAlert,
-  Users,
+  ShieldCheck,
+  SlidersHorizontal,
+  UserCheck,
   X,
 } from 'lucide-react'
 import {
   CAPABILITIES,
+  CAPABILITIES_INTRO,
+  FOOTER,
   HERO,
   PROCESS,
   STATS,
@@ -31,10 +34,11 @@ type Props = {
 }
 
 const VALUE_ICONS = {
-  lightbulb: Lightbulb,
-  handshake: Handshake,
-  rocket: Rocket,
-  users: Users,
+  shield: ShieldCheck,
+  authority: UserCheck,
+  synthetic: FlaskConical,
+  evidence: FileSearch,
+  calibration: SlidersHorizontal,
 } as const
 
 const CAP_ICONS = {
@@ -235,11 +239,11 @@ export default function Onboarding({ onEnter }: Props) {
         <BrandLockup compact />
         <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-1.5 py-1.5 text-[13px] text-white/55 backdrop-blur-md md:flex">
           {[
-            ['who', 'Who'],
+            ['who', 'About'],
+            ['why', 'Problem'],
             ['capabilities', 'Platform'],
-            ['process', 'Process'],
-            ['values', 'Values'],
-            ['why', 'Why'],
+            ['process', 'Journey'],
+            ['values', 'Safeguards'],
           ].map(([id, label]) => (
             <button
               key={id}
@@ -261,7 +265,7 @@ export default function Onboarding({ onEnter }: Props) {
           <div className="onboarding-glow-soft absolute left-[46%] top-[48%] h-[380px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full md:h-[520px] md:w-[580px]" />
         </div>
 
-        <motion.div className="relative max-w-3xl" {...fadeUp(reduce, 0.04)}>
+        <motion.div className="relative max-w-4xl" {...fadeUp(reduce, 0.04)}>
           <motion.div
             className="mb-8 flex justify-center"
             {...(reduce ? {} : { initial: { scale: 0.92, opacity: 0 }, animate: { scale: 1, opacity: 1 }, transition: { duration: 0.7, ease } })}
@@ -275,7 +279,7 @@ export default function Onboarding({ onEnter }: Props) {
             </div>
           </motion.div>
 
-          <h1 className="text-[2.35rem] font-semibold leading-[1.12] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
+          <h1 className="text-[2rem] font-semibold leading-[1.15] tracking-tight text-white sm:text-[2.6rem] lg:text-5xl">
             {HERO.headline}
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/55 md:text-lg">
@@ -332,90 +336,7 @@ export default function Onboarding({ onEnter }: Props) {
         </div>
       </section>
 
-      {/* Capabilities */}
-      <section id="capabilities" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
-        <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
-          <Pill>Platform</Pill>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">Everything in one intelligence surface</h2>
-          <p className="mt-4 text-base leading-relaxed text-white/55">
-            Six connected workspaces — each grounded in the same FCC Unit knowledge graph.
-          </p>
-        </motion.div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {CAPABILITIES.map((cap, i) => {
-            const Icon = CAP_ICONS[cap.icon]
-            return (
-              <motion.article
-                key={cap.title}
-                className="onboarding-card moc-glass cursor-default rounded-2xl border border-white/10 p-5"
-                {...cardMotion(reduce, i * 0.09)}
-              >
-                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#4f8ef7]/25 bg-[#4f8ef7]/10 text-[#93c5fd]">
-                  <Icon className="h-4 w-4" strokeWidth={1.75} />
-                </span>
-                <h3 className="text-[15px] font-semibold text-white">{cap.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/50">{cap.body}</p>
-              </motion.article>
-            )
-          })}
-        </div>
-      </section>
-
-      {/* Process */}
-      <section id="process" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
-        <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
-          <Pill>{PROCESS.badge}</Pill>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{PROCESS.headline}</h2>
-          <p className="mt-4 text-base leading-relaxed text-white/55">{PROCESS.subhead}</p>
-        </motion.div>
-        <div className="relative mt-14 grid gap-4 md:grid-cols-4">
-          <div className="pointer-events-none absolute left-[12%] right-[12%] top-8 hidden h-px bg-gradient-to-r from-transparent via-[#4f8ef7]/35 to-transparent md:block" aria-hidden />
-          {PROCESS.steps.map((step, i) => (
-            <motion.article
-              key={step.step}
-              className="onboarding-process-card moc-glass relative cursor-default rounded-2xl border border-white/10 p-5 text-left"
-              {...cardMotion(reduce, i * 0.12)}
-            >
-              <div className="text-xs font-semibold tracking-[0.18em] text-[#F4A261]">{step.step}</div>
-              <h3 className="mt-3 text-base font-semibold text-white">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/50">{step.body}</p>
-            </motion.article>
-          ))}
-        </div>
-      </section>
-
-      {/* Values */}
-      <section id="values" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4f8ef7]/10 blur-3xl" aria-hidden />
-        <motion.div className="relative mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
-          <Pill>{VALUES.badge}</Pill>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{VALUES.headline}</h2>
-          <p className="mt-4 text-base leading-relaxed text-white/55">{VALUES.subhead}</p>
-        </motion.div>
-
-        <div className="relative mt-12 grid gap-4 sm:grid-cols-2">
-          {VALUES.cards.map((card, i) => {
-            const Icon = VALUE_ICONS[card.icon]
-            return (
-              <motion.article
-                key={card.title}
-                className="onboarding-card moc-glass cursor-default rounded-2xl border border-white/10 p-6"
-                {...cardMotion(reduce, i * 0.1)}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#F4A261]">
-                    <Icon className="h-4 w-4" strokeWidth={1.75} />
-                  </span>
-                  <h3 className="text-base font-semibold text-white">{card.title}</h3>
-                </div>
-                <p className="mt-3 text-sm leading-relaxed text-white/55">{card.body}</p>
-              </motion.article>
-            )
-          })}
-        </div>
-      </section>
-
-      {/* Why Us */}
+      {/* Problems and response */}
       <section id="why" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
         <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
           <Pill>{WHY_US.badge}</Pill>
@@ -484,6 +405,87 @@ export default function Onboarding({ onEnter }: Props) {
         </div>
       </section>
 
+      {/* Capabilities */}
+      <section id="capabilities" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
+        <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
+          <Pill>{CAPABILITIES_INTRO.badge}</Pill>
+          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{CAPABILITIES_INTRO.headline}</h2>
+          <p className="mt-4 text-base leading-relaxed text-white/55">{CAPABILITIES_INTRO.subhead}</p>
+        </motion.div>
+        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {CAPABILITIES.map((cap, i) => {
+            const Icon = CAP_ICONS[cap.icon]
+            return (
+              <motion.article
+                key={cap.title}
+                className="onboarding-card moc-glass cursor-default rounded-2xl border border-white/10 p-5"
+                {...cardMotion(reduce, i * 0.09)}
+              >
+                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#4f8ef7]/25 bg-[#4f8ef7]/10 text-[#93c5fd]">
+                  <Icon className="h-4 w-4" strokeWidth={1.75} />
+                </span>
+                <h3 className="text-[15px] font-semibold text-white">{cap.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/50">{cap.body}</p>
+              </motion.article>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* Process */}
+      <section id="process" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
+        <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
+          <Pill>{PROCESS.badge}</Pill>
+          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{PROCESS.headline}</h2>
+          <p className="mt-4 text-base leading-relaxed text-white/55">{PROCESS.subhead}</p>
+        </motion.div>
+        <div className="relative mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="pointer-events-none absolute left-[12%] right-[12%] top-8 hidden h-px bg-gradient-to-r from-transparent via-[#4f8ef7]/35 to-transparent lg:block" aria-hidden />
+          {PROCESS.steps.map((step, i) => (
+            <motion.article
+              key={step.step}
+              className="onboarding-process-card moc-glass relative cursor-default rounded-2xl border border-white/10 p-5 text-left"
+              {...cardMotion(reduce, i * 0.12)}
+            >
+              <div className="text-xs font-semibold tracking-[0.18em] text-[#F4A261]">{step.step}</div>
+              <h3 className="mt-3 text-base font-semibold text-white">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/50">{step.body}</p>
+            </motion.article>
+          ))}
+        </div>
+      </section>
+
+      {/* Values */}
+      <section id="values" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4f8ef7]/10 blur-3xl" aria-hidden />
+        <motion.div className="relative mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
+          <Pill>{VALUES.badge}</Pill>
+          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{VALUES.headline}</h2>
+          <p className="mt-4 text-base leading-relaxed text-white/55">{VALUES.subhead}</p>
+        </motion.div>
+
+        <div className="relative mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {VALUES.cards.map((card, i) => {
+            const Icon = VALUE_ICONS[card.icon]
+            return (
+              <motion.article
+                key={card.title}
+                className="onboarding-card moc-glass cursor-default rounded-2xl border border-white/10 p-6"
+                {...cardMotion(reduce, i * 0.1)}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#F4A261]">
+                    <Icon className="h-4 w-4" strokeWidth={1.75} />
+                  </span>
+                  <h3 className="text-base font-semibold text-white">{card.title}</h3>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-white/55">{card.body}</p>
+              </motion.article>
+            )
+          })}
+        </div>
+      </section>
+
       {/* Footer CTA */}
       <footer className="relative z-10 px-5 pb-20 pt-8 md:px-8">
         <motion.div
@@ -493,16 +495,14 @@ export default function Onboarding({ onEnter }: Props) {
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b1020]/80 to-black/90" aria-hidden />
           <div className="relative">
             <SymmetraLogo size={44} />
-            <h2 className="mt-5 text-2xl font-semibold text-white md:text-3xl">Ready to explore the platform?</h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm text-white/50">
-              Enter Smart Form, Risk & Impact, Cost Predictor, MoCBot, and Process Intelligence — all grounded in your FCC Unit graph.
-            </p>
+            <h2 className="mt-5 text-2xl font-semibold text-white md:text-3xl">{FOOTER.headline}</h2>
+            <p className="mx-auto mt-3 max-w-lg text-sm text-white/50">{FOOTER.body}</p>
             <div className="mt-8">
               <PrimaryCta onClick={onEnter} />
             </div>
           </div>
         </motion.div>
-        <p className="mt-8 text-center text-[11px] text-white/25">MoC Intelligence Platform · FCC Unit · Symmetra Systems</p>
+        <p className="mt-8 text-center text-[11px] text-white/25">{FOOTER.line}</p>
       </footer>
     </div>
   )
