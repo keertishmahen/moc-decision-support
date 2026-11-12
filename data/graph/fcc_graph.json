@@ -1,0 +1,6446 @@
+{
+ "meta": {
+  "name": "FCC unit MoC knowledge graph (synthetic)",
+  "description": "Canonical content of the Neo4j knowledge graph: one FCC unit, 22 assets, 10 Management of Change records and their work orders, hazards, risk assessments and outcomes. Synthetic research data.",
+  "provenance": "Converted from a Neo4j Browser export of the project database dated 2026-05-08, merged with the two nodes that existed only in the live database on 2026-11-12. Dates are ISO strings. Duplicate relationships removed.",
+  "loader": "python -m loaders.snapshot_loader --dry-run | --apply"
+ },
+ "keys": {
+  "MoC": "moc_id",
+  "Asset": "asset_id",
+  "Area": "area_id",
+  "ProcessUnit": "unit_id",
+  "Plant": "plant_id",
+  "Hazard": "hazard_id",
+  "RiskAssessment": "risk_id",
+  "RiskScore": "rs_id",
+  "HAZOP": "hazop_id",
+  "PSSR": "pssr_id",
+  "Parameter": "param_id",
+  "WorkOrder": "wo_id",
+  "MaintenanceActivity": "ma_id",
+  "Personnel": "person_id",
+  "Department": "dept_id",
+  "Incident": "incident_id",
+  "ImplementationOutcome": "outcome_id",
+  "LessonsLearned": "ll_id",
+  "FailureMode": "fm_id",
+  "PIDDocument": "pid_ref",
+  "ApprovalStage": "stage_id"
+ },
+ "nodes": [
+  {
+   "label": "MoC",
+   "key": "MoC-001",
+   "props": {
+    "action_type": "Replace equipment",
+    "actual_cost": 118000,
+    "actual_manhours": 58,
+    "approval_date": "2025-01-15",
+    "change_description": "It is proposed that to solve the excessive vibration and deteriorating performance of the feed preparation area P-101 feed pump, the replacement should be done. Although the new pump is likely to enhance reliability and energy efficiency, it will not change the characteristics of feed flow including pressure, flow rate, and stability.",
+    "change_type": "Mechanical",
+    "criticality_rating": 4,
+    "date_initiated": "2025-01-10",
+    "description": "Replace failing feed pump P-101 with upgraded unit",
+    "engineering_risks": "Temporary instability in flow during start-up or switch-over. Lack of correspondence with current control valve features. Possible oscillations in flow control loop FIC. Threat of reactor temperature fluctuation due to variations in feed flow rate and composition.",
+    "estimated_cost": 120000,
+    "estimated_manhours": 60,
+    "final_approver_role": "Safety Manager",
+    "hazop_justification": "HAZOP not required: Like-for-like pump replacement with no change to process design limits, control philosophy, or operating envelope; existing HAZOP remains valid. PSSR required: installing new equipment prior to start-up.",
+    "hazop_reason": "Like-for-like replacement, no change to process design limits",
+    "hazop_required": false,
+    "incident_occurred": false,
+    "lessons_learned": "Improved pump reliability and stable operation",
+    "moc_id": "MoC-001",
+    "name": "MoC-001",
+    "new_value": "New stable flow profile",
+    "old_value": "Baseline unstable flow",
+    "parameter_name": "Flow rate / Pressure / Stability",
+    "pssr_required": true,
+    "shutdown_required": false,
+    "system_impacts": "P-101 directly feeds reactor R-201. Any variation in flow stability can affect reactor inlet conditions including flow and temperature coupling, catalyst reaction efficiency, and downstream fractionator load and separation performance.",
+    "title": "Feed Pump (P-101) Replacement"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-002",
+   "props": {
+    "action_type": "Upgrade",
+    "actual_cost": 36500,
+    "actual_manhours": 26,
+    "approval_date": "2025-02-07",
+    "change_description": "The modification of the FV-103 control valve to a smart control valve will enhance the temperature regulation process in the feed heater. The change will also bring about advanced control such as remote control and improved feedback accuracy.",
+    "change_type": "Instrumentation",
+    "criticality_rating": 3,
+    "date_initiated": "2025-02-03",
+    "description": "Replace FV-103 with smart control valve to improve temperature regulation and enable remote monitoring",
+    "engineering_risks": "Incorrect tuning of PID leading to temperature control oscillation. Sensor-actuator mismatch leading to delayed control system response. Integration errors in control systems commissioning. Threat of overheating or under heating of the reactor feed.",
+    "estimated_cost": 35000,
+    "estimated_manhours": 24,
+    "final_approver_role": "Safety Manager",
+    "hazop_justification": "HAZOP required: impact on important temperature control loop. PSSR required: because of instrumentation and control logic revision.",
+    "hazop_required": true,
+    "incident_occurred": false,
+    "lessons_learned": "Enhanced temperature control after tuning stabilization",
+    "moc_id": "MoC-002",
+    "name": "MoC-002",
+    "new_value": "Stable and precise temperature control",
+    "old_value": "Unstable temperature control",
+    "parameter_name": "Temperature control accuracy and response time",
+    "pssr_required": true,
+    "reason": "Inconsistent control performance and need for improved temperature stability",
+    "redundancy_available": false,
+    "shutdown_required": true,
+    "system_impacts": "The feed heater directly influences reactor inlet temperature. It influences the reaction kinetics of catalyst in R-201, influences the yield of products and selectivity, and influences the downstream separation in the fractionator.",
+    "threshold_limit": "Within operating limits",
+    "title": "Feed Heater Control Valve (FV-103) Upgrade"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-003",
+   "props": {
+    "action_type": "Set-point change",
+    "actual_cost": 7500,
+    "actual_manhours": 15,
+    "approval_date": "2025-03-10",
+    "change_description": "The change in reactor temperature R-201 setpoint is a system-level change in the FCC Unit, and its effects spread over several interrelated regions. Reactor temperature change has a direct impact on reaction kinetics in the Reactor-Riser and consequently the catalyst activity, regenerator heat equilibrium and the subsequent separation of product downstream in the Fractionation section. This interdependency brings about the element of complexity since changes in temperature can affect the feed conversion efficiency, distribution of product yield and stability in operation. Besides, the change also affects control loops that control temperature, flow, and pressure, which enhances the chances of coupled system responses.",
+    "change_type": "Process Parameter",
+    "criticality_rating": 5,
+    "date_initiated": "2025-03-05",
+    "description": "Adjust reactor temperature setpoint to optimise catalyst performance and improve gasoline yield",
+    "engineering_risks": "Heat build-up and deactivation of catalysts in reactors. Bigger coke growth that influences the performance of the regenerators. Existence of thermal imbalance between reactor and regenerator. New operating range instability of control loop.",
+    "estimated_cost": 8000,
+    "estimated_manhours": 16,
+    "final_approver_role": "Process Safety Manager",
+    "hazop_justification": "HAZOP mandatory: alteration of critical process parameter. PSSR required: prior to working within new conditions.",
+    "hazop_required": true,
+    "incident_occurred": false,
+    "lessons_learned": "Improved yield with stable thermal control",
+    "moc_id": "MoC-003",
+    "name": "MoC-003",
+    "new_value": "525 C",
+    "old_value": "510 C",
+    "parameter_name": "Reactor temperature setpoint",
+    "pssr_required": true,
+    "reason": "Need to improve catalyst activity and process efficiency",
+    "redundancy_available": true,
+    "shutdown_required": false,
+    "system_impacts": "Directly impacts catalyst activity and coke formation. Influences regenerator load via coke burn-off. Affects downstream product distribution in fractionator. Interacts with air blower and combustion control system.",
+    "threshold_limit": "Max 545 C",
+    "title": "Reactor R-201 Temperature Setpoint Adjustment"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-004",
+   "props": {
+    "action_type": "Repair and replacement",
+    "actual_cost": 102000,
+    "actual_manhours": 88,
+    "approval_date": "2025-04-07",
+    "change_description": "Inspection and repair of the internal components of the C-203 cyclone separator to address erosion damage and restore separation efficiency. The repair restores the cyclone to its original design condition without changing process design basis or operating limits.",
+    "change_type": "Mechanical Maintenance",
+    "criticality_rating": 4,
+    "date_initiated": "2025-04-01",
+    "description": "Inspect and repair cyclone internals to restore catalyst separation efficiency",
+    "engineering_risks": "Downstream fouling due to the leakage of catalysts. Reactor performance changes due to pressure drop changes. Failure to repair completely results in a recurrence of failures. The risks of start-up following shutdown.",
+    "estimated_cost": 95000,
+    "estimated_manhours": 80,
+    "final_approver_role": "Maintenance Manager",
+    "hazop_justification": "HAZOP not required: Repair restores the cyclone separator to its original design and operating condition, with no change to process design basis, control philosophy, or operating limits. PSSR required: owing to the shutdown and the opening of important units.",
+    "hazop_reason": "Repair restores original design, no change to operating limits",
+    "hazop_required": false,
+    "incident_occurred": false,
+    "lessons_learned": "Restored separation efficiency and reduced losses",
+    "moc_id": "MoC-004",
+    "name": "MoC-004",
+    "new_value": "Restored separation performance",
+    "old_value": "Reduced efficiency due to erosion",
+    "parameter_name": "Separation efficiency and pressure drop",
+    "pssr_required": true,
+    "reason": "Erosion damage causing catalyst losses and reduced efficiency",
+    "redundancy_available": false,
+    "shutdown_required": true,
+    "system_impacts": "Ineffective separation will result in carryover of catalyst to fractionator. Modifies load of regenerator and emissions. Affects mass balance of the FCC.",
+    "threshold_limit": "Within design limits",
+    "title": "Cyclone Separator (C-203) Internal Inspection and Repair"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-005",
+   "props": {
+    "action_type": "Upgrade",
+    "actual_cost": 67500,
+    "actual_manhours": 52,
+    "approval_date": "2025-05-12",
+    "change_description": "Upgrade of catalyst control valve SV-204 with an advanced actuator is proposed to improve control of catalyst circulation between reactors and regenerator.",
+    "change_type": "Instrumentation",
+    "criticality_rating": 5,
+    "date_initiated": "2025-05-06",
+    "description": "Upgrade slide valve actuator to improve catalyst circulation control and monitoring",
+    "engineering_risks": "Actuator malfunction leading to uncontrolled catalyst circulation. Sensor-actuator mismatch causing delayed or inaccurate control response. Control signal or feedback loop failure reducing regulation accuracy. Interaction failure with temperature and pressure control loops. Risk of thermal imbalance across the FCC Unit. Potential propagation of instability across interconnected systems.",
+    "estimated_cost": 65000,
+    "estimated_manhours": 48,
+    "final_approver_role": "Process Safety Manager",
+    "hazop_justification": "HAZOP mandatory: modification of a critical control element governing multiple interconnected process areas, strong system coupling between reactor and regenerator, high potential for propagated system-wide effects. PSSR required: validation of actuator installation, calibration, and integration with control systems prior to commissioning.",
+    "hazop_required": true,
+    "incident_occurred": false,
+    "lessons_learned": "Improved catalyst circulation and process stability",
+    "moc_id": "MoC-005",
+    "name": "MoC-005",
+    "new_value": "Advanced actuator with feedback",
+    "old_value": "Basic pneumatic actuator",
+    "parameter_name": "Catalyst circulation control accuracy",
+    "pssr_required": true,
+    "reason": "Need for improved catalyst flow control and reactor-regenerator balance",
+    "redundancy_available": false,
+    "shutdown_required": true,
+    "system_impacts": "Directly regulates catalyst circulation rate between reactor and regenerator. Maintains thermal balance between Reactor-Riser and Catalyst Regeneration. Influences reactor conversion efficiency and product yield. Affects regenerator combustion stability and heat generation. Interacts with temperature, pressure, and flow control loops. Represents a critical coupling point between reaction and regeneration systems.",
+    "threshold_limit": "Max catalyst circulation 200 t/h",
+    "title": "Catalyst Slide Valve (SV-204) Control System Upgrade"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-006",
+   "props": {
+    "action_type": "Parameter and equipment change",
+    "actual_cost": 92000,
+    "actual_manhours": 82,
+    "approval_date": "2025-03-08",
+    "change_description": "This scenario proposes enhancing stripping efficiency in the catalyst stripper S-301 by installing a steam flow control valve and optimizing the steam injection rate.",
+    "change_type": "Process and Instrumentation",
+    "criticality_rating": 4,
+    "date_initiated": "2025-03-03",
+    "description": "Install steam control valve and optimise steam injection to improve stripping efficiency",
+    "engineering_risks": "Excessive steam injection causing temperature imbalance. Insufficient stripping leading to hydrocarbon carryover and potential afterburn in the regenerator. Control loop instability due to improper tuning of steam flow regulation. Leakage risk at valve connections or flanges during commissioning. Potential disturbance propagation across interconnected process sections.",
+    "estimated_cost": 85000,
+    "estimated_manhours": 70,
+    "final_approver_role": "Process Safety Manager",
+    "hazop_justification": "HAZOP required: direct impact on stripping efficiency and regenerator combustion behavior, interaction with thermodynamic balance and process emissions, involvement of control system modification affecting process stability. PSSR required: verification of valve installation, integrity, and control loop performance prior to startup.",
+    "hazop_required": true,
+    "incident_occurred": true,
+    "lessons_learned": "Steam leakage incident required improved flange installation and inspection procedures",
+    "moc_id": "MoC-006",
+    "name": "MoC-006",
+    "new_value": "15000",
+    "old_value": "12000",
+    "parameter_name": "Steam flow rate kg/h",
+    "pssr_required": true,
+    "reason": "Improve stripping efficiency and reduce hydrocarbon carryover",
+    "redundancy_available": false,
+    "rework_required": true,
+    "shutdown_required": true,
+    "system_impacts": "Stripping efficiency directly affects hydrocarbon carryover to the regenerator. Increased carryover impacts regenerator combustion load and emissions. Influences overall heat balance across the Reactor-Riser and Catalyst Regeneration sections. Affects downstream flue gas treatment and environmental compliance. Interacts with temperature and flow control loops within the FCC Unit.",
+    "threshold_limit": "18000",
+    "title": "Catalyst Stripper Steam Optimization"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-007",
+   "props": {
+    "action_type": "Mechanical upgrade",
+    "actual_cost": 78000,
+    "actual_manhours": 310,
+    "approval_date": "2025-04-16",
+    "change_description": "Modification of flue gas expander EX-403 to enhance the level of energy recovery by installing modern turbine gear.",
+    "change_type": "Mechanical Efficiency Improvement",
+    "criticality_rating": 3,
+    "date_initiated": "2025-04-10",
+    "description": "Upgrade expander components to improve energy recovery and operational efficiency",
+    "engineering_risks": "Expander trip with accumulation of pressure in regenerator. More flaring because of bypass activation. Mechanical misalignment, vibration and failure. Connection with the pressure control system.",
+    "estimated_cost": 60000,
+    "estimated_manhours": 260,
+    "final_approver_role": "Maintenance Manager",
+    "hazop_justification": "HAZOP not required: upgrade remains within existing process design limits and control philosophy, with no change to normal operating envelope. PSSR required: before commissioning upgraded expander.",
+    "hazop_reason": "Upgrade within existing process design limits",
+    "hazop_required": false,
+    "incident_occurred": true,
+    "lessons_learned": "Temporary misalignment caused trip. Improved alignment procedures implemented",
+    "moc_id": "MoC-007",
+    "name": "MoC-007",
+    "new_value": "10500",
+    "old_value": "9500",
+    "parameter_name": "Expander power output kW",
+    "pssr_required": true,
+    "reason": "Low efficiency and opportunity for improved energy recovery",
+    "redundancy_available": false,
+    "rework_required": true,
+    "shutdown_required": true,
+    "system_impacts": "Expander transforms pressure into regenerator by energy recovery. Has an impact on regenerator pressure balance and flue gas flow. Downstream emission control systems are affected. Associated to air blower and combustion stability.",
+    "threshold_limit": "13000",
+    "title": "Flue Gas Expander (EX-403) Performance Upgrade"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-008",
+   "props": {
+    "action_type": "Replace",
+    "actual_cost": 135000,
+    "actual_manhours": 108,
+    "approval_date": "2025-09-24",
+    "change_description": "To prevent frequent breakdowns in the functioning of the reflux pump and increase the stability of the fractionation process, replacement of reflux pump P-502 is offered.",
+    "change_type": "Mechanical",
+    "criticality_rating": 4,
+    "date_initiated": "2025-09-20",
+    "description": "Replace reflux pump P-502 to improve reliability and stabilize fractionation process",
+    "engineering_risks": "Column instability related to the column equilibrium. Poor sizing of pump leads to imbalance. Transients in startups which influence product quality. Communication with level and temperature control loops.",
+    "estimated_cost": 120000,
+    "estimated_manhours": 96,
+    "final_approver_role": "Maintenance Manager",
+    "hazop_justification": "HAZOP required: influences the performance of separation and quality of product. PSSR required: required before the start-up after the pump changed.",
+    "hazop_required": true,
+    "incident_occurred": true,
+    "lessons_learned": "Alignment issues required improved installation and startup procedures",
+    "moc_id": "MoC-008",
+    "name": "MoC-008",
+    "new_value": "Stable reflux flow",
+    "old_value": "Unstable reflux flow",
+    "parameter_name": "Reflux flow stability",
+    "pssr_required": true,
+    "reason": "Frequent failures affecting separation performance",
+    "redundancy_available": false,
+    "rework_required": true,
+    "shutdown_required": true,
+    "system_impacts": "The reflux flow has a direct influence on the column separation efficiency. Affects purity of products and recovery. Modifies temperature and pressure of the influencer. Associated with upstream product composition of reactor.",
+    "threshold_limit": "Within operating limits",
+    "title": "Fractionator Reflux Pump Replacement"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-009",
+   "props": {
+    "action_type": "Update",
+    "actual_cost": 22000,
+    "actual_manhours": 35,
+    "approval_date": "2024-02-23",
+    "change_description": "The emergency shutdown ESD procedure for the FCC Unit is revised following a safety audit to improve response time, communication protocols, and coordination between control room and field operators during emergency conditions.",
+    "change_type": "Procedural",
+    "criticality_rating": 3,
+    "date_initiated": "2024-02-18",
+    "description": "Revise FCC emergency shutdown procedure and train operators",
+    "engineering_risks": "Delayed shutdown due to incorrect or incomplete procedure execution. Miscommunication between operators during critical conditions. Failure or misalignment of safety interlocks and automated shutdown logic. Human-machine interface errors affecting response accuracy. Increased risk severity during emergencies due to procedural gaps or delays.",
+    "estimated_cost": 20000,
+    "estimated_manhours": 30,
+    "final_approver_role": "HSE Manager",
+    "hazop_justification": "HAZOP mandatory: direct impact on safety-critical operations and shutdown logic, involvement of human-control system interaction, potential for system-wide consequences across the FCC Unit. PSSR required: verification of updated procedures, operator readiness, and system integration prior to implementation.",
+    "hazop_required": true,
+    "incident_occurred": false,
+    "lessons_learned": "Improved emergency preparedness and response coordination",
+    "moc_id": "MoC-009",
+    "name": "MoC-009",
+    "new_value": "Improved structured response procedure",
+    "old_value": "Outdated procedure",
+    "parameter_name": "Response time and communication effectiveness",
+    "pssr_required": true,
+    "reason": "Improve response coordination and communication after safety audit",
+    "redundancy_available": false,
+    "shutdown_required": false,
+    "system_impacts": "ESD activation affects all major subsystems within the FCC Unit including Reactor-Riser, Catalyst Regeneration, and Fractionation. Requires coordinated interaction between control room systems and field operators. Involves safety interlocks, shutdown logic, and alarm management systems. Integrates multiple instrumentation and control systems across process areas. Depends on synchronized execution across interconnected units.",
+    "threshold_limit": "As per safety standards",
+    "title": "Emergency Shutdown Procedure Update"
+   }
+  },
+  {
+   "label": "MoC",
+   "key": "MoC-010",
+   "props": {
+    "action_type": "Reinforce",
+    "actual_cost": 165000,
+    "actual_manhours": 146,
+    "approval_date": "2024-11-19",
+    "change_description": "Installation of high-temperature resistant materials to reinforce the catalyst transfer line between the reactor and regenerator in order to deal with any wear and enhance long-term integrity.",
+    "change_type": "Mechanical Integrity Improvement",
+    "criticality_rating": 5,
+    "date_initiated": "2024-11-12",
+    "description": "Reinforce catalyst transfer line to improve integrity and prevent failure",
+    "engineering_risks": "Loss of containment due to line failure. Blockage of the catalyst flow causing instability of the process. Defects that undermine integrity because of welding. Thermal stress caused by high operating temperatures.",
+    "estimated_cost": 150000,
+    "estimated_manhours": 125,
+    "final_approver_role": "Maintenance Manager",
+    "hazop_justification": "HAZOP mandatory: important mechanical integrity and continuity of the process. PSSR required: prior to reinforced line re-commissioning.",
+    "hazop_required": true,
+    "incident_occurred": true,
+    "lessons_learned": "Weld defect required rework. Improved welding and inspection procedures implemented",
+    "moc_id": "MoC-010",
+    "name": "MoC-010",
+    "new_value": "Reinforced high-temperature resistant material",
+    "old_value": "Degraded material with wall thinning",
+    "parameter_name": "Wall thickness and structural integrity",
+    "pssr_required": true,
+    "reason": "Material degradation and wall thinning identified",
+    "redundancy_available": false,
+    "rework_required": true,
+    "shutdown_required": true,
+    "system_impacts": "Reactor and regenerator critical link. Influences the circulation of catalysts and continuity of the processes. It affects body temperature and response rate. It may significantly affect the overall performance and stability of the FCC Unit.",
+    "threshold_limit": "Within design limits",
+    "title": "Catalyst Transfer Line Reinforcement"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "C-203",
+   "props": {
+    "asset_id": "C-203",
+    "criticality": 4,
+    "equipment_type": "Cyclone",
+    "name": "C-203"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "CTL-205",
+   "props": {
+    "asset_id": "CTL-205",
+    "criticality": 5,
+    "equipment_type": "Piping",
+    "name": "CTL-205"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "E-102",
+   "props": {
+    "asset_id": "E-102",
+    "criticality": 3,
+    "equipment_type": "Heat Exchanger",
+    "name": "E-102"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "ESD-SYS",
+   "props": {
+    "asset_id": "ESD-SYS",
+    "criticality": 5,
+    "equipment_type": "Safety System",
+    "name": "ESD-SYS"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "EX-403",
+   "props": {
+    "asset_id": "EX-403",
+    "criticality": 3,
+    "equipment_type": "Expander",
+    "name": "EX-403"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "F-501",
+   "props": {
+    "asset_id": "F-501",
+    "criticality": 4,
+    "equipment_type": "Fractionator",
+    "name": "F-501"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "FG-404",
+   "props": {
+    "asset_id": "FG-404",
+    "criticality": 3,
+    "equipment_type": "Piping",
+    "name": "FG-404"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "FV-103",
+   "props": {
+    "asset_id": "FV-103",
+    "criticality": 3,
+    "equipment_type": "Control Valve",
+    "name": "FV-103"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "IV-303",
+   "props": {
+    "asset_id": "IV-303",
+    "criticality": 3,
+    "equipment_type": "Control Valve",
+    "name": "IV-303"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "K-402",
+   "props": {
+    "asset_id": "K-402",
+    "criticality": 4,
+    "equipment_type": "Blower",
+    "name": "K-402"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "P-101",
+   "props": {
+    "asset_id": "P-101",
+    "criticality": 4,
+    "equipment_type": "Pump",
+    "name": "P-101"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "P-502",
+   "props": {
+    "asset_id": "P-502",
+    "criticality": 4,
+    "equipment_type": "Pump",
+    "name": "P-502"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "P-503",
+   "props": {
+    "asset_id": "P-503",
+    "criticality": 3,
+    "equipment_type": "Pump",
+    "name": "P-503"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "P-504",
+   "props": {
+    "asset_id": "P-504",
+    "criticality": 3,
+    "equipment_type": "Pump",
+    "name": "P-504"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "R-201",
+   "props": {
+    "asset_id": "R-201",
+    "criticality": 5,
+    "equipment_type": "Reactor",
+    "name": "R-201"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "RG-401",
+   "props": {
+    "asset_id": "RG-401",
+    "criticality": 5,
+    "equipment_type": "Vessel",
+    "name": "RG-401"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "S-301",
+   "props": {
+    "asset_id": "S-301",
+    "criticality": 4,
+    "equipment_type": "Stripper",
+    "name": "S-301"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "ST-302",
+   "props": {
+    "asset_id": "ST-302",
+    "criticality": 3,
+    "equipment_type": "Piping",
+    "name": "ST-302"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "SV-204",
+   "props": {
+    "asset_id": "SV-204",
+    "criticality": 5,
+    "equipment_type": "Control Valve",
+    "name": "SV-204"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "V-101",
+   "props": {
+    "asset_id": "V-101",
+    "criticality": 3,
+    "equipment_type": "Vessel",
+    "name": "V-101"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "V-202",
+   "props": {
+    "asset_id": "V-202",
+    "criticality": 5,
+    "equipment_type": "Vessel",
+    "name": "V-202"
+   }
+  },
+  {
+   "label": "Asset",
+   "key": "WGC-401",
+   "props": {
+    "asset_id": "WGC-401",
+    "criticality": 5,
+    "description": "Compresses overhead gases from fractionator. Regulates reactor pressure stability.",
+    "equipment_type": "Compressor",
+    "name": "WGC-401"
+   }
+  },
+  {
+   "label": "Area",
+   "key": "AREA-ALL",
+   "props": {
+    "area_id": "AREA-ALL",
+    "name": "AREA-ALL"
+   }
+  },
+  {
+   "label": "Area",
+   "key": "AREA-FEED",
+   "props": {
+    "area_id": "AREA-FEED",
+    "name": "AREA-FEED"
+   }
+  },
+  {
+   "label": "Area",
+   "key": "AREA-FRAC",
+   "props": {
+    "area_id": "AREA-FRAC",
+    "name": "AREA-FRAC"
+   }
+  },
+  {
+   "label": "Area",
+   "key": "AREA-REGEN",
+   "props": {
+    "area_id": "AREA-REGEN",
+    "name": "AREA-REGEN"
+   }
+  },
+  {
+   "label": "Area",
+   "key": "AREA-RXR",
+   "props": {
+    "area_id": "AREA-RXR",
+    "name": "AREA-RXR"
+   }
+  },
+  {
+   "label": "Area",
+   "key": "AREA-STRIP",
+   "props": {
+    "area_id": "AREA-STRIP",
+    "name": "AREA-STRIP"
+   }
+  },
+  {
+   "label": "ProcessUnit",
+   "key": "FCC-UNIT",
+   "props": {
+    "description": "Fluid Catalytic Cracking Unit",
+    "name": "FCC-UNIT",
+    "unit_id": "FCC-UNIT"
+   }
+  },
+  {
+   "label": "Plant",
+   "key": "REFINERY-A",
+   "props": {
+    "location": "Site A",
+    "name": "REFINERY-A",
+    "plant_id": "REFINERY-A"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-001",
+   "props": {
+    "category": "Flow instability affecting reactor temperature",
+    "description": "Unstable pump flow causes downstream reactor temperature fluctuations",
+    "hazard_id": "HZ-001",
+    "name": "HZ-001",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-002",
+   "props": {
+    "category": "Loss of temperature control causing reactor instability",
+    "description": "Faulty valve loses temperature control causing R-201 instability",
+    "hazard_id": "HZ-002",
+    "name": "HZ-002",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-003",
+   "props": {
+    "category": "Reactor over-temperature and catalyst degradation",
+    "description": "Raising setpoint risks exceeding 545C safety limit",
+    "hazard_id": "HZ-003",
+    "name": "HZ-003",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-004",
+   "props": {
+    "category": "Catalyst carryover and loss of separation efficiency",
+    "description": "Eroded cyclone internals allow catalyst carryover into downstream systems",
+    "hazard_id": "HZ-004",
+    "name": "HZ-004",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-005",
+   "props": {
+    "category": "Uncontrolled catalyst circulation causing thermal imbalance",
+    "description": "Actuator failure causes uncontrolled catalyst flow between reactor and regenerator",
+    "hazard_id": "HZ-005",
+    "name": "HZ-005",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-006",
+   "props": {
+    "category": "Improper stripping leading to regenerator instability and emissions",
+    "description": "Incorrect steam flow causes hydrocarbon carryover to regenerator",
+    "hazard_id": "HZ-006",
+    "name": "HZ-006",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-007",
+   "props": {
+    "category": "Expander trip causing regenerator overpressure",
+    "description": "Upgraded expander trip causes pressure buildup and emergency flaring",
+    "hazard_id": "HZ-007",
+    "name": "HZ-007",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-008",
+   "props": {
+    "category": "Reflux instability causing poor separation and temperature excursions",
+    "description": "Pump failure causes reflux loss leading to fractionator column instability",
+    "hazard_id": "HZ-008",
+    "name": "HZ-008",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-009",
+   "props": {
+    "category": "Delayed or incorrect emergency response",
+    "description": "Outdated procedure causes delayed operator actions during emergency",
+    "hazard_id": "HZ-009",
+    "name": "HZ-009",
+    "source": "Human"
+   }
+  },
+  {
+   "label": "Hazard",
+   "key": "HZ-010",
+   "props": {
+    "category": "Line failure causing catalyst loss and process shutdown",
+    "description": "Degraded transfer line wall could rupture causing total catalyst loss",
+    "hazard_id": "HZ-010",
+    "name": "HZ-010",
+    "source": "Process"
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-001",
+   "props": {
+    "assessment_date": "2025-01-11",
+    "assessor_role": "Process Safety Engineer",
+    "likelihood": 3,
+    "name": "RA-001",
+    "overall_score": 12,
+    "risk_asset": 4,
+    "risk_category": "High",
+    "risk_community": 2,
+    "risk_environment": 2,
+    "risk_id": "RA-001",
+    "risk_people": 3
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-002",
+   "props": {
+    "assessment_date": "2025-02-04",
+    "assessor_role": "Process Safety Engineer",
+    "likelihood": 2,
+    "name": "RA-002",
+    "overall_score": 8,
+    "risk_asset": 4,
+    "risk_category": "Medium",
+    "risk_community": 2,
+    "risk_environment": 2,
+    "risk_id": "RA-002",
+    "risk_people": 3
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-003",
+   "props": {
+    "assessment_date": "2025-03-06",
+    "assessor_role": "Process Safety Engineer",
+    "likelihood": 2,
+    "name": "RA-003",
+    "overall_score": 8,
+    "risk_asset": 4,
+    "risk_category": "Medium",
+    "risk_community": 2,
+    "risk_environment": 2,
+    "risk_id": "RA-003",
+    "risk_people": 4
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-004",
+   "props": {
+    "assessment_date": "2025-04-02",
+    "assessor_role": "HSE Engineer",
+    "likelihood": 3,
+    "name": "RA-004",
+    "overall_score": 12,
+    "risk_asset": 4,
+    "risk_category": "High",
+    "risk_community": 2,
+    "risk_environment": 3,
+    "risk_id": "RA-004",
+    "risk_people": 3
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-005",
+   "props": {
+    "assessment_date": "2025-05-07",
+    "assessor_role": "Process Safety Engineer",
+    "likelihood": 3,
+    "name": "RA-005",
+    "overall_score": 12,
+    "risk_asset": 4,
+    "risk_category": "High",
+    "risk_community": 2,
+    "risk_environment": 2,
+    "risk_id": "RA-005",
+    "risk_people": 4
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-006",
+   "props": {
+    "assessment_date": "2025-03-04",
+    "assessor_role": "Process Safety Engineer",
+    "likelihood": 3,
+    "name": "RA-006",
+    "overall_score": 12,
+    "risk_asset": 4,
+    "risk_category": "High",
+    "risk_community": 2,
+    "risk_environment": 3,
+    "risk_id": "RA-006",
+    "risk_people": 3
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-007",
+   "props": {
+    "assessment_date": "2025-04-13",
+    "assessor_role": "Process Safety Engineer",
+    "likelihood": 2,
+    "name": "RA-007",
+    "overall_score": 8,
+    "risk_asset": 4,
+    "risk_category": "Medium",
+    "risk_community": 2,
+    "risk_environment": 3,
+    "risk_id": "RA-007",
+    "risk_people": 3
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-008",
+   "props": {
+    "assessment_date": "2025-09-21",
+    "assessor_role": "Mechanical Integrity Engineer",
+    "likelihood": 3,
+    "name": "RA-008",
+    "overall_score": 12,
+    "risk_asset": 4,
+    "risk_category": "High",
+    "risk_community": 2,
+    "risk_environment": 2,
+    "risk_id": "RA-008",
+    "risk_people": 3
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-009",
+   "props": {
+    "assessment_date": "2024-02-19",
+    "assessor_role": "Safety Manager",
+    "likelihood": 2,
+    "name": "RA-009",
+    "overall_score": 10,
+    "risk_asset": 3,
+    "risk_category": "High",
+    "risk_community": 3,
+    "risk_environment": 3,
+    "risk_id": "RA-009",
+    "risk_people": 5
+   }
+  },
+  {
+   "label": "RiskAssessment",
+   "key": "RA-010",
+   "props": {
+    "assessment_date": "2024-11-14",
+    "assessor_role": "Mechanical Integrity Engineer",
+    "likelihood": 3,
+    "name": "RA-010",
+    "overall_score": 15,
+    "risk_asset": 5,
+    "risk_category": "High",
+    "risk_community": 2,
+    "risk_environment": 3,
+    "risk_id": "RA-010",
+    "risk_people": 4
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-001",
+   "props": {
+    "asset": 4,
+    "category": "High",
+    "community": 2,
+    "environment": 2,
+    "likelihood": 3,
+    "name": "RS-001",
+    "overall": 12,
+    "people": 3,
+    "rs_id": "RS-001"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-002",
+   "props": {
+    "asset": 4,
+    "category": "Medium",
+    "community": 2,
+    "environment": 2,
+    "likelihood": 2,
+    "name": "RS-002",
+    "overall": 8,
+    "people": 3,
+    "rs_id": "RS-002"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-003",
+   "props": {
+    "asset": 4,
+    "category": "Medium",
+    "community": 2,
+    "environment": 2,
+    "likelihood": 2,
+    "name": "RS-003",
+    "overall": 8,
+    "people": 4,
+    "rs_id": "RS-003"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-004",
+   "props": {
+    "asset": 4,
+    "category": "High",
+    "community": 2,
+    "environment": 3,
+    "likelihood": 3,
+    "name": "RS-004",
+    "overall": 12,
+    "people": 3,
+    "rs_id": "RS-004"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-005",
+   "props": {
+    "asset": 4,
+    "category": "High",
+    "community": 2,
+    "environment": 2,
+    "likelihood": 3,
+    "name": "RS-005",
+    "overall": 12,
+    "people": 4,
+    "rs_id": "RS-005"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-006",
+   "props": {
+    "asset": 4,
+    "category": "High",
+    "community": 2,
+    "environment": 3,
+    "likelihood": 3,
+    "name": "RS-006",
+    "overall": 12,
+    "people": 3,
+    "rs_id": "RS-006"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-007",
+   "props": {
+    "asset": 4,
+    "category": "Medium",
+    "community": 2,
+    "environment": 3,
+    "likelihood": 2,
+    "name": "RS-007",
+    "overall": 8,
+    "people": 3,
+    "rs_id": "RS-007"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-008",
+   "props": {
+    "asset": 4,
+    "category": "High",
+    "community": 2,
+    "environment": 2,
+    "likelihood": 3,
+    "name": "RS-008",
+    "overall": 12,
+    "people": 3,
+    "rs_id": "RS-008"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-009",
+   "props": {
+    "asset": 3,
+    "category": "High",
+    "community": 3,
+    "environment": 3,
+    "likelihood": 2,
+    "name": "RS-009",
+    "overall": 10,
+    "people": 5,
+    "rs_id": "RS-009"
+   }
+  },
+  {
+   "label": "RiskScore",
+   "key": "RS-010",
+   "props": {
+    "asset": 5,
+    "category": "High",
+    "community": 2,
+    "environment": 3,
+    "likelihood": 3,
+    "name": "RS-010",
+    "overall": 15,
+    "people": 4,
+    "rs_id": "RS-010"
+   }
+  },
+  {
+   "label": "HAZOP",
+   "key": "HAZOP-002",
+   "props": {
+    "hazop_id": "HAZOP-002",
+    "name": "HAZOP-002",
+    "reason": "Impact on critical temperature control loop",
+    "required": true
+   }
+  },
+  {
+   "label": "HAZOP",
+   "key": "HAZOP-003",
+   "props": {
+    "conducted_by": "Process Safety Engineer",
+    "date": "2025-03-06",
+    "hazop_id": "HAZOP-003",
+    "justification": "Setpoint change modifies core process parameter affecting multiple systems",
+    "name": "HAZOP-003",
+    "outcome": "Change approved with enhanced monitoring requirements",
+    "required": true
+   }
+  },
+  {
+   "label": "HAZOP",
+   "key": "HAZOP-005",
+   "props": {
+    "conducted_by": "Process Safety Engineer",
+    "date": "2025-05-07",
+    "hazop_id": "HAZOP-005",
+    "justification": "Critical control element governing reactor-regenerator balance. High system coupling risk.",
+    "name": "HAZOP-005",
+    "outcome": "HAZOP completed - additional interlock verification required",
+    "required": true
+   }
+  },
+  {
+   "label": "HAZOP",
+   "key": "HAZOP-006",
+   "props": {
+    "hazop_id": "HAZOP-006",
+    "name": "HAZOP-006",
+    "reason": "Direct impact on stripping efficiency and regenerator combustion",
+    "required": true
+   }
+  },
+  {
+   "label": "HAZOP",
+   "key": "HAZOP-008",
+   "props": {
+    "hazop_id": "HAZOP-008",
+    "name": "HAZOP-008",
+    "reason": "Influences separation performance and product quality",
+    "required": true
+   }
+  },
+  {
+   "label": "HAZOP",
+   "key": "HAZOP-009",
+   "props": {
+    "conducted_by": "Safety Manager",
+    "date": "2024-02-19",
+    "hazop_id": "HAZOP-009",
+    "justification": "Direct impact on safety-critical shutdown logic and human-control system interaction",
+    "name": "HAZOP-009",
+    "outcome": "Procedure gaps identified and addressed in revised documentation",
+    "required": true
+   }
+  },
+  {
+   "label": "HAZOP",
+   "key": "HAZOP-010",
+   "props": {
+    "hazop_id": "HAZOP-010",
+    "name": "HAZOP-010",
+    "reason": "Critical mechanical integrity and process continuity",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-001",
+   "props": {
+    "name": "PSSR-001",
+    "pssr_id": "PSSR-001",
+    "reason": "New equipment installation before startup",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-002",
+   "props": {
+    "name": "PSSR-002",
+    "pssr_id": "PSSR-002",
+    "reason": "Instrumentation and control logic revision",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-003",
+   "props": {
+    "conducted_by": "Process Safety Manager",
+    "date": "2025-03-10",
+    "justification": "Validation of new setpoint and system stability before full operation",
+    "name": "PSSR-003",
+    "outcome": "All checks passed - setpoint validated within safe limits",
+    "pssr_id": "PSSR-003",
+    "reason": "Validation before operating at new conditions",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-004",
+   "props": {
+    "name": "PSSR-004",
+    "pssr_id": "PSSR-004",
+    "reason": "Shutdown and opening of critical units",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-005",
+   "props": {
+    "conducted_by": "Process Safety Manager",
+    "date": "2025-05-15",
+    "justification": "Validation of actuator installation calibration and DCS integration",
+    "name": "PSSR-005",
+    "outcome": "All systems verified - advanced actuator commissioned successfully",
+    "pssr_id": "PSSR-005",
+    "reason": "Actuator installation and DCS integration validation",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-006",
+   "props": {
+    "name": "PSSR-006",
+    "pssr_id": "PSSR-006",
+    "reason": "Valve installation and control loop performance verification",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-007",
+   "props": {
+    "name": "PSSR-007",
+    "pssr_id": "PSSR-007",
+    "reason": "Before commissioning upgraded expander",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-008",
+   "props": {
+    "name": "PSSR-008",
+    "pssr_id": "PSSR-008",
+    "reason": "Before startup after pump replacement",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-009",
+   "props": {
+    "conducted_by": "HSE Manager",
+    "date": "2024-02-23",
+    "justification": "Verification of operator readiness and system integration before implementation",
+    "name": "PSSR-009",
+    "outcome": "All operators trained and assessed - procedure signed off for implementation",
+    "pssr_id": "PSSR-009",
+    "reason": "Operator readiness and system integration verification",
+    "required": true
+   }
+  },
+  {
+   "label": "PSSR",
+   "key": "PSSR-010",
+   "props": {
+    "name": "PSSR-010",
+    "pssr_id": "PSSR-010",
+    "reason": "Before re-commissioning reinforced catalyst transfer line",
+    "required": true
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-001",
+   "props": {
+    "name": "PARAM-001",
+    "new_value": "New stable flow profile",
+    "old_value": "Baseline unstable flow",
+    "param_id": "PARAM-001",
+    "parameter_name": "Flow rate / Pressure / Stability",
+    "threshold": "Within design limits"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-002",
+   "props": {
+    "name": "PARAM-002",
+    "new_value": "Stable and precise temperature control",
+    "old_value": "Unstable temperature control",
+    "param_id": "PARAM-002",
+    "parameter_name": "Temperature control accuracy / response time",
+    "threshold": "Within operating limits"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-003",
+   "props": {
+    "name": "PARAM-003",
+    "new_value": "525 °C",
+    "old_value": "510 °C",
+    "param_id": "PARAM-003",
+    "parameter_name": "Reactor temperature setpoint",
+    "threshold": "Max 545 °C"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-004",
+   "props": {
+    "name": "PARAM-004",
+    "new_value": "Restored separation performance",
+    "old_value": "Reduced efficiency due to erosion",
+    "param_id": "PARAM-004",
+    "parameter_name": "Separation efficiency / pressure drop",
+    "threshold": "Within design limits"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-005",
+   "props": {
+    "name": "PARAM-005",
+    "new_value": "Advanced actuator with feedback",
+    "old_value": "Basic pneumatic actuator",
+    "param_id": "PARAM-005",
+    "parameter_name": "Catalyst circulation control accuracy",
+    "threshold": "Max catalyst circulation 200 t/h"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-006",
+   "props": {
+    "name": "PARAM-006",
+    "new_value": "15000",
+    "old_value": "12000",
+    "param_id": "PARAM-006",
+    "parameter_name": "Steam flow rate (kg/h)",
+    "threshold": "18000"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-007",
+   "props": {
+    "name": "PARAM-007",
+    "new_value": "10500",
+    "old_value": "9500",
+    "param_id": "PARAM-007",
+    "parameter_name": "Expander power output (kW)",
+    "threshold": "13000"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-008",
+   "props": {
+    "name": "PARAM-008",
+    "new_value": "Stable reflux flow",
+    "old_value": "Unstable reflux flow",
+    "param_id": "PARAM-008",
+    "parameter_name": "Reflux flow stability",
+    "threshold": "Within operating limits"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-009",
+   "props": {
+    "name": "PARAM-009",
+    "new_value": "Improved structured response procedure",
+    "old_value": "Outdated procedure",
+    "param_id": "PARAM-009",
+    "parameter_name": "Response time / communication effectiveness",
+    "threshold": "As per safety standards"
+   }
+  },
+  {
+   "label": "Parameter",
+   "key": "PARAM-010",
+   "props": {
+    "name": "PARAM-010",
+    "new_value": "Reinforced high-temperature resistant material",
+    "old_value": "Degraded material",
+    "param_id": "PARAM-010",
+    "parameter_name": "Wall thickness / structural integrity",
+    "threshold": "Within design limits"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-001",
+   "props": {
+    "actual_cost": 47000,
+    "actual_duration": 10,
+    "date_issued": "2025-01-18",
+    "delay_reason": "Isolation valve required additional sealing",
+    "equipment_status": "Removed from service",
+    "estimated_cost": 45000,
+    "failure_mode": "Excessive vibration due to mechanical wear",
+    "name": "WO-001",
+    "planned_duration": 8,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "Remove existing P-101 feed pump for replacement",
+    "wo_id": "WO-001",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-002",
+   "props": {
+    "actual_cost": 79000,
+    "actual_duration": 14,
+    "date_issued": "2025-01-19",
+    "delay_reason": "Alignment adjustment required after pump installation",
+    "equipment_status": "Operational - new pump installed and tested",
+    "estimated_cost": 75000,
+    "failure_mode": "Excessive vibration due to mechanical wear",
+    "name": "WO-002",
+    "planned_duration": 12,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "Install replacement P-101 feed pump and reconnect piping",
+    "wo_id": "WO-002",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-003",
+   "props": {
+    "actual_cost": 12400,
+    "actual_duration": 4,
+    "date_issued": "2025-02-09",
+    "delay_reason": "Additional isolation work required before valve removal",
+    "equipment_status": "Removed from service - awaiting replacement",
+    "estimated_cost": 12000,
+    "failure_mode": "Sensor failure and inconsistent valve positioning",
+    "name": "WO-003",
+    "planned_duration": 3,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "Remove existing FV-103 feed heater control valve",
+    "wo_id": "WO-003",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-004",
+   "props": {
+    "actual_cost": 24100,
+    "actual_duration": 5,
+    "date_issued": "2025-02-09",
+    "delay_reason": "Loop calibration required additional fine-tuning",
+    "equipment_status": "Operational - smart valve installed and commissioned",
+    "estimated_cost": 23000,
+    "failure_mode": "Sensor failure and inconsistent valve positioning",
+    "name": "WO-004",
+    "planned_duration": 5,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "Install smart control valve FV-103 and calibrate instrumentation",
+    "wo_id": "WO-004",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-005",
+   "props": {
+    "actual_cost": 3500,
+    "actual_duration": 4,
+    "date_issued": "2025-03-11",
+    "delay_reason": "No delay",
+    "equipment_status": "Operational - setpoint updated to 525 C",
+    "estimated_cost": 3500,
+    "failure_mode": "Suboptimal control parameter configuration",
+    "name": "WO-005",
+    "planned_duration": 4,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "Update R-201 reactor temperature setpoint in control system",
+    "wo_id": "WO-005",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-006",
+   "props": {
+    "actual_cost": 4800,
+    "actual_duration": 9,
+    "date_issued": "2025-03-12",
+    "delay_reason": "Extended monitoring required to confirm steady-state performance",
+    "equipment_status": "Operational - reactor within validated limits at new setpoint",
+    "estimated_cost": 4500,
+    "failure_mode": "Suboptimal control parameter configuration",
+    "name": "WO-006",
+    "planned_duration": 8,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "Verify R-201 reactor operating limits and confirm safe operation",
+    "wo_id": "WO-006",
+    "work_type": "Inspection"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-007",
+   "props": {
+    "actual_cost": 31000,
+    "actual_duration": 20,
+    "date_issued": "2025-04-09",
+    "delay_reason": "Confined space entry preparation took longer than planned",
+    "equipment_status": "Out of service - inspection complete awaiting replacement",
+    "estimated_cost": 28000,
+    "failure_mode": "Corrosion or material degradation",
+    "name": "WO-007",
+    "planned_duration": 18,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Internal inspection of C-203 cyclone separator and erosion assessment",
+    "wo_id": "WO-007",
+    "work_type": "Inspection"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-008",
+   "props": {
+    "actual_cost": 71000,
+    "actual_duration": 32,
+    "date_issued": "2025-04-10",
+    "delay_reason": "Replacement vortex finder required custom fabrication",
+    "equipment_status": "Operational - cyclone internals replaced and performance verified",
+    "estimated_cost": 67000,
+    "failure_mode": "Corrosion or material degradation",
+    "name": "WO-008",
+    "planned_duration": 30,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Replace damaged cyclone separator C-203 internal components",
+    "wo_id": "WO-008",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-009",
+   "props": {
+    "actual_cost": 26000,
+    "actual_duration": 11,
+    "date_issued": "2025-05-14",
+    "delay_reason": "High-temperature component cooling required before safe access",
+    "equipment_status": "Out of service - existing actuator removed",
+    "estimated_cost": 25000,
+    "failure_mode": "Wear and inadequate position control",
+    "name": "WO-009",
+    "planned_duration": 10,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Remove existing pneumatic actuator from catalyst slide valve SV-204",
+    "wo_id": "WO-009",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-010",
+   "props": {
+    "actual_cost": 41500,
+    "actual_duration": 15,
+    "date_issued": "2025-05-14",
+    "delay_reason": "DCS integration required additional loop testing before commissioning",
+    "equipment_status": "Operational - advanced actuator installed and commissioned",
+    "estimated_cost": 40000,
+    "failure_mode": "Wear and inadequate position control",
+    "name": "WO-010",
+    "planned_duration": 14,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Install advanced actuator on SV-204 and configure catalyst flow control",
+    "wo_id": "WO-010",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-011",
+   "props": {
+    "actual_cost": 38000,
+    "actual_duration": 3,
+    "date_issued": "2025-03-10",
+    "delay_reason": "Steam leakage at flange during installation requiring gasket replacement",
+    "equipment_status": "Installed - pending commissioning and tuning",
+    "estimated_cost": 35000,
+    "failure_mode": "Inadequate steam flow control leading to poor stripping efficiency",
+    "name": "WO-011",
+    "planned_duration": 2,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "Install steam flow control valve on catalyst stripper S-301",
+    "wo_id": "WO-011",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-012",
+   "props": {
+    "actual_cost": 54000,
+    "actual_duration": 5,
+    "date_issued": "2025-03-10",
+    "delay_reason": "Suboptimal steam flow required additional control loop tuning",
+    "equipment_status": "Operational - steam control system stabilized and verified",
+    "estimated_cost": 50000,
+    "failure_mode": "Suboptimal steam flow causing inefficient hydrocarbon stripping",
+    "name": "WO-012",
+    "planned_duration": 4,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "Commission and optimize steam flow control for catalyst stripper S-301",
+    "wo_id": "WO-012",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-013",
+   "props": {
+    "actual_cost": 39000,
+    "actual_duration": 15,
+    "date_issued": "2025-04-22",
+    "delay_reason": "Rework after trip and extra alignment checks",
+    "equipment_status": "Running - higher power output and stable vibration",
+    "estimated_cost": 30000,
+    "failure_mode": "Efficiency loss and high vibration due to worn blades and seals",
+    "name": "WO-013",
+    "planned_duration": 12,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "EX-403 mechanical upgrade - blades and seals",
+    "wo_id": "WO-013",
+    "work_type": "Planned mechanical upgrade"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-014",
+   "props": {
+    "actual_cost": 39000,
+    "actual_duration": 15,
+    "date_issued": "2025-04-23",
+    "delay_reason": "Additional tuning and re-run after trip event",
+    "equipment_status": "Operable - improved power output and stable control",
+    "estimated_cost": 30000,
+    "failure_mode": "Incorrect protection or control settings after upgrade",
+    "name": "WO-014",
+    "planned_duration": 12,
+    "priority": "Medium",
+    "status": "Completed",
+    "title": "EX-403 post-upgrade performance test and control tuning",
+    "wo_id": "WO-014",
+    "work_type": "Performance test and control tuning"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-015",
+   "props": {
+    "actual_cost": 56000,
+    "actual_duration": 7,
+    "date_issued": "2025-09-26",
+    "delay_reason": "Stuck flange bolts increased removal time",
+    "equipment_status": "Removed from service - replacement pending",
+    "estimated_cost": 50000,
+    "failure_mode": "Frequent trips due to bearing and seal wear",
+    "name": "WO-015",
+    "planned_duration": 6,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Remove failed reflux pump P-502",
+    "wo_id": "WO-015",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-016",
+   "props": {
+    "actual_cost": 79000,
+    "actual_duration": 9,
+    "date_issued": "2025-09-26",
+    "delay_reason": "Alignment correction and soft-foot adjustment required",
+    "equipment_status": "Operational - replacement pump in service",
+    "estimated_cost": 70000,
+    "failure_mode": "Pump replacement and alignment issue",
+    "name": "WO-016",
+    "planned_duration": 8,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Install replacement reflux pump and complete testing",
+    "wo_id": "WO-016",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-017",
+   "props": {
+    "actual_cost": 10000,
+    "actual_duration": 4,
+    "date_issued": "2024-02-25",
+    "delay_reason": "Additional review comments incorporated before issue",
+    "equipment_status": "Documentation updated - training pending",
+    "estimated_cost": 9000,
+    "failure_mode": "Outdated response steps",
+    "name": "WO-017",
+    "planned_duration": 4,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Revise FCC emergency shutdown documentation",
+    "wo_id": "WO-017",
+    "work_type": "Administrative"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-018",
+   "props": {
+    "actual_cost": 12000,
+    "actual_duration": 6,
+    "date_issued": "2024-02-26",
+    "delay_reason": "Shift handover delayed final training session start",
+    "equipment_status": "Procedure implemented and operators trained",
+    "estimated_cost": 11000,
+    "failure_mode": "Insufficient operator familiarity with revised procedure",
+    "name": "WO-018",
+    "planned_duration": 6,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Conduct operator training and emergency drill on revised ESD procedure",
+    "wo_id": "WO-018",
+    "work_type": "Administrative"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-019",
+   "props": {
+    "actual_cost": 45000,
+    "actual_duration": 7,
+    "date_issued": "2024-11-21",
+    "delay_reason": "Access scaffold adjustment delayed start",
+    "equipment_status": "Section removed - reinforced spool pending",
+    "estimated_cost": 40000,
+    "failure_mode": "Wall thinning from catalyst erosion",
+    "name": "WO-019",
+    "planned_duration": 6,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Remove worn catalyst transfer line section and prepare spool",
+    "wo_id": "WO-019",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-020",
+   "props": {
+    "actual_cost": 87000,
+    "actual_duration": 11,
+    "date_issued": "2024-11-21",
+    "delay_reason": "Radiography identified a weld defect requiring repair",
+    "equipment_status": "Installed - pending final inspection",
+    "estimated_cost": 80000,
+    "failure_mode": "Reinforcement welding on degraded line section",
+    "name": "WO-020",
+    "planned_duration": 10,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Install reinforced catalyst transfer line section and complete welding",
+    "wo_id": "WO-020",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "WorkOrder",
+   "key": "WO-021",
+   "props": {
+    "actual_cost": 33000,
+    "actual_duration": 7,
+    "date_issued": "2024-11-22",
+    "delay_reason": "Extended hold-point checks before handover",
+    "equipment_status": "Operational - reinforced transfer line returned to service",
+    "estimated_cost": 30000,
+    "failure_mode": "Integrity verification after reinforcement",
+    "name": "WO-021",
+    "planned_duration": 7,
+    "priority": "High",
+    "status": "Completed",
+    "title": "Perform NDT leak test and return reinforced line to service",
+    "wo_id": "WO-021",
+    "work_type": "Inspection"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO001",
+   "props": {
+    "actual_hrs": 10,
+    "delay_reason": "Isolation valve required additional sealing before pump removal",
+    "failure_mode": "Excessive vibration due to mechanical wear",
+    "ma_id": "MA-WO001",
+    "name": "MA-WO001",
+    "planned_hrs": 8,
+    "status_after": "Removed from service – awaiting replacement pump installation",
+    "title": "Remove existing P-101 feed pump for replacement",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO002",
+   "props": {
+    "actual_hrs": 14,
+    "delay_reason": "Alignment adjustment required after pump installation",
+    "failure_mode": "Excessive vibration due to mechanical wear",
+    "ma_id": "MA-WO002",
+    "name": "MA-WO002",
+    "planned_hrs": 12,
+    "status_after": "Operational – new pump installed and tested",
+    "title": "Install replacement P-101 feed pump and reconnect piping and instrumentation",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO003",
+   "props": {
+    "actual_hrs": 4,
+    "delay_reason": "Additional isolation work required before valve removal",
+    "failure_mode": "Sensor failure / inconsistent valve positioning",
+    "ma_id": "MA-WO003",
+    "name": "MA-WO003",
+    "planned_hrs": 3,
+    "status_after": "Removed from service – awaiting replacement valve installation",
+    "title": "Remove existing FV-103 feed heater control valve",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO004",
+   "props": {
+    "actual_hrs": 5,
+    "delay_reason": "Loop calibration required additional fine-tuning",
+    "failure_mode": "Sensor failure / inconsistent valve positioning",
+    "ma_id": "MA-WO004",
+    "name": "MA-WO004",
+    "planned_hrs": 5,
+    "status_after": "Operational – smart valve installed, calibrated and commissioned",
+    "title": "Install smart control valve FV-103 and calibrate instrumentation",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO005",
+   "props": {
+    "actual_hrs": 4,
+    "delay_reason": "No delay",
+    "failure_mode": "Suboptimal control parameter configuration",
+    "ma_id": "MA-WO005",
+    "name": "MA-WO005",
+    "planned_hrs": 4,
+    "status_after": "Operational – temperature setpoint updated to 525 °C",
+    "title": "Update R-201 reactor temperature setpoint in control system",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO006",
+   "props": {
+    "actual_hrs": 9,
+    "delay_reason": "Extended monitoring period required to confirm steady-state performance",
+    "failure_mode": "Suboptimal control parameter configuration",
+    "ma_id": "MA-WO006",
+    "name": "MA-WO006",
+    "planned_hrs": 8,
+    "status_after": "Operational – reactor operating within validated limits at new setpoint",
+    "title": "Verify R-201 reactor operating limits and confirm safe operation",
+    "work_type": "Inspection"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO007",
+   "props": {
+    "actual_hrs": 20,
+    "delay_reason": "Confined space entry preparation took longer than planned",
+    "failure_mode": "Corrosion or material degradation",
+    "ma_id": "MA-WO007",
+    "name": "MA-WO007",
+    "planned_hrs": 18,
+    "status_after": "Out of service – inspection complete, awaiting component replacement",
+    "title": "Internal inspection of C-203 cyclone separator and erosion assessment",
+    "work_type": "Inspection"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO008",
+   "props": {
+    "actual_hrs": 32,
+    "delay_reason": "Replacement vortex finder required custom fabrication causing minor delay",
+    "failure_mode": "Corrosion or material degradation",
+    "ma_id": "MA-WO008",
+    "name": "MA-WO008",
+    "planned_hrs": 30,
+    "status_after": "Operational – cyclone internals replaced and performance verified",
+    "title": "Replace damaged cyclone separator C-203 internal components",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO009",
+   "props": {
+    "actual_hrs": 11,
+    "delay_reason": "High-temperature component cooling required before safe access",
+    "failure_mode": "Wear / inadequate position control",
+    "ma_id": "MA-WO009",
+    "name": "MA-WO009",
+    "planned_hrs": 10,
+    "status_after": "Out of service – existing actuator removed, ready for advanced actuator installation",
+    "title": "Remove existing pneumatic actuator from catalyst slide valve SV-204",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO010",
+   "props": {
+    "actual_hrs": 15,
+    "delay_reason": "DCS integration required additional loop testing before commissioning",
+    "failure_mode": "Wear / inadequate position control",
+    "ma_id": "MA-WO010",
+    "name": "MA-WO010",
+    "planned_hrs": 14,
+    "status_after": "Operational – advanced actuator installed, configured and commissioned",
+    "title": "Install advanced actuator on SV-204 and configure catalyst flow control system",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO011",
+   "props": {
+    "actual_hrs": 3,
+    "delay_reason": "Steam leakage observed at flange during installation requiring gasket replacement",
+    "failure_mode": "Inadequate steam flow control leading to poor stripping efficiency",
+    "ma_id": "MA-WO011",
+    "name": "MA-WO011",
+    "planned_hrs": 2,
+    "status_after": "Installed – pending commissioning and tuning",
+    "title": "Install steam flow control valve on catalyst stripper S-301",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO012",
+   "props": {
+    "actual_hrs": 5,
+    "delay_reason": "Suboptimal steam flow causing inefficient hydrocarbon stripping",
+    "failure_mode": "Suboptimal steam flow causing inefficient hydrocarbon stripping",
+    "ma_id": "MA-WO012",
+    "name": "MA-WO012",
+    "planned_hrs": 4,
+    "status_after": "Operational – steam control system stabilized and performance verified",
+    "title": "Commission and optimize steam flow control for catalyst stripper S-301",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO013",
+   "props": {
+    "actual_hrs": 15,
+    "delay_reason": "Rework after trip and extra alignment checks",
+    "failure_mode": "Efficiency loss and high vibration due to worn blades/seals",
+    "ma_id": "MA-WO013",
+    "name": "MA-WO013",
+    "planned_hrs": 12,
+    "status_after": "Running; higher power output and stable vibration",
+    "title": "EX-403 mechanical upgrade – blades and seals",
+    "work_type": "Planned mechanical upgrade"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO014",
+   "props": {
+    "actual_hrs": 15,
+    "delay_reason": "Additional tuning and re-run after trip event",
+    "failure_mode": "Incorrect protection or control settings after upgrade",
+    "ma_id": "MA-WO014",
+    "name": "MA-WO014",
+    "planned_hrs": 12,
+    "status_after": "Operable; improved power output, lower backpressure, and stable control",
+    "title": "EX-403 post-upgrade performance test and control tuning",
+    "work_type": "Performance test and control tuning"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO015",
+   "props": {
+    "actual_hrs": 7,
+    "delay_reason": "Stuck flange bolts increased removal time",
+    "failure_mode": "Frequent trips due to bearing and seal wear",
+    "ma_id": "MA-WO015",
+    "name": "MA-WO015",
+    "planned_hrs": 6,
+    "status_after": "Removed from service - replacement pending",
+    "title": "Remove failed reflux pump P-502",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO016",
+   "props": {
+    "actual_hrs": 9,
+    "delay_reason": "Alignment correction and soft-foot adjustment required",
+    "failure_mode": "Pump replacement and alignment issue",
+    "ma_id": "MA-WO016",
+    "name": "MA-WO016",
+    "planned_hrs": 8,
+    "status_after": "Operational - replacement pump in service",
+    "title": "Install replacement reflux pump and complete testing",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO017",
+   "props": {
+    "actual_hrs": 4,
+    "delay_reason": "Additional review comments incorporated before issue",
+    "failure_mode": "Outdated response steps",
+    "ma_id": "MA-WO017",
+    "name": "MA-WO017",
+    "planned_hrs": 4,
+    "status_after": "Documentation updated - training pending",
+    "title": "Revise FCC emergency shutdown documentation",
+    "work_type": "Administrative"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO018",
+   "props": {
+    "actual_hrs": 6,
+    "delay_reason": "Shift handover delayed final training session start",
+    "failure_mode": "Insufficient operator familiarity with revised procedure",
+    "ma_id": "MA-WO018",
+    "name": "MA-WO018",
+    "planned_hrs": 6,
+    "status_after": "Procedure implemented and operators trained",
+    "title": "Conduct operator training and emergency drill on revised ESD procedure",
+    "work_type": "Administrative"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO019",
+   "props": {
+    "actual_hrs": 7,
+    "delay_reason": "Access scaffold adjustment delayed start",
+    "failure_mode": "Wall thinning from catalyst erosion",
+    "ma_id": "MA-WO019",
+    "name": "MA-WO019",
+    "planned_hrs": 6,
+    "status_after": "Section removed - reinforced spool pending",
+    "title": "Remove worn catalyst transfer line section and prepare spool",
+    "work_type": "Corrective Maintenance"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO020",
+   "props": {
+    "actual_hrs": 11,
+    "delay_reason": "Radiography identified a weld defect requiring repair",
+    "failure_mode": "Reinforcement welding on degraded line section",
+    "ma_id": "MA-WO020",
+    "name": "MA-WO020",
+    "planned_hrs": 10,
+    "status_after": "Installed - pending final inspection",
+    "title": "Install reinforced catalyst transfer line section and complete welding",
+    "work_type": "Modification"
+   }
+  },
+  {
+   "label": "MaintenanceActivity",
+   "key": "MA-WO021",
+   "props": {
+    "actual_hrs": 7,
+    "delay_reason": "Extended hold-point checks before handover",
+    "failure_mode": "Integrity verification after reinforcement",
+    "ma_id": "MA-WO021",
+    "name": "MA-WO021",
+    "planned_hrs": 7,
+    "status_after": "Operational - reinforced transfer line returned to service",
+    "title": "Perform NDT, leak test, and return reinforced line to service",
+    "work_type": "Inspection"
+   }
+  },
+  {
+   "label": "Personnel",
+   "key": "PERS-HSE-MGR",
+   "props": {
+    "department": "HSE",
+    "person_id": "PERS-HSE-MGR",
+    "role": "HSE Manager"
+   }
+  },
+  {
+   "label": "Personnel",
+   "key": "PERS-MAINT-MGR",
+   "props": {
+    "department": "Maintenance",
+    "person_id": "PERS-MAINT-MGR",
+    "role": "Maintenance Manager"
+   }
+  },
+  {
+   "label": "Personnel",
+   "key": "PERS-PSM",
+   "props": {
+    "department": "Process Safety",
+    "person_id": "PERS-PSM",
+    "role": "Process Safety Manager"
+   }
+  },
+  {
+   "label": "Personnel",
+   "key": "PERS-SAFETY-MGR",
+   "props": {
+    "department": "HSE",
+    "person_id": "PERS-SAFETY-MGR",
+    "role": "Safety Manager"
+   }
+  },
+  {
+   "label": "Department",
+   "key": "DEPT-INSTR",
+   "props": {
+    "dept_id": "DEPT-INSTR",
+    "name": "DEPT-INSTR"
+   }
+  },
+  {
+   "label": "Department",
+   "key": "DEPT-MAINT",
+   "props": {
+    "dept_id": "DEPT-MAINT",
+    "name": "DEPT-MAINT"
+   }
+  },
+  {
+   "label": "Department",
+   "key": "DEPT-MECH",
+   "props": {
+    "dept_id": "DEPT-MECH",
+    "name": "DEPT-MECH"
+   }
+  },
+  {
+   "label": "Department",
+   "key": "DEPT-OPS",
+   "props": {
+    "dept_id": "DEPT-OPS",
+    "name": "DEPT-OPS"
+   }
+  },
+  {
+   "label": "Department",
+   "key": "DEPT-PROC",
+   "props": {
+    "dept_id": "DEPT-PROC",
+    "name": "DEPT-PROC"
+   }
+  },
+  {
+   "label": "Incident",
+   "key": "INC-006",
+   "props": {
+    "description": "Steam leakage at flange during commissioning",
+    "incident_id": "INC-006",
+    "name": "INC-006",
+    "outcome": "Gasket replaced and inspection procedure improved"
+   }
+  },
+  {
+   "label": "Incident",
+   "key": "INC-007",
+   "props": {
+    "description": "Temporary misalignment caused expander trip and flaring during startup",
+    "incident_id": "INC-007",
+    "name": "INC-007",
+    "outcome": "Alignment corrected and procedures improved"
+   }
+  },
+  {
+   "label": "Incident",
+   "key": "INC-008",
+   "props": {
+    "description": "Alignment issues during installation delayed startup",
+    "incident_id": "INC-008",
+    "name": "INC-008",
+    "outcome": "Alignment corrected with soft-foot adjustment"
+   }
+  },
+  {
+   "label": "Incident",
+   "key": "INC-010",
+   "props": {
+    "description": "Weld defect detected during radiographic inspection required full rework",
+    "incident_id": "INC-010",
+    "name": "INC-010",
+    "outcome": "Weld repaired and QC procedures improved"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-001",
+   "props": {
+    "actual_cost": 118000,
+    "actual_hours": 58,
+    "description": "Improved pump reliability and stable operation",
+    "name": "OUT-001",
+    "outcome_id": "OUT-001",
+    "result": "Successful"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-002",
+   "props": {
+    "actual_cost": 36500,
+    "actual_hours": 26,
+    "description": "Enhanced temperature control after tuning stabilization",
+    "name": "OUT-002",
+    "outcome_id": "OUT-002",
+    "result": "Successful"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-003",
+   "props": {
+    "actual_cost": 7500,
+    "actual_hours": 15,
+    "description": "Improved yield with stable thermal control",
+    "name": "OUT-003",
+    "outcome_id": "OUT-003",
+    "result": "Successful"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-004",
+   "props": {
+    "actual_cost": 102000,
+    "actual_hours": 88,
+    "description": "Restored separation efficiency and reduced losses",
+    "name": "OUT-004",
+    "outcome_id": "OUT-004",
+    "result": "Successful"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-005",
+   "props": {
+    "actual_cost": 67500,
+    "actual_hours": 52,
+    "description": "Improved catalyst circulation and process stability",
+    "name": "OUT-005",
+    "outcome_id": "OUT-005",
+    "result": "Successful"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-006",
+   "props": {
+    "actual_cost": 92000,
+    "actual_hours": 82,
+    "description": "Improved stripping efficiency after corrective action on steam leakage",
+    "name": "OUT-006",
+    "outcome_id": "OUT-006",
+    "result": "Successful after rework"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-007",
+   "props": {
+    "actual_cost": 78000,
+    "actual_hours": 310,
+    "description": "Improved energy recovery and stable operation after alignment correction",
+    "name": "OUT-007",
+    "outcome_id": "OUT-007",
+    "result": "Successful after rework"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-008",
+   "props": {
+    "actual_cost": 135000,
+    "actual_hours": 108,
+    "description": "Stable reflux flow and improved separation efficiency after alignment correction",
+    "name": "OUT-008",
+    "outcome_id": "OUT-008",
+    "result": "Successful after rework"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-009",
+   "props": {
+    "actual_cost": 22000,
+    "actual_hours": 35,
+    "description": "Improved emergency preparedness and response coordination",
+    "name": "OUT-009",
+    "outcome_id": "OUT-009",
+    "result": "Successful"
+   }
+  },
+  {
+   "label": "ImplementationOutcome",
+   "key": "OUT-010",
+   "props": {
+    "actual_cost": 165000,
+    "actual_hours": 146,
+    "description": "Improved line integrity and long-term reliability after weld defect corrected",
+    "name": "OUT-010",
+    "outcome_id": "OUT-010",
+    "result": "Successful after rework"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-001",
+   "props": {
+    "ll_id": "LL-001",
+    "name": "LL-001",
+    "text": "Improved pump reliability and stable operation"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-002",
+   "props": {
+    "ll_id": "LL-002",
+    "name": "LL-002",
+    "text": "Enhanced temperature control after tuning stabilization"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-003",
+   "props": {
+    "ll_id": "LL-003",
+    "name": "LL-003",
+    "text": "Improved yield with stable thermal control"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-004",
+   "props": {
+    "ll_id": "LL-004",
+    "name": "LL-004",
+    "text": "Restored separation efficiency and reduced losses"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-005",
+   "props": {
+    "ll_id": "LL-005",
+    "name": "LL-005",
+    "text": "Improved catalyst circulation and process stability"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-006",
+   "props": {
+    "ll_id": "LL-006",
+    "name": "LL-006",
+    "text": "Steam leakage incident required improved flange installation and inspection procedures"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-007",
+   "props": {
+    "ll_id": "LL-007",
+    "name": "LL-007",
+    "text": "Temporary misalignment caused trip; improved alignment procedures implemented"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-008",
+   "props": {
+    "ll_id": "LL-008",
+    "name": "LL-008",
+    "text": "Alignment issues required improved installation and startup procedures"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-009",
+   "props": {
+    "ll_id": "LL-009",
+    "name": "LL-009",
+    "text": "Improved emergency preparedness and response coordination"
+   }
+  },
+  {
+   "label": "LessonsLearned",
+   "key": "LL-010",
+   "props": {
+    "ll_id": "LL-010",
+    "name": "LL-010",
+    "text": "Weld defect required rework; improved welding and inspection procedures implemented"
+   }
+  },
+  {
+   "label": "FailureMode",
+   "key": "FM-003-A",
+   "props": {
+    "consequence": "Catalyst degradation and potential unplanned shutdown",
+    "description": "Setpoint too high causing reactor temperature to exceed 545C threshold",
+    "fm_id": "FM-003-A",
+    "likelihood": "Low",
+    "mode": "Overtemperature excursion"
+   }
+  },
+  {
+   "label": "FailureMode",
+   "key": "FM-003-B",
+   "props": {
+    "consequence": "Off-spec product and yield reduction",
+    "description": "DCS setpoint entered incorrectly causing wrong operating temperature",
+    "fm_id": "FM-003-B",
+    "likelihood": "Very Low",
+    "mode": "Control system misconfiguration"
+   }
+  },
+  {
+   "label": "FailureMode",
+   "key": "FM-005-A",
+   "props": {
+    "consequence": "Thermal imbalance between reactor and regenerator leading to instability",
+    "description": "Advanced actuator fails causing uncontrolled catalyst circulation rate",
+    "fm_id": "FM-005-A",
+    "likelihood": "Low",
+    "mode": "Actuator malfunction"
+   }
+  },
+  {
+   "label": "FailureMode",
+   "key": "FM-005-B",
+   "props": {
+    "consequence": "Reduced control accuracy affecting catalyst circulation rate",
+    "description": "Control signal mismatch between DCS and new actuator causing delayed response",
+    "fm_id": "FM-005-B",
+    "likelihood": "Medium",
+    "mode": "DCS integration failure"
+   }
+  },
+  {
+   "label": "FailureMode",
+   "key": "FM-005-C",
+   "props": {
+    "consequence": "Wrong catalyst flow rate with no alarm indication",
+    "description": "Feedback loop failure causing incorrect position reporting",
+    "fm_id": "FM-005-C",
+    "likelihood": "Low",
+    "mode": "Sensor-actuator mismatch"
+   }
+  },
+  {
+   "label": "FailureMode",
+   "key": "FM-009-A",
+   "props": {
+    "consequence": "Extended exposure to hazardous conditions during emergency",
+    "description": "Operator follows outdated procedure causing delayed ESD activation",
+    "fm_id": "FM-009-A",
+    "likelihood": "Medium",
+    "mode": "Delayed shutdown execution"
+   }
+  },
+  {
+   "label": "FailureMode",
+   "key": "FM-009-B",
+   "props": {
+    "consequence": "Wrong sequence of shutdown steps increasing risk of equipment damage",
+    "description": "Unclear communication protocol causes conflicting actions during emergency",
+    "fm_id": "FM-009-B",
+    "likelihood": "Medium",
+    "mode": "Miscommunication between control room and field"
+   }
+  },
+  {
+   "label": "FailureMode",
+   "key": "FM-009-C",
+   "props": {
+    "consequence": "Safety system not activated during actual emergency",
+    "description": "Operator bypasses safety interlock due to unfamiliarity with updated procedure",
+    "fm_id": "FM-009-C",
+    "likelihood": "Low",
+    "mode": "Interlock bypass"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-101",
+   "props": {
+    "pid_ref": "PID-FCC-101",
+    "version": "Rev3"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-103",
+   "props": {
+    "pid_ref": "PID-FCC-103",
+    "version": "Rev2"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-201",
+   "props": {
+    "pid_ref": "PID-FCC-201",
+    "version": "Rev4"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-203",
+   "props": {
+    "pid_ref": "PID-FCC-203",
+    "version": "Rev2"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-204",
+   "props": {
+    "pid_ref": "PID-FCC-204",
+    "version": "Rev3"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-301",
+   "props": {
+    "pid_ref": "PID-FCC-301",
+    "version": "Rev2"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-403",
+   "props": {
+    "pid_ref": "PID-FCC-403",
+    "version": "Rev2"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-502",
+   "props": {
+    "pid_ref": "PID-FCC-502",
+    "version": "Rev2"
+   }
+  },
+  {
+   "label": "PIDDocument",
+   "key": "PID-FCC-LINE",
+   "props": {
+    "pid_ref": "PID-FCC-LINE",
+    "version": "Rev2"
+   }
+  },
+  {
+   "label": "ApprovalStage",
+   "key": "AS-003-3",
+   "props": {
+    "name": "AS-003-3",
+    "order": 3,
+    "role": "Process Safety Engineer",
+    "stage": "Risk Assessment",
+    "stage_id": "AS-003-3",
+    "timestamp": "2025-03-06T11:00:00Z"
+   }
+  }
+ ],
+ "relationships": [
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-SAFETY-MGR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-SAFETY-MGR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-PSM"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-MAINT-MGR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-PSM"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-PSM"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-MAINT-MGR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-MAINT-MGR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-HSE-MGR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "APPROVED_BY",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "Personnel",
+    "PERS-MAINT-MGR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "C-203"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "CTL-205"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "E-102"
+   ],
+   "to": [
+    "Area",
+    "AREA-FEED"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "to": [
+    "Area",
+    "AREA-ALL"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "EX-403"
+   ],
+   "to": [
+    "Area",
+    "AREA-REGEN"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "F-501"
+   ],
+   "to": [
+    "Area",
+    "AREA-FRAC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "FG-404"
+   ],
+   "to": [
+    "Area",
+    "AREA-REGEN"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "FV-103"
+   ],
+   "to": [
+    "Area",
+    "AREA-FEED"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "IV-303"
+   ],
+   "to": [
+    "Area",
+    "AREA-STRIP"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "K-402"
+   ],
+   "to": [
+    "Area",
+    "AREA-REGEN"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "P-101"
+   ],
+   "to": [
+    "Area",
+    "AREA-FEED"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "P-502"
+   ],
+   "to": [
+    "Area",
+    "AREA-FRAC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "P-503"
+   ],
+   "to": [
+    "Area",
+    "AREA-FRAC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "P-504"
+   ],
+   "to": [
+    "Area",
+    "AREA-FRAC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "R-201"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "RG-401"
+   ],
+   "to": [
+    "Area",
+    "AREA-REGEN"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "S-301"
+   ],
+   "to": [
+    "Area",
+    "AREA-STRIP"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "ST-302"
+   ],
+   "to": [
+    "Area",
+    "AREA-STRIP"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "SV-204"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "V-101"
+   ],
+   "to": [
+    "Area",
+    "AREA-FEED"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "V-202"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "BELONGS_TO",
+   "from": [
+    "Asset",
+    "WGC-401"
+   ],
+   "to": [
+    "Area",
+    "AREA-FRAC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CHANGES_PARAMETER",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CIRCULATES_TO",
+   "from": [
+    "Asset",
+    "R-201"
+   ],
+   "to": [
+    "Asset",
+    "RG-401"
+   ],
+   "props": {
+    "description": "Spent catalyst from reactor to regenerator",
+    "flow_type": "Catalyst Circulation"
+   }
+  },
+  {
+   "type": "CONNECTS",
+   "from": [
+    "Asset",
+    "SV-204"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CONTROLS_FLOW_TO",
+   "from": [
+    "Asset",
+    "SV-204"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CONTROLS_FLOW_TO",
+   "from": [
+    "Asset",
+    "SV-204"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {}
+  },
+  {
+   "type": "CONTROLS_FLOW_TO",
+   "from": [
+    "Asset",
+    "SV-204"
+   ],
+   "to": [
+    "Asset",
+    "RG-401"
+   ],
+   "props": {}
+  },
+  {
+   "type": "DEPENDS_ON",
+   "from": [
+    "Asset",
+    "R-201"
+   ],
+   "to": [
+    "Asset",
+    "SV-204"
+   ],
+   "props": {}
+  },
+  {
+   "type": "DEPENDS_ON",
+   "from": [
+    "Asset",
+    "RG-401"
+   ],
+   "to": [
+    "Asset",
+    "SV-204"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-001"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-002"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-003"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-004"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-005"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-006"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-007"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-008"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-009"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EVALUATES",
+   "from": [
+    "RiskAssessment",
+    "RA-010"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-001"
+   ],
+   "to": [
+    "Asset",
+    "P-101"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-002"
+   ],
+   "to": [
+    "Asset",
+    "P-101"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-003"
+   ],
+   "to": [
+    "Asset",
+    "FV-103"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-004"
+   ],
+   "to": [
+    "Asset",
+    "FV-103"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-005"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-006"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-007"
+   ],
+   "to": [
+    "Asset",
+    "C-203"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-008"
+   ],
+   "to": [
+    "Asset",
+    "C-203"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-009"
+   ],
+   "to": [
+    "Asset",
+    "SV-204"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-010"
+   ],
+   "to": [
+    "Asset",
+    "SV-204"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-011"
+   ],
+   "to": [
+    "Asset",
+    "S-301"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-012"
+   ],
+   "to": [
+    "Asset",
+    "S-301"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-013"
+   ],
+   "to": [
+    "Asset",
+    "EX-403"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-014"
+   ],
+   "to": [
+    "Asset",
+    "EX-403"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-015"
+   ],
+   "to": [
+    "Asset",
+    "P-502"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-016"
+   ],
+   "to": [
+    "Asset",
+    "P-502"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-017"
+   ],
+   "to": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-018"
+   ],
+   "to": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-019"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-020"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "EXECUTED_ON",
+   "from": [
+    "WorkOrder",
+    "WO-021"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "C-203"
+   ],
+   "to": [
+    "Asset",
+    "SV-204"
+   ],
+   "props": {
+    "description": "Separated gases through catalyst slide valve",
+    "flow_type": "Side Loop"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "E-102"
+   ],
+   "to": [
+    "Asset",
+    "FV-103"
+   ],
+   "props": {
+    "description": "Heated feed to control valve",
+    "flow_type": "Main Feed"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "EX-403"
+   ],
+   "to": [
+    "Asset",
+    "FG-404"
+   ],
+   "props": {
+    "description": "Expanded flue gas to flue gas line",
+    "flow_type": "Side Loop"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "F-501"
+   ],
+   "to": [
+    "Asset",
+    "P-502"
+   ],
+   "props": {
+    "description": "Fractionator liquid to reflux pump",
+    "flow_type": "Reflux"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "FV-103"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {
+    "description": "Controlled feed to riser reactor",
+    "flow_type": "Main Feed"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "IV-303"
+   ],
+   "to": [
+    "Asset",
+    "S-301"
+   ],
+   "props": {
+    "description": "Controlled steam to catalyst stripper",
+    "flow_type": "Steam"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "K-402"
+   ],
+   "to": [
+    "Asset",
+    "RG-401"
+   ],
+   "props": {
+    "description": "Air blower supplies combustion air to regenerator",
+    "flow_type": "Air Supply"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "P-101"
+   ],
+   "to": [
+    "Asset",
+    "E-102"
+   ],
+   "props": {
+    "description": "Feed pump to feed heater",
+    "flow_type": "Main Feed"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "P-502"
+   ],
+   "to": [
+    "Asset",
+    "F-501"
+   ],
+   "props": {
+    "description": "Reflux pump returns liquid to fractionator",
+    "flow_type": "Reflux Return"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "R-201"
+   ],
+   "to": [
+    "Asset",
+    "C-203"
+   ],
+   "props": {
+    "description": "Reactor gases to cyclone separator",
+    "flow_type": "Side Loop"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "R-201"
+   ],
+   "to": [
+    "Asset",
+    "V-202"
+   ],
+   "props": {
+    "description": "Reactor products to reactor vessel",
+    "flow_type": "Main Feed"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "RG-401"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {
+    "description": "Regenerated catalyst from regenerator to reactor",
+    "flow_type": "Regeneration"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "S-301"
+   ],
+   "to": [
+    "Asset",
+    "F-501"
+   ],
+   "props": {
+    "description": "Recovered hydrocarbons from stripper to fractionator",
+    "flow_type": "Hydrocarbon Recovery"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "S-301"
+   ],
+   "to": [
+    "Asset",
+    "RG-401"
+   ],
+   "props": {
+    "description": "Stripped spent catalyst to regenerator",
+    "flow_type": "Stripped Catalyst"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "SV-204"
+   ],
+   "to": [
+    "Asset",
+    "EX-403"
+   ],
+   "props": {
+    "description": "Controlled flow to flue gas expander",
+    "flow_type": "Side Loop"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "V-101"
+   ],
+   "to": [
+    "Asset",
+    "P-101"
+   ],
+   "props": {
+    "description": "Feed surge drum to feed pump",
+    "flow_type": "Main Feed"
+   }
+  },
+  {
+   "type": "FEEDS",
+   "from": [
+    "Asset",
+    "V-202"
+   ],
+   "to": [
+    "Asset",
+    "S-301"
+   ],
+   "props": {
+    "description": "Reactor vessel vapours to catalyst stripper",
+    "flow_type": "Hydrocarbon"
+   }
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATED_LESSON",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "LessonsLearned",
+    "LL-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-011"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-012"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-013"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-014"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-015"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-016"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-017"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-018"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-019"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-020"
+   ],
+   "props": {}
+  },
+  {
+   "type": "GENERATES",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "WorkOrder",
+    "WO-021"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "C-203"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "CTL-205"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "EX-403"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "FV-103"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "P-101"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "P-502"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "R-201"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "S-301"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "HAS_PARAMETER",
+   "from": [
+    "Asset",
+    "SV-204"
+   ],
+   "to": [
+    "Parameter",
+    "PARAM-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IDENTIFIES",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "Hazard",
+    "HZ-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IMPACTS",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IMPACTS",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {}
+  },
+  {
+   "type": "IMPACTS",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "Asset",
+    "RG-401"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-001"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-002"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-003"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-004"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-005"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-006"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-007"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-008"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-009"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-010"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-011"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO011"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-012"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO012"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-013"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO013"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-014"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO014"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-015"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO015"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-016"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO016"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-017"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO017"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-018"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO018"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-019"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO019"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-020"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO020"
+   ],
+   "props": {}
+  },
+  {
+   "type": "INCLUDES_ACTIVITY",
+   "from": [
+    "WorkOrder",
+    "WO-021"
+   ],
+   "to": [
+    "MaintenanceActivity",
+    "MA-WO021"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "Area",
+    "AREA-FEED"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "Area",
+    "AREA-FEED"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "Area",
+    "AREA-STRIP"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "Area",
+    "AREA-REGEN"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "Area",
+    "AREA-FRAC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "Area",
+    "AREA-ALL"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "Area",
+    "AREA-REGEN"
+   ],
+   "props": {}
+  },
+  {
+   "type": "LOCATED_IN",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "MANIFESTS_AS",
+   "from": [
+    "Hazard",
+    "HZ-003"
+   ],
+   "to": [
+    "FailureMode",
+    "FM-003-A"
+   ],
+   "props": {}
+  },
+  {
+   "type": "MANIFESTS_AS",
+   "from": [
+    "Hazard",
+    "HZ-003"
+   ],
+   "to": [
+    "FailureMode",
+    "FM-003-B"
+   ],
+   "props": {}
+  },
+  {
+   "type": "MANIFESTS_AS",
+   "from": [
+    "Hazard",
+    "HZ-005"
+   ],
+   "to": [
+    "FailureMode",
+    "FM-005-A"
+   ],
+   "props": {}
+  },
+  {
+   "type": "MANIFESTS_AS",
+   "from": [
+    "Hazard",
+    "HZ-005"
+   ],
+   "to": [
+    "FailureMode",
+    "FM-005-B"
+   ],
+   "props": {}
+  },
+  {
+   "type": "MANIFESTS_AS",
+   "from": [
+    "Hazard",
+    "HZ-005"
+   ],
+   "to": [
+    "FailureMode",
+    "FM-005-C"
+   ],
+   "props": {}
+  },
+  {
+   "type": "MANIFESTS_AS",
+   "from": [
+    "Hazard",
+    "HZ-009"
+   ],
+   "to": [
+    "FailureMode",
+    "FM-009-A"
+   ],
+   "props": {}
+  },
+  {
+   "type": "MANIFESTS_AS",
+   "from": [
+    "Hazard",
+    "HZ-009"
+   ],
+   "to": [
+    "FailureMode",
+    "FM-009-B"
+   ],
+   "props": {}
+  },
+  {
+   "type": "MANIFESTS_AS",
+   "from": [
+    "Hazard",
+    "HZ-009"
+   ],
+   "to": [
+    "FailureMode",
+    "FM-009-C"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PART_OF",
+   "from": [
+    "Area",
+    "AREA-ALL"
+   ],
+   "to": [
+    "ProcessUnit",
+    "FCC-UNIT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PART_OF",
+   "from": [
+    "Area",
+    "AREA-FEED"
+   ],
+   "to": [
+    "ProcessUnit",
+    "FCC-UNIT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PART_OF",
+   "from": [
+    "Area",
+    "AREA-FRAC"
+   ],
+   "to": [
+    "ProcessUnit",
+    "FCC-UNIT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PART_OF",
+   "from": [
+    "Area",
+    "AREA-REGEN"
+   ],
+   "to": [
+    "ProcessUnit",
+    "FCC-UNIT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PART_OF",
+   "from": [
+    "Area",
+    "AREA-RXR"
+   ],
+   "to": [
+    "ProcessUnit",
+    "FCC-UNIT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PART_OF",
+   "from": [
+    "Area",
+    "AREA-STRIP"
+   ],
+   "to": [
+    "ProcessUnit",
+    "FCC-UNIT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PART_OF",
+   "from": [
+    "ProcessUnit",
+    "FCC-UNIT"
+   ],
+   "to": [
+    "Plant",
+    "REFINERY-A"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-001"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-002"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-003"
+   ],
+   "to": [
+    "Department",
+    "DEPT-INSTR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-004"
+   ],
+   "to": [
+    "Department",
+    "DEPT-INSTR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-005"
+   ],
+   "to": [
+    "Department",
+    "DEPT-PROC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-006"
+   ],
+   "to": [
+    "Department",
+    "DEPT-PROC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-007"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-008"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-009"
+   ],
+   "to": [
+    "Department",
+    "DEPT-INSTR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-010"
+   ],
+   "to": [
+    "Department",
+    "DEPT-INSTR"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-011"
+   ],
+   "to": [
+    "Department",
+    "DEPT-PROC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-012"
+   ],
+   "to": [
+    "Department",
+    "DEPT-PROC"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-013"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MECH"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-014"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MECH"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-015"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-016"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-017"
+   ],
+   "to": [
+    "Department",
+    "DEPT-OPS"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-018"
+   ],
+   "to": [
+    "Department",
+    "DEPT-OPS"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-019"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-020"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "PERFORMED_BY",
+   "from": [
+    "WorkOrder",
+    "WO-021"
+   ],
+   "to": [
+    "Department",
+    "DEPT-MAINT"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-101"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-103"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-201"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-203"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-204"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-301"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-403"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-502"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REFERENCES_PID",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "PIDDocument",
+    "PID-FCC-LINE"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RELATED_TO",
+   "from": [
+    "Incident",
+    "INC-006"
+   ],
+   "to": [
+    "MoC",
+    "MoC-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RELATED_TO",
+   "from": [
+    "Incident",
+    "INC-007"
+   ],
+   "to": [
+    "MoC",
+    "MoC-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RELATED_TO",
+   "from": [
+    "Incident",
+    "INC-008"
+   ],
+   "to": [
+    "MoC",
+    "MoC-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RELATED_TO",
+   "from": [
+    "Incident",
+    "INC-010"
+   ],
+   "to": [
+    "MoC",
+    "MoC-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "RiskAssessment",
+    "RA-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_HAZOP",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "HAZOP",
+    "HAZOP-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_HAZOP",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "HAZOP",
+    "HAZOP-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_HAZOP",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "HAZOP",
+    "HAZOP-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_HAZOP",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "HAZOP",
+    "HAZOP-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_HAZOP",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "HAZOP",
+    "HAZOP-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_HAZOP",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "HAZOP",
+    "HAZOP-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_HAZOP",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "HAZOP",
+    "HAZOP-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "REQUIRES_PSSR",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "PSSR",
+    "PSSR-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "RESULTS_IN",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "ImplementationOutcome",
+    "OUT-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-001"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-001"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-002"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-002"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-003"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-003"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-004"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-004"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-005"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-005"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-006"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-006"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-007"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-007"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-008"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-008"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-009"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-009"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SCORED_AS",
+   "from": [
+    "RiskAssessment",
+    "RA-010"
+   ],
+   "to": [
+    "RiskScore",
+    "RS-010"
+   ],
+   "props": {}
+  },
+  {
+   "type": "SHUTS_DOWN",
+   "from": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "to": [
+    "Asset",
+    "EX-403"
+   ],
+   "props": {
+    "description": "Emergency isolation of flue gas expander"
+   }
+  },
+  {
+   "type": "SHUTS_DOWN",
+   "from": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "to": [
+    "Asset",
+    "F-501"
+   ],
+   "props": {
+    "description": "Emergency isolation of main fractionator"
+   }
+  },
+  {
+   "type": "SHUTS_DOWN",
+   "from": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {
+    "description": "Emergency isolation of riser reactor"
+   }
+  },
+  {
+   "type": "SHUTS_DOWN",
+   "from": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "to": [
+    "Asset",
+    "RG-401"
+   ],
+   "props": {
+    "description": "Emergency isolation of regenerator"
+   }
+  },
+  {
+   "type": "SHUTS_DOWN",
+   "from": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "to": [
+    "Asset",
+    "SV-204"
+   ],
+   "props": {
+    "description": "Emergency isolation of catalyst slide valve"
+   }
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-001"
+   ],
+   "to": [
+    "Asset",
+    "P-101"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-002"
+   ],
+   "to": [
+    "Asset",
+    "FV-103"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-003"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-004"
+   ],
+   "to": [
+    "Asset",
+    "C-203"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-005"
+   ],
+   "to": [
+    "Asset",
+    "SV-204"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-006"
+   ],
+   "to": [
+    "Asset",
+    "S-301"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-007"
+   ],
+   "to": [
+    "Asset",
+    "EX-403"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-008"
+   ],
+   "to": [
+    "Asset",
+    "P-502"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-009"
+   ],
+   "to": [
+    "Asset",
+    "ESD-SYS"
+   ],
+   "props": {}
+  },
+  {
+   "type": "TARGETS",
+   "from": [
+    "MoC",
+    "MoC-010"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "C-203"
+   ],
+   "to": [
+    "Asset",
+    "S-301"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "C-203"
+   ],
+   "to": [
+    "Asset",
+    "SV-204"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "CTL-205"
+   ],
+   "to": [
+    "Asset",
+    "RG-401"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "E-102"
+   ],
+   "to": [
+    "Asset",
+    "FV-103"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "EX-403"
+   ],
+   "to": [
+    "Asset",
+    "FG-404"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "F-501"
+   ],
+   "to": [
+    "Asset",
+    "P-502"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "FV-103"
+   ],
+   "to": [
+    "Asset",
+    "R-201"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "IV-303"
+   ],
+   "to": [
+    "Asset",
+    "S-301"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "K-402"
+   ],
+   "to": [
+    "Asset",
+    "RG-401"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "P-101"
+   ],
+   "to": [
+    "Asset",
+    "E-102"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "P-502"
+   ],
+   "to": [
+    "Asset",
+    "F-501"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "R-201"
+   ],
+   "to": [
+    "Asset",
+    "C-203"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "R-201"
+   ],
+   "to": [
+    "Asset",
+    "F-501"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "RG-401"
+   ],
+   "to": [
+    "Asset",
+    "EX-403"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "S-301"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "SV-204"
+   ],
+   "to": [
+    "Asset",
+    "CTL-205"
+   ],
+   "props": {}
+  },
+  {
+   "type": "UPSTREAM_OF",
+   "from": [
+    "Asset",
+    "V-101"
+   ],
+   "to": [
+    "Asset",
+    "P-101"
+   ],
+   "props": {}
+  }
+ ]
+}

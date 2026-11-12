@@ -59,3 +59,32 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(pytest.mark.live)
             if not have_creds:
                 item.add_marker(skip_live)
+
+
+# ── Decision-allocation fixtures: the service on a file-backed graph, no Neo4j ─────────────────
+
+@pytest.fixture
+def file_graph():
+    from file_graph import FileGraph
+    return FileGraph()
+
+
+@pytest.fixture
+def allocation_service(monkeypatch, file_graph):
+    """DecisionAllocationService whose graph reads come from data/graph/fcc_graph.json."""
+    from modules.decision_allocation import DecisionAllocationService, graph_store
+    for name in ("list_mocs", "get_moc_facts", "get_asset_facts", "get_reach",
+                 "get_stored_characterisation", "get_allocation_subgraph"):
+        monkeypatch.setattr(graph_store, name, getattr(file_graph, name))
+    return DecisionAllocationService(client_factory=lambda: object())
+
+
+@pytest.fixture
+def offline_service():
+    """DecisionAllocationService whose knowledge graph is unreachable."""
+    from modules.decision_allocation import DecisionAllocationService
+
+    def unreachable():
+        raise ConnectionError("graph offline (test)")
+
+    return DecisionAllocationService(client_factory=unreachable)

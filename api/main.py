@@ -77,6 +77,11 @@ def _is_neo4j_connection_error(exc: Exception) -> bool:
     from core.neo4j_client import _is_transient
     return _is_transient(exc)
 
+# ── Routers ────────────────────────────────────────────────────────────────
+from api.routes.allocation import router as allocation_router  # noqa: E402
+
+app.include_router(allocation_router)
+
 # ── Request models ─────────────────────────────────────────────────────────
 class FormRequest(BaseModel):
     change_type: str
