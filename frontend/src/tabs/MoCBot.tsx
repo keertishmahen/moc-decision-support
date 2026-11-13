@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Bot, MessageSquare, Network, Send, Trash2, Zap } from 'lucide-react'
+import {
+  ArrowDown, ArrowRight, ArrowUp, BarChart3, Bot, ChevronRight, CornerDownRight, Link2, MessageSquare,
+  Network, Radio, Send, Trash2, TriangleAlert, Wrench, Zap,
+} from 'lucide-react'
+import { cssVar, severityToken } from '../theme/palette'
 import { sendChat, resetChat, getGraphContext, propagateDowntime, runAgent } from '../api'
 import { useStore } from '../store'
 import { Btn, Input, RiskBadge, SectionLabel, Card, Spinner } from '../components/ui'
@@ -43,16 +47,14 @@ function PropagationPanel({ assetId, hours }: { assetId: string; hours: number }
   if (!data) return null
 
   const affected = (data.affected_assets ?? []) as Record<string, unknown>[]
-  const RISK_COLORS: Record<string, string> = {
-    Critical: '#ef4444', High: '#f87171', Medium: '#fbbf24', Low: '#34d399',
-  }
+  const source = Number(data.source_downtime) || 1
 
   return (
     <div className="space-y-2">
       <div className="grid grid-cols-3 gap-2 text-center">
         <div className="moc-glass-card rounded-xl p-2">
           <div className="text-[10px] text-white/40 uppercase tracking-widest">Source</div>
-          <div className="text-sm font-bold text-[#4f8ef7]">{data.source_downtime}h</div>
+          <div className="text-sm font-bold text-accent">{data.source_downtime}h</div>
         </div>
         <div className="moc-glass-card rounded-xl p-2">
           <div className="text-[10px] text-white/40 uppercase tracking-widest">Affected</div>
@@ -65,11 +67,11 @@ function PropagationPanel({ assetId, hours }: { assetId: string; hours: number }
       </div>
       <div className="space-y-1 max-h-40 overflow-y-auto">
         {affected.slice(0, 8).map((a, i) => {
-          const color = RISK_COLORS[String(a.risk_level)] ?? '#64748b'
-          const pct = Math.min(100, (Number(a.propagated_hours) / (data.source_downtime as number)) * 100)
+          const color = cssVar(severityToken(String(a.risk_level)))
+          const pct = Math.min(100, (Number(a.propagated_hours) / source) * 100)
           return (
             <div key={i} className="flex items-center gap-2 text-[11px]">
-              <span className="font-mono text-[#4f8ef7] w-14 flex-shrink-0">{String(a.asset_id)}</span>
+              <span className="font-mono text-accent w-14 flex-shrink-0">{String(a.asset_id)}</span>
               <div className="flex-1 h-1.5 rounded-full bg-white/8">
                 <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
               </div>
@@ -87,14 +89,15 @@ function AgentToolLog({ toolCalls }: { toolCalls: Record<string, unknown>[] }) {
   if (!toolCalls?.length) return null
   return (
     <details className="group mt-2">
-      <summary className="cursor-pointer text-[10px] text-[#a78bfa]/60 hover:text-[#a78bfa] list-none flex items-center gap-1 transition-colors">
-        <span className="group-open:rotate-90 transition-transform inline-block">▶</span>
-        🔧 {toolCalls.length} tool call{toolCalls.length !== 1 ? 's' : ''} made
+      <summary className="cursor-pointer text-[10px] text-accent2/60 hover:text-accent2 list-none flex items-center gap-1 transition-colors">
+        <ChevronRight className="h-3 w-3 group-open:rotate-90 transition-transform" strokeWidth={2} aria-hidden />
+        <Wrench className="h-3 w-3" strokeWidth={1.75} aria-hidden />
+        {toolCalls.length} tool call{toolCalls.length !== 1 ? 's' : ''} made
       </summary>
       <div className="mt-1.5 space-y-1">
         {toolCalls.map((tc, i) => (
           <div key={i} className="rounded-lg border border-white/5 bg-white/[0.02] px-2.5 py-1.5 text-[10px]">
-            <span className="text-[#a78bfa] font-semibold">{String(tc.tool)}</span>
+            <span className="text-accent2 font-semibold">{String(tc.tool)}</span>
             <span className="text-white/30 ml-2">{JSON.stringify(tc.args).slice(0, 60)}</span>
           </div>
         ))}
@@ -139,7 +142,7 @@ export default function MoCBot() {
     },
     onError: (err: unknown) => {
       const msg = err instanceof Error ? err.message : 'Request failed. Please try again.'
-      addMessage({ role: 'assistant', content: `⚠️ Error: ${msg}`, intent: 'error' })
+      addMessage({ role: 'assistant', content: msg, intent: 'error' })
     },
   })
 
@@ -163,7 +166,7 @@ export default function MoCBot() {
     },
     onError: (err: unknown) => {
       const msg = err instanceof Error ? err.message : 'Agent request failed.'
-      addMessage({ role: 'assistant', content: `⚠️ Error: ${msg}`, intent: 'error' })
+      addMessage({ role: 'assistant', content: msg, intent: 'error' })
     },
   })
 
@@ -204,19 +207,24 @@ export default function MoCBot() {
           <div>
             <h2 className="text-lg font-bold text-white">MoCBot</h2>
             <p className="text-xs text-white/40">
-              {agentMode
-                ? '🤖 Agent mode — multi-step reasoning with tool calling'
-                : 'Grounded answers from Neo4j + ChromaDB · No hallucination'}
+              {agentMode ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <Bot className="h-3.5 w-3.5" strokeWidth={1.75} aria-hidden />
+                  Agent mode — multi-step reasoning with tool calling
+                </span>
+              ) : (
+                'Grounded answers from the knowledge graph and vector search'
+              )}
             </p>
           </div>
           <button
             onClick={() => setAgentMode(v => !v)}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
               agentMode
-                ? 'bg-[#a78bfa]/20 border-[#a78bfa]/40 text-[#c4b5fd]'
+                ? 'bg-accent2/20 border-accent2/40 text-accent2-soft'
                 : 'bg-white/5 border-white/10 text-white/50 hover:text-white/80'
             }`}>
-            <span className={`w-2 h-2 rounded-full ${agentMode ? 'bg-[#a78bfa] shadow-[0_0_6px_#a78bfa]' : 'bg-white/20'}`} />
+            <span className={`w-2 h-2 rounded-full ${agentMode ? 'bg-accent2 shadow-[0_0_6px_var(--color-accent2)]' : 'bg-white/20'}`} />
             {agentMode ? 'Agent ON' : 'Agent OFF'}
           </button>
         </div>
@@ -227,7 +235,7 @@ export default function MoCBot() {
             <button key={tab} onClick={() => setPromptTab(tab)}
               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-medium transition-all ${
                 promptTab === tab
-                  ? 'bg-[#4f8ef7]/20 border border-[#4f8ef7]/30 text-[#93c5fd]'
+                  ? 'bg-accent/20 border border-accent/30 text-accent-soft'
                   : 'bg-white/[0.03] border border-white/8 text-white/40 hover:text-white/70'
               }`}>
               {tab === 'standard' ? (
@@ -251,10 +259,10 @@ export default function MoCBot() {
               }}
               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                 promptTab === 'agent'
-                  ? 'bg-[#a78bfa]/10 border border-[#a78bfa]/25 text-[#c4b5fd] hover:bg-[#a78bfa]/20'
+                  ? 'bg-accent2/10 border border-accent2/25 text-accent2-soft hover:bg-accent2/20'
                   : promptTab === 'connectivity'
                   ? 'bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/20'
-                  : 'bg-[#4f8ef7]/10 border border-[#4f8ef7]/25 text-[#93c5fd] hover:bg-[#4f8ef7]/20'
+                  : 'bg-accent/10 border border-accent/25 text-accent-soft hover:bg-accent/20'
               }`}>
               {p.label}
             </button>
@@ -269,10 +277,10 @@ export default function MoCBot() {
                 className={`flex gap-3 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                   m.role === 'user'
-                    ? 'bg-[#4f8ef7]/20 text-[#4f8ef7]'
+                    ? 'bg-accent/20 text-accent'
                     : m.intent === 'agent'
-                    ? 'bg-[#a78bfa]/30 text-[#a78bfa]'
-                    : 'bg-[#a78bfa]/20 text-[#a78bfa]'}`}>
+                    ? 'bg-accent2/30 text-accent2'
+                    : 'bg-accent2/20 text-accent2'}`}>
                   {m.role === 'user' ? 'U' : m.intent === 'agent' ? (
                     <Bot className="h-3.5 w-3.5" strokeWidth={1.75} />
                   ) : (
@@ -281,11 +289,18 @@ export default function MoCBot() {
                 </div>
                 <div className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                   m.role === 'user'
-                    ? 'bg-[#4f8ef7]/15 border border-[#4f8ef7]/20 text-white'
+                    ? 'bg-accent/15 border border-accent/20 text-white'
+                    : m.intent === 'error'
+                    ? 'bg-red-500/10 border border-red-500/30 text-red-300'
                     : m.intent === 'agent'
-                    ? 'bg-[#a78bfa]/08 border border-[#a78bfa]/20 text-white/90'
+                    ? 'bg-accent2/10 border border-accent2/20 text-white/90'
                     : 'bg-white/[0.045] border border-white/10 text-white/90'}`}>
-                  {m.role === 'assistant'
+                  {m.intent === 'error' ? (
+                    <div role="alert" className="flex items-start gap-2">
+                      <TriangleAlert className="h-4 w-4 flex-shrink-0 mt-0.5" strokeWidth={1.75} aria-hidden />
+                      <span><b>Error:</b> {m.content}</span>
+                    </div>
+                  ) : m.role === 'assistant'
                     ? <MarkdownMessage content={m.content} />
                     : m.content
                   }
@@ -293,7 +308,7 @@ export default function MoCBot() {
                   {m.role === 'assistant' && i === messages.length - 1 && agentToolCalls.length > 0 && (
                     <AgentToolLog toolCalls={agentToolCalls} />
                   )}
-                  {m.intent && !['general', 'agent'].includes(m.intent) && (
+                  {m.intent && !['general', 'agent', 'error'].includes(m.intent) && (
                     <div className="mt-1.5 text-[10px] text-white/30 font-mono">intent: {m.intent}</div>
                   )}
                 </div>
@@ -304,11 +319,11 @@ export default function MoCBot() {
           {isPending && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3">
               <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold ${
-                agentMode ? 'bg-[#a78bfa]/30 text-[#a78bfa]' : 'bg-[#a78bfa]/20 text-[#a78bfa]'}`}>
+                agentMode ? 'bg-accent2/30 text-accent2' : 'bg-accent2/20 text-accent2'}`}>
                 {agentMode ? <Bot className="h-3.5 w-3.5" strokeWidth={1.75} /> : <Zap className="h-3.5 w-3.5" strokeWidth={1.75} />}
               </div>
               <div className="moc-glass-card rounded-2xl px-4 py-3 flex items-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/20 border-t-[#a78bfa] rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-white/20 border-t-accent2 rounded-full animate-spin" />
                 <span className="text-sm text-white/50">
                   {agentMode ? 'Agent reasoning — calling tools…' : 'Querying knowledge graph…'}
                 </span>
@@ -326,7 +341,7 @@ export default function MoCBot() {
               : 'Ask about MoC history, risks, HAZOP, approvals, process network…'}
             onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send(input)} />
           <Btn onClick={() => send(input)} loading={isPending} disabled={!input.trim()}
-            className={agentMode ? 'from-[#a78bfa] to-[#7c6af7]' : ''}>
+            className={agentMode ? 'from-accent2 to-accent2-strong' : ''}>
             {agentMode ? <Bot className="h-4 w-4" strokeWidth={1.75} /> : <Send className="h-4 w-4" strokeWidth={1.75} />}
             Send
           </Btn>
@@ -364,7 +379,7 @@ export default function MoCBot() {
                     <span>Asset: <span className="text-emerald-400 font-mono">{String(d.asset_id)}</span></span>
                     <RiskBadge rating={String(d.risk_category ?? 'Unknown')} />
                     <span>Score: <span className="text-red-400">{String(d.risk_score ?? '?')}</span></span>
-                    <span>Cost: <span className="text-[#4f8ef7]">${Number(d.actual_cost ?? 0).toLocaleString()}</span></span>
+                    <span>Cost: <span className="text-accent">${Number(d.actual_cost ?? 0).toLocaleString()}</span></span>
                   </div>
                 </Card>
               )
@@ -378,21 +393,29 @@ export default function MoCBot() {
                    (graphContext.impact_chain as Record<string, unknown>[])) ?? []).slice(0, 8).map((n, i) => {
                   const hop   = Number(n.hop_distance ?? 1)
                   const crit  = Number(n.criticality ?? 3)
-                  const color = hop === 1
-                    ? crit >= 5 ? '#ef4444' : '#34d399'
-                    : '#a78bfa'
+                  const color = cssVar(hop === 1 ? (crit >= 5 ? 'critical' : 'ok') : 'accent2')
                   const rels  = (n.relationship_chain as string[] | undefined) ?? []
                   return (
                     <div key={i} className="text-xs py-1.5 border-b border-white/5 last:border-0">
                       <div className="flex items-center gap-1.5" style={{ color }}>
-                        {'↳'.repeat(hop)}
+                        <span className="inline-flex" aria-label={`${hop} hop${hop > 1 ? 's' : ''}`}>
+                          {Array.from({ length: Math.max(1, Math.min(hop, 4)) }, (_, k) => (
+                            <CornerDownRight key={k} className="h-3 w-3" strokeWidth={1.75} aria-hidden />
+                          ))}
+                        </span>
                         <span className="font-mono font-semibold">{String(n.node_id)}</span>
                         <span className="text-white/40">{String(n.node_name ?? '')}</span>
                         <span className="ml-auto text-[10px] text-white/30">crit={crit}</span>
                       </div>
                       {rels.length > 0 && (
-                        <div className="text-[10px] text-white/25 pl-4 mt-0.5">
-                          via {rels.join(' → ')}
+                        <div className="text-[10px] text-white/25 pl-4 mt-0.5 flex flex-wrap items-center gap-1">
+                          via
+                          {rels.map((rel, k) => (
+                            <React.Fragment key={k}>
+                              {k > 0 && <ArrowRight className="h-2.5 w-2.5" strokeWidth={2} aria-hidden />}
+                              <span>{rel}</span>
+                            </React.Fragment>
+                          ))}
                         </div>
                       )}
                     </div>
@@ -410,7 +433,7 @@ export default function MoCBot() {
                     <span className="text-[10px] text-white/40">Source hrs:</span>
                     <input type="number" value={propHours}
                       onChange={e => setPropHours(Number(e.target.value))}
-                      className="w-12 bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[11px] text-white text-center focus:outline-none focus:border-[#4f8ef7]" />
+                      className="w-12 bg-white/5 border border-white/10 rounded px-1.5 py-0.5 text-[11px] text-white text-center focus:outline-none focus:border-accent" />
                   </div>
                 </div>
                 <div className="text-[11px] text-white/40 mb-2">
@@ -428,9 +451,9 @@ export default function MoCBot() {
                   const sim = Number(h.similarity ?? 0)
                   return (
                     <div key={String(h.moc_id)} className="flex items-center gap-2 py-1.5 border-b border-white/5 last:border-0">
-                      <span className="text-xs font-mono text-[#4f8ef7] w-16">{String(h.moc_id)}</span>
+                      <span className="text-xs font-mono text-accent w-16">{String(h.moc_id)}</span>
                       <div className="flex-1 h-1.5 rounded-full bg-white/8">
-                        <div className="h-full rounded-full" style={{ width: `${sim * 100}%`, background: 'linear-gradient(90deg,#4f8ef7,#a78bfa)' }} />
+                        <div className="h-full rounded-full" style={{ width: `${sim * 100}%`, background: `linear-gradient(90deg, ${cssVar('accent')}, ${cssVar('accent2')})` }} />
                       </div>
                       <span className="text-xs text-white/40 w-10 text-right">{sim.toFixed(3)}</span>
                     </div>
@@ -450,7 +473,7 @@ export default function MoCBot() {
                   <SectionLabel>Process Connectivity</SectionLabel>
                   {up.length > 0 && (
                     <div className="mb-2">
-                      <div className="text-[10px] text-white/40 mb-1">↑ Upstream (feeds in)</div>
+                      <div className="text-[10px] text-white/40 mb-1 flex items-center gap-1"><ArrowUp className="h-3 w-3" strokeWidth={2} aria-hidden />Upstream (feeds in)</div>
                       {up.slice(0, 4).map((n, i) => (
                         <div key={i} className="flex items-center gap-2 text-[11px] py-0.5">
                           <span className="font-mono text-purple-400 w-14">{String(n.asset_id)}</span>
@@ -462,7 +485,7 @@ export default function MoCBot() {
                   )}
                   {down.length > 0 && (
                     <div>
-                      <div className="text-[10px] text-white/40 mb-1">↓ Downstream (feeds out)</div>
+                      <div className="text-[10px] text-white/40 mb-1 flex items-center gap-1"><ArrowDown className="h-3 w-3" strokeWidth={2} aria-hidden />Downstream (feeds out)</div>
                       {down.slice(0, 4).map((n, i) => (
                         <div key={i} className="flex items-center gap-2 text-[11px] py-0.5">
                           <span className="font-mono text-emerald-400 w-14">{String(n.asset_id)}</span>
@@ -478,21 +501,21 @@ export default function MoCBot() {
 
           </>
         ) : (
-          <div className="moc-glass-card rounded-2xl border-dashed border-[#4f8ef7]/25 p-8 text-center">
-            <div className="text-3xl mb-3">🕸️</div>
+          <div className="moc-glass-card rounded-2xl border-dashed border-accent/25 p-8 text-center">
+            <Network className="mx-auto mb-3 h-8 w-8 text-accent/70" strokeWidth={1.5} aria-hidden />
             <div className="text-sm font-semibold text-white/50">Knowledge Graph</div>
             <div className="text-xs text-white/30 mt-2 leading-relaxed">
               Send a message and the graph will show retrieved nodes, relationships, and process connectivity.
             </div>
             <div className="mt-4 space-y-1.5 text-left">
-              {[
-                '🔗 Process connectivity map',
-                '📡 Downtime propagation',
-                '🤖 Agent tool call log',
-                '📊 Vector similarity scores',
-              ].map(f => (
-                <div key={f} className="text-[11px] text-white/30 flex items-center gap-2">
-                  <span className="w-1 h-1 rounded-full bg-[#4f8ef7]/40" />
+              {([
+                [Link2, 'Process connectivity map'],
+                [Radio, 'Downtime propagation'],
+                [Bot, 'Agent tool call log'],
+                [BarChart3, 'Vector similarity scores'],
+              ] as const).map(([Icon, f]) => (
+                <div key={f} className="text-[11px] text-white/40 flex items-center gap-2">
+                  <Icon className="h-3.5 w-3.5 text-accent/70" strokeWidth={1.75} aria-hidden />
                   {f}
                 </div>
               ))}

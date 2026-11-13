@@ -3,32 +3,70 @@
 @theme {
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
-  --color-bg:      #080c14;
-  --color-surface: #0d1220;
-  --color-card:    rgba(255,255,255,0.045);
-  --color-border:  rgba(255,255,255,0.10);
-  --color-accent:  #4f8ef7;
-  --color-accent2: #a78bfa;
-  --color-ok:      #34d399;
-  --color-warn:    #fbbf24;
-  --color-danger:  #f87171;
-  --color-text:    #e8eeff;
-  --color-muted:   rgba(232,238,255,0.55);
+}
+
+/*
+ * Colour tokens — the ONLY place colours are defined (tests/structure/test_frontend.py).
+ * Dark values here; light values under :root[data-theme='light'] at the end of this file.
+ * Components use them as Tailwind classes (text-accent, bg-surface, border-ok/30 ...) or,
+ * when a colour must be a JavaScript value (charts, canvas), through usePalette().
+ * `static` keeps every token in the output so usePalette() can read it at run time.
+ */
+@theme static {
+  --color-canvas:         #080c14;
+  --color-surface:        #0d1220;
+  --color-surface-2:      #0b1020;
+  --color-ink:            #e8eeff;
+  --color-accent:         #4f8ef7;
+  --color-accent-soft:    #93c5fd;
+  --color-accent2:        #a78bfa;
+  --color-accent2-soft:   #c4b5fd;
+  --color-accent2-strong: #7c6af7;
+  --color-highlight:      #f4a261;
+  --color-ok:             #34d399;
+  --color-warn:           #fbbf24;
+  --color-danger:         #f87171;
+  --color-critical:       #ef4444;
+  --color-slate:          #94a3b8;
+  --color-slate-dim:      #64748b;
+  --color-on-accent:      #ffffff;
+  /* knowledge-graph node types */
+  --color-node-moc:            #4f8ef7;
+  --color-node-asset:          #34d399;
+  --color-node-hazard:         #f87171;
+  --color-node-workorder:      #fbbf24;
+  --color-node-personnel:      #a78bfa;
+  --color-node-risk:           #fb923c;
+  --color-node-lesson:         #38bdf8;
+  --color-node-hazop:          #e879f9;
+  --color-node-pssr:           #4ade80;
+  --color-node-query:          #94a3b8;
+  --color-node-default:        #64748b;
+  --color-node-characterisation: #f472b6;
+  --color-node-category:       #22d3ee;
+  --color-node-mode:           #facc15;
+  --color-node-dimension:      #c084fc;
 }
 
 * { box-sizing: border-box; }
 
+:root { color-scheme: dark; }
+
 body {
   margin: 0;
   font-family: 'Inter', sans-serif;
-  background: #080c14;
-  color: #e8eeff;
+  background: var(--color-canvas);
+  color: var(--color-ink);
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--color-white) 12%, transparent); border-radius: 3px; }
+
+/* Elements on a solid accent background keep white text in both themes. */
+.on-accent, .moc-btn-primary, .moc-cta { --color-white: #ffffff; color: #ffffff; }
 
 .shimmer {
   background: linear-gradient(90deg, transparent 0%, rgba(79,142,247,0.06) 50%, transparent 100%);
@@ -402,3 +440,161 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(8px);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * Light theme. Set by data-theme="light" on <html> (see src/theme/).
+ *
+ * Tailwind compiles every `white/xx` utility through var(--color-white), so pointing
+ * that variable at dark ink turns "white text / white tint" into "ink text / ink tint"
+ * without touching the components. The 200–400 status shades become darker shades so
+ * they stay readable on a light background.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-white: #0f172a;
+
+  --color-canvas:         #eef2f8;
+  --color-surface:        #ffffff;
+  --color-surface-2:      #ffffff;
+  --color-ink:            #0f172a;
+  --color-accent:         #2563eb;
+  --color-accent-soft:    #1d4ed8;
+  --color-accent2:        #7c3aed;
+  --color-accent2-soft:   #6d28d9;
+  --color-accent2-strong: #6d28d9;
+  --color-highlight:      #c2410c;
+  --color-ok:             #047857;
+  --color-warn:           #b45309;
+  --color-danger:         #dc2626;
+  --color-critical:       #b91c1c;
+  --color-slate:          #475569;
+  --color-slate-dim:      #64748b;
+
+  --color-node-moc:            #2563eb;
+  --color-node-asset:          #059669;
+  --color-node-hazard:         #dc2626;
+  --color-node-workorder:      #d97706;
+  --color-node-personnel:      #7c3aed;
+  --color-node-risk:           #ea580c;
+  --color-node-lesson:         #0284c7;
+  --color-node-hazop:          #c026d3;
+  --color-node-pssr:           #16a34a;
+  --color-node-query:          #475569;
+  --color-node-default:        #64748b;
+  --color-node-characterisation: #db2777;
+  --color-node-category:       #0891b2;
+  --color-node-mode:           #ca8a04;
+  --color-node-dimension:      #9333ea;
+
+  --color-emerald-400: #047857;
+  --color-emerald-500: #059669;
+  --color-amber-200:   #92400e;
+  --color-amber-300:   #b45309;
+  --color-amber-400:   #b45309;
+  --color-amber-500:   #d97706;
+  --color-red-200:     #991b1b;
+  --color-red-300:     #b91c1c;
+  --color-red-400:     #dc2626;
+  --color-blue-300:    #1d4ed8;
+  --color-purple-300:  #6d28d9;
+  --color-purple-400:  #7c3aed;
+}
+
+/* Landing page */
+:root[data-theme='light'] .onboarding-root { background: #f4f7fc; }
+:root[data-theme='light'] .onboarding-stars { display: none; }
+:root[data-theme='light'] .onboarding-glow {
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(37, 99, 235, 0.16) 0%, rgba(37, 99, 235, 0.07) 35%, transparent 70%);
+}
+:root[data-theme='light'] .onboarding-glow-soft {
+  background: radial-gradient(ellipse 80% 70% at 48% 52%, rgba(14, 165, 233, 0.12) 0%, rgba(37, 99, 235, 0.05) 40%, transparent 68%);
+}
+:root[data-theme='light'] .moc-glass {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.78) 100%);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.05);
+}
+:root[data-theme='light'] .moc-solution {
+  background: linear-gradient(165deg, rgba(37, 99, 235, 0.08) 0%, rgba(255, 255, 255, 0.95) 55%);
+}
+:root[data-theme='light'] .moc-footer-panel {
+  background: linear-gradient(180deg, #ffffff 0%, #eef3fb 100%);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+}
+:root[data-theme='light'] .moc-footer-panel > .bg-gradient-to-b { display: none; }
+:root[data-theme='light'] .moc-hero-brand {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+}
+:root[data-theme='light'] .onboarding-card { background-image: radial-gradient(ellipse 80% 60% at 100% 100%, rgba(37, 99, 235, 0.06), transparent 55%); }
+:root[data-theme='light'] .onboarding-card:hover,
+:root[data-theme='light'] .onboarding-stat:hover,
+:root[data-theme='light'] .onboarding-process-card:hover {
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(37, 99, 235, 0.08);
+}
+
+/* Dashboard shell */
+:root[data-theme='light'] .moc-dash-root { background: #eef2f8; }
+:root[data-theme='light'] .moc-dash-mesh {
+  background:
+    radial-gradient(ellipse 55% 40% at 78% 8%, rgba(37, 99, 235, 0.12), transparent 58%),
+    radial-gradient(ellipse 45% 35% at 12% 42%, rgba(14, 165, 233, 0.07), transparent 55%),
+    #eef2f8;
+}
+:root[data-theme='light'] .moc-dash-grid {
+  background-image:
+    radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
+  opacity: 0.6;
+}
+:root[data-theme='light'] .moc-dash-orb-a { background: radial-gradient(circle, rgba(37, 99, 235, 0.14) 0%, transparent 70%); }
+:root[data-theme='light'] .moc-dash-orb-b { background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 72%); }
+:root[data-theme='light'] .moc-dash-vignette { display: none; }
+:root[data-theme='light'] .moc-sidebar {
+  background: rgba(255, 255, 255, 0.86);
+  border-right: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04);
+}
+:root[data-theme='light'] .moc-sidebar-panel,
+:root[data-theme='light'] .moc-status-row {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.08);
+}
+:root[data-theme='light'] .moc-hero-bar {
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(255, 255, 255, 0.85) 55%, rgba(37, 99, 235, 0.04) 100%);
+  border-bottom-color: rgba(15, 23, 42, 0.08);
+  box-shadow: none;
+}
+:root[data-theme='light'] .moc-tab-rail { background: rgba(255, 255, 255, 0.8); border-color: rgba(15, 23, 42, 0.08); }
+:root[data-theme='light'] .moc-tab-active {
+  background: rgba(37, 99, 235, 0.1);
+  border-color: rgba(37, 99, 235, 0.35);
+  color: #1d4ed8;
+  box-shadow: none;
+}
+:root[data-theme='light'] .moc-tab-idle { color: rgba(15, 23, 42, 0.6); }
+:root[data-theme='light'] .moc-tab-idle:hover { background: rgba(15, 23, 42, 0.05); color: #0f172a; }
+:root[data-theme='light'] .moc-glass-card {
+  background: #ffffff;
+  border-color: rgba(15, 23, 42, 0.09);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+:root[data-theme='light'] .moc-glass-card:hover {
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+:root[data-theme='light'] .moc-input-glass { background: #ffffff; border-color: rgba(15, 23, 42, 0.16); }
+:root[data-theme='light'] .moc-input-glass:focus { border-color: rgba(37, 99, 235, 0.6); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
+:root[data-theme='light'] .moc-chip { background: rgba(37, 99, 235, 0.08); border-color: rgba(37, 99, 235, 0.25); }
+:root[data-theme='light'] .moc-btn-primary,
+:root[data-theme='light'] .moc-cta {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3), 0 6px 18px rgba(37, 99, 235, 0.25);
+}
+:root[data-theme='light'] .shimmer { background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.05) 50%, transparent 100%); }
+
+/* Disclosure markers are drawn with icons; hide the browser's own triangle everywhere. */
+summary::-webkit-details-marker { display: none; }
+summary { list-style: none; }

@@ -1,8 +1,8 @@
 import React from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { Search } from 'lucide-react'
+import { ChevronRight, Library, Lightbulb, Search, UserRound, Wrench } from 'lucide-react'
 import { prefillForm } from '../api'
-import { Card, KpiCard, RiskBadge, SectionLabel, Btn, Select, Textarea, ErrorBox } from '../components/ui'
+import { Card, KpiCard, RiskBadge, SectionLabel, Btn, Select, Textarea, ErrorBox, FlagTile } from '../components/ui'
 import { CHANGE_TYPES, ASSET_IDS } from '../constants'
 import { useStore } from '../store'
 
@@ -77,49 +77,39 @@ export default function SmartForm() {
 
           <div className="grid grid-cols-3 gap-3">
             <KpiCard label="Risk Level" value={<RiskBadge rating={s.risk_level ?? 'Unknown'} />} />
-            <div className="moc-glass-card rounded-2xl p-4 flex flex-col items-center justify-center gap-1"
-              style={{ borderColor: s.hazop_required === 'Yes' ? '#fbbf2440' : '#34d39940' }}>
-              <div className="text-[11px] font-semibold uppercase tracking-widest text-white/50">HAZOP Required</div>
-              <div className="text-xl font-bold" style={{ color: s.hazop_required === 'Yes' ? '#fbbf24' : '#34d399' }}>
-                {s.hazop_required === 'Yes' ? '⚠ Yes' : '✓ No'}
-              </div>
-            </div>
-            <div className="moc-glass-card rounded-2xl p-4 flex flex-col items-center justify-center gap-1"
-              style={{ borderColor: s.pssr_required === 'Yes' ? '#fbbf2440' : '#34d39940' }}>
-              <div className="text-[11px] font-semibold uppercase tracking-widest text-white/50">PSSR Required</div>
-              <div className="text-xl font-bold" style={{ color: s.pssr_required === 'Yes' ? '#fbbf24' : '#34d399' }}>
-                {s.pssr_required === 'Yes' ? '⚠ Yes' : '✓ No'}
-              </div>
-            </div>
+            <FlagTile label="HAZOP Required" value={s.hazop_required} />
+            <FlagTile label="PSSR Required" value={s.pssr_required} />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <Card>
               <SectionLabel>Recommended Approvers</SectionLabel>
               {(s.approvers ?? []).map((a: string) => (
-                <div key={a} className="text-sm text-white/80 py-1 border-b border-white/5 last:border-0">👤 {a}</div>
+                <div key={a} className="text-sm text-white/80 py-1 border-b border-white/5 last:border-0 flex items-center gap-2"><UserRound className="h-3.5 w-3.5 text-accent flex-shrink-0" strokeWidth={1.75} aria-hidden />{a}</div>
               ))}
             </Card>
             <Card>
               <SectionLabel>P&ID Tags to Review</SectionLabel>
               {(s.pid_tags ?? []).map((t: string) => (
-                <div key={t} className="text-sm font-mono text-white/80 py-1 border-b border-white/5 last:border-0">🔧 {t}</div>
+                <div key={t} className="text-sm font-mono text-white/80 py-1 border-b border-white/5 last:border-0 flex items-center gap-2"><Wrench className="h-3.5 w-3.5 text-accent flex-shrink-0" strokeWidth={1.75} aria-hidden />{t}</div>
               ))}
               {s.scope && <p className="text-xs text-white/50 mt-2"><b>Scope:</b> {s.scope}</p>}
             </Card>
           </div>
 
           {s.justification && (
-            <div className="moc-glass-card rounded-xl border-[#4f8ef7]/25 p-4 text-sm text-white/80 leading-relaxed">
-              💡 <b>AI Justification:</b> {s.justification}
+            <div className="moc-glass-card rounded-xl border-accent/25 p-4 text-sm text-white/80 leading-relaxed flex gap-2.5">
+              <Lightbulb className="h-4 w-4 text-warn flex-shrink-0 mt-0.5" strokeWidth={1.75} aria-hidden />
+              <span><b>AI Justification:</b> {s.justification}</span>
             </div>
           )}
 
           {similar.length > 0 && (
             <details className="group">
-              <summary className="cursor-pointer text-sm font-semibold text-[#4f8ef7] hover:text-blue-300 transition-colors list-none flex items-center gap-2">
-                <span className="group-open:rotate-90 transition-transform inline-block">▶</span>
-                📚 Similar Historical MoCs ({similar.length})
+              <summary className="cursor-pointer text-sm font-semibold text-accent hover:text-blue-300 transition-colors list-none flex items-center gap-2">
+                <ChevronRight className="h-4 w-4 group-open:rotate-90 transition-transform" strokeWidth={2} aria-hidden />
+                <Library className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+                Similar Historical MoCs ({similar.length})
               </summary>
               <div className="mt-3 space-y-2">
                 {similar.slice(0, 5).map((m: Record<string, unknown>) => {
@@ -130,16 +120,16 @@ export default function SmartForm() {
                   const cost  = meta.cost ?? m.cost
                   return (
                     <div key={String(m.moc_id)} className="flex items-start gap-3 p-3 rounded-xl border border-white/8 bg-white/[0.02]">
-                      <div className="w-2 h-2 rounded-full bg-[#4f8ef7] mt-1.5 flex-shrink-0 shadow-[0_0_6px_#4f8ef7]" />
+                      <div className="w-2 h-2 rounded-full bg-accent mt-1.5 flex-shrink-0 shadow-[0_0_6px_var(--color-accent)]" />
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold text-white">{String(m.moc_id)} — {title.slice(0, 55)}</div>
                         <div className="flex items-center gap-3 mt-1.5">
                           <RiskBadge rating={risk} />
                           <span className="text-xs text-white/40">Cost: ${String(cost)}</span>
                           <div className="flex-1 h-1 rounded-full bg-white/8">
-                            <div className="h-full rounded-full bg-[#4f8ef7]" style={{ width: `${sim * 100}%` }} />
+                            <div className="h-full rounded-full bg-accent" style={{ width: `${sim * 100}%` }} />
                           </div>
-                          <span className="text-xs text-[#4f8ef7]">{sim.toFixed(2)}</span>
+                          <span className="text-xs text-accent">{sim.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>

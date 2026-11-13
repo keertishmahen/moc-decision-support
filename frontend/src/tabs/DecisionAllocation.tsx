@@ -119,7 +119,7 @@ export default function DecisionAllocation() {
           <div className="flex gap-2" role="tablist" aria-label="What to assess">
             {(['moc', 'proposed'] as const).map(m => (
               <button key={m} type="button" role="tab" aria-selected={mode === m} onClick={() => setMode(m)}
-                className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors ${mode === m ? 'bg-[#4f8ef7]/20 text-white border border-[#4f8ef7]/50' : 'border border-white/10 text-white/50 hover:text-white/80'}`}>
+                className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-colors ${mode === m ? 'bg-accent/20 text-white border border-accent/50' : 'border border-white/10 text-white/50 hover:text-white/80'}`}>
                 {m === 'moc' ? 'Existing MoC record' : 'Proposed change'}
               </button>
             ))}
@@ -173,7 +173,7 @@ export default function DecisionAllocation() {
 
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h3 className="font-bold text-white">
-              {assessment.subject.moc_id ? <span className="font-mono text-[#4f8ef7] mr-2">{assessment.subject.moc_id}</span> : null}
+              {assessment.subject.moc_id ? <span className="font-mono text-accent mr-2">{assessment.subject.moc_id}</span> : null}
               {assessment.subject.title}
             </h3>
             {assessment.subject.case_id && <span className="text-xs text-white/40">thesis case {assessment.subject.case_id}</span>}
@@ -194,7 +194,7 @@ export default function DecisionAllocation() {
             <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
               <SectionLabel>Characterisation · eight axes</SectionLabel>
               {edited && (
-                <button type="button" className="text-xs text-[#4f8ef7] hover:text-blue-300"
+                <button type="button" className="text-xs text-accent hover:text-blue-300"
                   onClick={() => { setSelection(assessment.selection); setResult(assessment.result) }}>
                   Reset all
                 </button>

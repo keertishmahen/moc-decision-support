@@ -24,7 +24,7 @@ function parseInline(text: string): React.ReactNode[] {
     } else if (m[4] !== undefined) {
       parts.push(
         <code key={m.index}
-          className="px-1.5 py-0.5 rounded text-[11px] font-mono bg-white/10 text-[#93c5fd]">
+          className="px-1.5 py-0.5 rounded text-[11px] font-mono bg-white/10 text-accent-soft">
           {m[4]}
         </code>
       )
@@ -51,7 +51,7 @@ function parseTable(lines: string[]): React.ReactNode {
           <tr>
             {header.map((h, i) => (
               <th key={i}
-                className="px-3 py-2 text-left font-semibold text-[#93c5fd] border-b border-white/15 bg-white/[0.04]">
+                className="px-3 py-2 text-left font-semibold text-accent-soft border-b border-white/15 bg-white/[0.04]">
                 {parseInline(h)}
               </th>
             ))}
@@ -193,8 +193,23 @@ interface Props {
   className?: string
 }
 
+/**
+ * Model replies are shown without emojis or pictographic symbols (the interface uses icons).
+ * Removes pictographs, dingbats, miscellaneous symbols, keycap/skin-tone/variation modifiers
+ * and joiners; arrows and ordinary punctuation are kept because they carry meaning in text.
+ */
+const EMOJI = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{1F1E6}-\u{1F1FF}\u{20E3}\u{FE0E}\u{FE0F}\u{200D}]/gu
+
+export function stripEmoji(text: string): string {
+  return text
+    .replace(EMOJI, '')
+    .replace(/^[ \t]+(?=\S)/gm, m => m)          // keep indentation as is
+    .replace(/([^\s]) {2,}/g, '$1 ')             // collapse gaps left inside a line
+    .replace(/^(\s*[-*]|\s*\d+\.)\s{2,}/gm, '$1 ') // and after list markers
+}
+
 export default function MarkdownMessage({ content, className = '' }: Props) {
-  const blocks = parseBlocks(content)
+  const blocks = parseBlocks(stripEmoji(content ?? ''))
 
   return (
     <div className={`markdown-body space-y-2 ${className}`}>
@@ -208,13 +223,13 @@ export default function MarkdownMessage({ content, className = '' }: Props) {
             )
           case 'h2':
             return (
-              <h2 key={idx} className="text-sm font-bold text-[#93c5fd] mt-3 mb-1">
+              <h2 key={idx} className="text-sm font-bold text-accent-soft mt-3 mb-1">
                 {parseInline(block.text)}
               </h2>
             )
           case 'h3':
             return (
-              <h3 key={idx} className="text-xs font-semibold uppercase tracking-widest text-[#4f8ef7] mt-2 mb-1">
+              <h3 key={idx} className="text-xs font-semibold uppercase tracking-widest text-accent mt-2 mb-1">
                 {parseInline(block.text)}
               </h3>
             )
@@ -224,7 +239,7 @@ export default function MarkdownMessage({ content, className = '' }: Props) {
               <ul key={idx} className="space-y-1 pl-1">
                 {block.items.map((item, ii) => (
                   <li key={ii} className="flex items-start gap-2 text-sm text-white/85">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#4f8ef7] flex-shrink-0" />
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
                     <span>{parseInline(item)}</span>
                   </li>
                 ))}
@@ -236,7 +251,7 @@ export default function MarkdownMessage({ content, className = '' }: Props) {
               <ol key={idx} className="space-y-1 pl-1">
                 {block.items.map((item, ii) => (
                   <li key={ii} className="flex items-start gap-2.5 text-sm text-white/85">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-[#4f8ef7]/20 text-[#4f8ef7] text-[10px] font-bold flex items-center justify-center mt-0.5">
+                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-accent/20 text-accent text-[10px] font-bold flex items-center justify-center mt-0.5">
                       {ii + 1}
                     </span>
                     <span>{parseInline(item)}</span>
@@ -253,7 +268,7 @@ export default function MarkdownMessage({ content, className = '' }: Props) {
                     {block.lang}
                   </div>
                 )}
-                <pre className="px-4 py-3 text-[11px] font-mono text-[#93c5fd] bg-[#080c14] overflow-x-auto leading-relaxed whitespace-pre-wrap">
+                <pre className="px-4 py-3 text-[11px] font-mono text-accent-soft bg-canvas overflow-x-auto leading-relaxed whitespace-pre-wrap">
                   {block.text}
                 </pre>
               </div>

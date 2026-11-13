@@ -3,9 +3,11 @@ import { useQuery } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Bot,
+  ChevronRight,
   CircleDollarSign,
   ClipboardList,
   GitBranch,
+  RefreshCw,
   Scale,
   TriangleAlert,
   type LucideIcon,
@@ -24,6 +26,7 @@ import {
 } from './navigation'
 import Onboarding from './components/Onboarding'
 import SymmetraLogo from './components/SymmetraLogo'
+import ThemeToggle from './components/ThemeToggle'
 import SmartForm    from './tabs/SmartForm'
 import RiskAnalysis from './tabs/RiskAnalysis'
 import CostPredictor from './tabs/CostPredictor'
@@ -140,18 +143,24 @@ export default function App() {
             <div className="pt-1">
               <SymmetraLogo size={30} />
               <div className="mt-2 text-[10px] text-white/40">MoC Intelligence Platform · FCC Unit</div>
-              <button
-                type="button"
-                onClick={reopenAbout}
-                className="mt-3 text-[11px] font-medium text-[#4f8ef7] hover:text-blue-300 transition-colors"
-              >
-                About
-              </button>
+              <div className="mt-3 flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={reopenAbout}
+                  className="text-[11px] font-medium text-accent hover:text-accent-soft transition-colors"
+                >
+                  About
+                </button>
+                <ThemeToggle />
+              </div>
             </div>
 
             <div className="moc-sidebar-panel p-3">
               <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-2">System Status</div>
-              <button onClick={() => refetch()} className="text-[11px] text-[#4f8ef7] hover:text-blue-300 mb-2 transition-colors">↺ Refresh</button>
+              <button onClick={() => refetch()} className="mb-2 inline-flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-soft transition-colors">
+                <RefreshCw className="h-3 w-3" strokeWidth={2} aria-hidden />
+                Refresh
+              </button>
               {(['neo4j','openai'] as const).map(svc => {
                 // A failed health request means the backend itself is down or still waking up,
                 // not that Neo4j/OpenAI are at fault — say so instead of showing stale or blank status.
@@ -160,7 +169,7 @@ export default function App() {
                 const fallback = healthError ? 'Backend unreachable — may be waking up, retrying' : 'Connecting…'
                 return (
                   <div key={svc} className="moc-status-row flex items-center gap-2 p-2 rounded-xl mb-1.5 last:mb-0">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ok ? 'bg-emerald-400 shadow-[0_0_6px_#34d399]' : 'bg-red-400 shadow-[0_0_6px_#f87171]'}`} />
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ok ? 'bg-emerald-400 shadow-[0_0_6px_var(--color-ok)]' : 'bg-red-400 shadow-[0_0_6px_var(--color-danger)]'}`} />
                     <span className="text-[11px] font-semibold text-white/80 w-12">{svc === 'neo4j' ? 'Neo4j' : 'OpenAI'}</span>
                     <span className="text-[10px] text-white/40 truncate" title={info?.message ?? fallback}>{info?.message ?? fallback}</span>
                   </div>
@@ -171,7 +180,9 @@ export default function App() {
             <div className="moc-sidebar-panel p-3">
               <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-2">Tech Stack</div>
               {STACK.map(s => (
-                <div key={s} className="text-[11px] text-white/60 py-1.5 border-b border-white/5 last:border-0">▸ {s}</div>
+                <div key={s} className="text-[11px] text-white/60 py-1.5 border-b border-white/5 last:border-0 flex items-center gap-1.5">
+                  <ChevronRight className="h-3 w-3 text-accent flex-shrink-0" strokeWidth={2} aria-hidden />{s}
+                </div>
               ))}
             </div>
 
@@ -180,7 +191,7 @@ export default function App() {
               {DATASET.map(d => (
                 <div key={d.label} className="flex justify-between py-1.5 border-b border-white/5 last:border-0">
                   <span className="text-[11px] text-white/50">{d.label}</span>
-                  <span className="text-[11px] font-bold text-[#4f8ef7]">{d.value}</span>
+                  <span className="text-[11px] font-bold text-accent">{d.value}</span>
                 </div>
               ))}
             </div>
@@ -195,7 +206,7 @@ export default function App() {
                 <p className="text-sm text-white/50 mt-1">Hybrid Neo4j + ChromaDB retrieval · GPT-4o reasoning · Engineering-grade decision support</p>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {['Live Graph', 'RAG Pipeline', 'ML Prediction', 'Vector Search'].map(b => (
-                    <span key={b} className="moc-chip px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-[#93c5fd]">{b}</span>
+                    <span key={b} className="moc-chip px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-accent-soft">{b}</span>
                   ))}
                 </div>
               </div>

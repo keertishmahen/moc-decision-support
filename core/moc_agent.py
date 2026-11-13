@@ -293,6 +293,7 @@ STRICT RULES:
 - Cite exact values from tool outputs (costs, hours, scores)
 - For multi-asset queries, call tools for each relevant asset
 - Limit tool calls to what is necessary (max 6 per query)
+- Do not use emojis, emoticons or decorative symbols; the interface supplies its own icons.
 """
 
 

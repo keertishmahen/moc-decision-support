@@ -1,5 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
+import { CircleCheck, CircleHelp, TriangleAlert } from 'lucide-react'
+import { cssVar, ink, tint, type Token } from '../theme/palette'
 
 // ── Card ──────────────────────────────────────────────────────────────────
 export const Card = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
@@ -9,15 +11,15 @@ export const Card = ({ children, className = '' }: { children: React.ReactNode; 
 )
 
 // ── KPI Card ──────────────────────────────────────────────────────────────
-export const KpiCard = ({ label, value, sub, color = '#4f8ef7' }: {
-  label: string; value: React.ReactNode; sub?: string; color?: string
+export const KpiCard = ({ label, value, sub, tone = 'accent' }: {
+  label: string; value: React.ReactNode; sub?: string; tone?: Token
 }) => (
   <motion.div
-    whileHover={{ y: -2, borderColor: 'rgba(79,142,247,0.4)' }}
+    whileHover={{ y: -2 }}
     className="moc-glass-card rounded-2xl p-4 transition-colors"
   >
     <div className="text-[11px] font-semibold uppercase tracking-widest text-white/50 mb-2">{label}</div>
-    <div className="text-2xl font-bold leading-none" style={{ color }}>{value}</div>
+    <div className="text-2xl font-bold leading-none" style={{ color: cssVar(tone) }}>{value}</div>
     {sub && <div className="text-[12px] text-white/40 mt-1">{sub}</div>}
   </motion.div>
 )
@@ -38,7 +40,7 @@ export const RiskBadge = ({ rating }: { rating: string }) => (
 
 // ── Section Label ─────────────────────────────────────────────────────────
 export const SectionLabel = ({ children }: { children: React.ReactNode }) => (
-  <div className="text-[11px] font-semibold uppercase tracking-widest text-[#4f8ef7] mb-2">{children}</div>
+  <div className="text-[11px] font-semibold uppercase tracking-widest text-accent mb-2">{children}</div>
 )
 
 // ── Button ────────────────────────────────────────────────────────────────
@@ -68,7 +70,7 @@ export const Select = ({ label, value, onChange, options }: {
     <label className="block text-[11px] font-semibold uppercase tracking-widest text-white/50 mb-1.5">{label}</label>
     <select value={value} onChange={e => onChange(e.target.value)}
       className="moc-input-glass w-full rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none transition-colors">
-      {options.map(o => <option key={o} value={o} className="bg-[#0d1220]">{o}</option>)}
+      {options.map(o => <option key={o} value={o} className="bg-surface">{o}</option>)}
     </select>
   </div>
 )
@@ -107,16 +109,17 @@ export const ErrorBox = ({ error, title = 'Something went wrong' }: { error: unk
 // ── Spinner ───────────────────────────────────────────────────────────────
 export const Spinner = ({ text = 'Loading…' }: { text?: string }) => (
   <div className="flex items-center gap-3 text-white/50 text-sm py-6 justify-center">
-    <span className="w-5 h-5 border-2 border-white/20 border-t-[#4f8ef7] rounded-full animate-spin" />
+    <span className="w-5 h-5 border-2 border-white/20 border-t-accent rounded-full animate-spin" />
     {text}
   </div>
 )
 
 // ── Gauge (SVG arc) ───────────────────────────────────────────────────────
-export const Gauge = ({ value, max = 100, label, color = '#4f8ef7', prefix = '', suffix = '' }: {
-  value: number; max?: number; label: string; color?: string; prefix?: string; suffix?: string
+export const Gauge = ({ value, max = 100, label, tone = 'accent', prefix = '', suffix = '' }: {
+  value: number; max?: number; label: string; tone?: Token; prefix?: string; suffix?: string
 }) => {
-  const pct = Math.min(value / max, 1)
+  const safeMax = Number.isFinite(max) && max > 0 ? max : 1
+  const pct = Math.max(0, Math.min(value / safeMax, 1))
   const r = 52, cx = 64, cy = 64
   const startAngle = -210, endAngle = 30
   const totalArc = endAngle - startAngle
@@ -131,9 +134,9 @@ export const Gauge = ({ value, max = 100, label, color = '#4f8ef7', prefix = '',
   return (
     <div className="flex flex-col items-center">
       <svg width="128" height="100" viewBox="0 0 128 100">
-        <path d={arcPath(startAngle, endAngle)} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="8" strokeLinecap="round" />
-        {pct > 0 && <path d={arcPath(startAngle, angle)} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" />}
-        <text x={cx} y={cy + 8} textAnchor="middle" fill="#e8eeff" fontSize="16" fontWeight="700" fontFamily="Inter">
+        <path d={arcPath(startAngle, endAngle)} fill="none" style={{ stroke: ink(8) }} strokeWidth="8" strokeLinecap="round" />
+        {pct > 0 && <path d={arcPath(startAngle, angle)} fill="none" style={{ stroke: cssVar(tone) }} strokeWidth="8" strokeLinecap="round" />}
+        <text x={cx} y={cy + 8} textAnchor="middle" style={{ fill: cssVar('ink') }} fontSize="16" fontWeight="700" fontFamily="Inter">
           {prefix}{typeof value === 'number' ? value.toLocaleString(undefined, { maximumFractionDigits: 0 }) : value}{suffix}
         </text>
       </svg>
@@ -142,16 +145,23 @@ export const Gauge = ({ value, max = 100, label, color = '#4f8ef7', prefix = '',
   )
 }
 
-// ── Binary Card ───────────────────────────────────────────────────────────
-export const BinaryCard = ({ label, value }: { label: string; value: string }) => {
-  const yes = ['yes','true','triggered','required'].includes(value?.toLowerCase())
-  const color = yes ? '#fbbf24' : '#34d399'
-  const icon  = yes ? '⚠' : '✓'
+// ── Flag tile (Yes / No / Unknown review needs) ───────────────────────────
+/** A review flag such as "HAZOP required": Yes is a caution, No is clear, anything else is unknown. */
+export const FlagTile = ({ label, value, compact = false }: { label: string; value: string | null | undefined; compact?: boolean }) => {
+  const v = (value ?? '').toString().trim().toLowerCase()
+  const yes = ['yes', 'true', 'triggered', 'required'].includes(v)
+  const no = ['no', 'false', 'not required'].includes(v)
+  const tone: Token = yes ? 'warn' : no ? 'ok' : 'slate'
+  const Icon = yes ? TriangleAlert : no ? CircleCheck : CircleHelp
+  const text = yes ? 'Yes' : no ? 'No' : (value || 'Unknown')
   return (
-    <div className="moc-glass-card rounded-2xl p-4 flex flex-col items-center justify-center gap-2 min-h-[120px]"
-      style={{ borderColor: color + '55', boxShadow: `0 0 28px ${color}18` }}>
-      <div className="text-[11px] font-semibold uppercase tracking-widest text-white/50">{label}</div>
-      <div className="text-2xl font-bold" style={{ color }}>{icon} {value}</div>
+    <div className={`moc-glass-card rounded-2xl flex flex-col items-center justify-center gap-1.5 ${compact ? 'p-3' : 'p-4 min-h-[110px]'}`}
+      style={{ borderColor: tint(tone, 35) }}>
+      <div className="text-[11px] font-semibold uppercase tracking-widest text-white/50 text-center">{label}</div>
+      <div className={`flex items-center gap-1.5 font-bold ${compact ? 'text-lg' : 'text-xl'}`} style={{ color: cssVar(tone) }}>
+        <Icon className={compact ? 'h-4 w-4' : 'h-5 w-5'} strokeWidth={2} aria-hidden />
+        {text}
+      </div>
     </div>
   )
 }
@@ -166,12 +176,12 @@ export const CIBar = ({ estimate, low, high, label, prefix = '', suffix = '' }: 
     <div>
       <div className="flex justify-between text-[11px] text-white/50 mb-1">
         <span>{label}</span>
-        <span className="font-semibold text-[#4f8ef7]">{prefix}{estimate.toLocaleString(undefined, { maximumFractionDigits: 1 })}{suffix}</span>
+        <span className="font-semibold text-accent">{prefix}{estimate.toLocaleString(undefined, { maximumFractionDigits: 1 })}{suffix}</span>
       </div>
       <div className="relative h-2 rounded-full bg-white/8 overflow-hidden border border-white/5">
-        <div className="absolute inset-y-0 rounded-full bg-[#4f8ef7]/30"
+        <div className="absolute inset-y-0 rounded-full bg-accent/30"
           style={{ left: '0%', right: '0%' }} />
-        <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#4f8ef7] border-2 border-white/30 shadow-[0_0_10px_rgba(79,142,247,0.6)]"
+        <div className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-accent border-2 border-white/30 shadow-[0_0_10px_var(--color-accent)]"
           style={{ left: `calc(${pct}% - 6px)` }} />
       </div>
       <div className="flex justify-between text-[10px] text-white/30 mt-0.5">

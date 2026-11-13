@@ -156,3 +156,10 @@ class TestPropagation:
         assert result.total_propagated_hours == round(sum(a.propagated_hours for a in result.affected_assets), 1)
         strongest = next(a for a in result.affected_assets if a.asset_id == "C-203")
         assert strongest.hop_distance == 2                              # the stronger (shorter) route is kept
+
+
+def test_chat_and_agent_prompts_forbid_emojis():
+    from core.moc_agent import AGENT_SYSTEM_PROMPT
+    from modules.nlp_chatbot import SYSTEM_PROMPT
+    for prompt in (SYSTEM_PROMPT, AGENT_SYSTEM_PROMPT):
+        assert "Do not use emojis" in prompt

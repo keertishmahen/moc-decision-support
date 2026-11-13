@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useMutation } from '@tanstack/react-query'
+import { BarChart3, ChevronRight, Microscope } from 'lucide-react'
 import { predictCost } from '../api'
 import { Card, KpiCard, SectionLabel, Btn, Select, Textarea, Gauge, CIBar, ErrorBox } from '../components/ui'
 import { CHANGE_TYPES, ASSET_IDS, ASSET_CATS, RISK_LEVELS } from '../constants'
@@ -37,7 +38,10 @@ export default function CostPredictor() {
           </div>
           <Textarea label="Change description" value={desc} onChange={setDesc} rows={3}
             placeholder="e.g. Replace reflux pump P-502 due to bearing failure…" />
-          <Btn onClick={() => desc.trim() && mutate()} loading={isPending}>📊 Predict Cost & Downtime</Btn>
+          <Btn onClick={() => desc.trim() && mutate()} loading={isPending}>
+            <BarChart3 className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+            Predict Cost & Downtime
+          </Btn>
         </div>
 
         <Card className="text-sm text-white/60 space-y-1.5">
@@ -46,7 +50,7 @@ export default function CostPredictor() {
             'Graph dependency count (Neo4j)','Associated hazard count (Neo4j)',
             'Historical MoC count on asset'].map(f => (
             <div key={f} className="flex items-start gap-2">
-              <span className="text-[#4f8ef7] mt-0.5">▸</span>{f}
+              <ChevronRight className="h-3.5 w-3.5 text-accent mt-0.5 flex-shrink-0" strokeWidth={2} aria-hidden />{f}
             </div>
           ))}
         </Card>
@@ -61,20 +65,20 @@ export default function CostPredictor() {
           <div className="grid grid-cols-4 gap-3">
             <KpiCard label="Estimated Cost" value={`$${r.cost_estimate.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
               sub={`$${r.cost_ci[0].toLocaleString(undefined, { maximumFractionDigits: 0 })} – $${r.cost_ci[1].toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
-              color="#4f8ef7" />
+              tone="accent" />
             <KpiCard label="Estimated Downtime" value={`${r.downtime_estimate.toFixed(1)}h`}
               sub={`${r.downtime_ci[0].toFixed(1)} – ${r.downtime_ci[1].toFixed(1)} hrs`}
-              color="#a78bfa" />
-            <KpiCard label="Graph Dependencies" value={r.features?.n_dependencies ?? 0} sub="from Neo4j" color="#34d399" />
+              tone="accent2" />
+            <KpiCard label="Graph Dependencies" value={r.features?.n_dependencies ?? 0} sub="from Neo4j" tone="ok" />
             <KpiCard label="Model" value={<span className="text-sm font-semibold text-amber-400">{r.models_used?.includes('ML') ? 'ML' : 'Heuristic'}</span>} />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="flex flex-col items-center gap-2 moc-glass-card rounded-2xl p-4">
-              <Gauge value={r.cost_estimate} max={r.cost_ci[1] * 1.1} label="Estimated Cost ($)" prefix="$" color="#4f8ef7" />
+              <Gauge value={r.cost_estimate} max={r.cost_ci[1] * 1.1} label="Estimated Cost ($)" prefix="$" tone="accent" />
             </div>
             <div className="flex flex-col items-center gap-2 moc-glass-card rounded-2xl p-4">
-              <Gauge value={r.downtime_estimate} max={r.downtime_ci[1] * 1.25} label="Downtime (hrs)" suffix="h" color="#a78bfa" />
+              <Gauge value={r.downtime_estimate} max={r.downtime_ci[1] * 1.25} label="Downtime (hrs)" suffix="h" tone="accent2" />
             </div>
             <Card className="space-y-4 justify-center flex flex-col">
               <CIBar estimate={r.cost_estimate} low={r.cost_ci[0]} high={r.cost_ci[1]} label="Cost Confidence Interval" prefix="$" />
@@ -88,15 +92,16 @@ export default function CostPredictor() {
           </Card>
 
           <details className="group">
-            <summary className="cursor-pointer text-sm font-semibold text-[#4f8ef7] hover:text-blue-300 transition-colors list-none flex items-center gap-2">
-              <span className="group-open:rotate-90 transition-transform inline-block">▶</span>
-              🔬 Feature Vector
+            <summary className="cursor-pointer text-sm font-semibold text-accent hover:text-blue-300 transition-colors list-none flex items-center gap-2">
+              <ChevronRight className="h-4 w-4 group-open:rotate-90 transition-transform" strokeWidth={2} aria-hidden />
+              <Microscope className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+              Feature Vector
             </summary>
             <div className="mt-3 grid grid-cols-3 gap-3">
               {Object.entries(r.features ?? {}).map(([k, v]) => (
                 <div key={k} className="moc-glass-card rounded-xl p-3">
                   <div className="text-[11px] text-white/40 mb-1">{k}</div>
-                  <div className="text-base font-bold font-mono text-[#4f8ef7]">{String(v)}</div>
+                  <div className="text-base font-bold font-mono text-accent">{String(v)}</div>
                 </div>
               ))}
             </div>

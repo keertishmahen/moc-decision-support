@@ -111,6 +111,7 @@ RESPONSE FORMAT RULES (MANDATORY):
 - Use tables for comparative data (e.g. multiple MoCs side by side, cost comparisons)
 - Keep each section concise — bullet points over paragraphs wherever possible
 - Start every response with a 1-2 sentence summary, then structured sections below
+- Do not use emojis, emoticons or decorative symbols; the interface supplies its own icons.
 
 RETRIEVED CONTEXT (use this data to answer — do not invent):
 {context}
@@ -797,7 +798,7 @@ class MoCChatbot:
                         if margin > 0:
                             status_label = "WITHIN LIMITS"
                         else:
-                            status_label = "⚠ EXCEEDS LIMIT — ESCALATION REQUIRED"
+                            status_label = "WARNING: EXCEEDS LIMIT — ESCALATION REQUIRED"
                         sections.append(
                             f"THRESHOLD CHECK FOR {asset_id}:\n"
                             f"  Parameter: {p.get('name', 'parameter')}\n"

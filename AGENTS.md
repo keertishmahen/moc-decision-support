@@ -54,7 +54,9 @@ These fail the build; the failure message says how to fix it.
 3. **Model numbers live once**, in `core/allocation/config/`. Not in code, not in the frontend.
 4. **Published results stay reproduced**: thesis Table 2 and the 2,592-point enumeration.
    (`tests/allocation/`)
-5. **Docs stay true**: this file stays short, its links resolve, and
+5. **Frontend colours are tokens, icons are lucide**: no hex/rgba in `.ts`/`.tsx` and no emojis
+   in `frontend/src`; every dark token has a light value. (`tests/structure/test_frontend.py`)
+6. **Docs stay true**: this file stays short, its links resolve, and
    `docs/generated/api-routes.md` matches the app. (`tests/structure/test_docs.py`)
 
 ## Working principles

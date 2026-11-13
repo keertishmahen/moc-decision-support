@@ -1,20 +1,23 @@
 import React from 'react'
 import { useMutation } from '@tanstack/react-query'
 import { analyseRisk } from '../api'
-import { Card, KpiCard, RiskBadge, SectionLabel, Btn, Select, Textarea, Gauge, ErrorBox } from '../components/ui'
+import { ArrowRight, Brain, Circle, CircleCheck, CornerDownRight, Microscope } from 'lucide-react'
+import { Card, KpiCard, RiskBadge, SectionLabel, Btn, Select, Textarea, Gauge, ErrorBox, FlagTile } from '../components/ui'
+import { chartStyle, cssVar, severityColor, severityToken, usePalette } from '../theme/palette'
 import { CHANGE_TYPES, ASSET_IDS } from '../constants'
 import { useStore } from '../store'
 import { navigate, pathForTab, TAB_PATHS } from '../navigation'
 
 const yesNo = (v: unknown): boolean | null => (v === 'Yes' ? true : v === 'No' ? false : null)
-const ALLOCATION_TAB = TAB_PATHS.indexOf('/app/allocation')
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts'
 
-const SEV_COLOR: Record<string, string> = { High: '#f87171', Critical: '#ef4444', Medium: '#fbbf24', Low: '#34d399' }
+const ALLOCATION_TAB = TAB_PATHS.indexOf('/app/allocation')
 const RISK_SCORE: Record<string, number> = { Low: 22, Medium: 50, High: 76, Critical: 95 }
 
 export default function RiskAnalysis() {
   const { currentChange, setCurrentChange, setActiveTab, setAllocationIntent } = useStore()
+  const palette = usePalette()
+  const chart = chartStyle(palette)
   const ct = currentChange.changeType
   const aid = currentChange.assetId
   const desc = currentChange.description
@@ -58,7 +61,10 @@ export default function RiskAnalysis() {
       </div>
       <Textarea label="Describe the proposed change" value={desc} onChange={setDesc} rows={3}
         placeholder="e.g. Upgrade catalyst slide valve SV-204 actuator to advanced feedback control…" />
-      <Btn onClick={() => desc.trim() && mutate()} loading={isPending}>🔬 Analyse Risks</Btn>
+      <Btn onClick={() => desc.trim() && mutate()} loading={isPending}>
+        <Microscope className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+        Analyse Risks
+      </Btn>
 
       <ErrorBox error={error} title="Risk analysis failed" />
 
@@ -72,19 +78,22 @@ export default function RiskAnalysis() {
             </div>
           )}
 
-          <div className="moc-glass-card rounded-xl border-[#4f8ef7]/25 p-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="moc-glass-card rounded-xl border-accent/25 p-4 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-white/70">
               Next: who should decide this change? The HAZOP and PSSR findings carry over.
             </p>
-            <Btn variant="ghost" onClick={continueToAllocation}>Continue to Decision Allocation →</Btn>
+            <Btn variant="ghost" onClick={continueToAllocation}>
+              Continue to Decision Allocation
+              <ArrowRight className="h-4 w-4" strokeWidth={1.75} aria-hidden />
+            </Btn>
           </div>
 
           {/* KPI row */}
           <div className="grid grid-cols-4 gap-3">
             <KpiCard label="Overall Risk" value={<RiskBadge rating={r.overall_rating ?? 'Unknown'} />} />
-            <KpiCard label="Direct Assets" value={direct.length} sub="1 hop" color="#34d399" />
-            <KpiCard label="Indirect Assets" value={indirect.length} sub="2–3 hops" color="#fbbf24" />
-            <KpiCard label="Hazards Found" value={hazards.length} sub="from graph" color="#f87171" />
+            <KpiCard label="Direct Assets" value={direct.length} sub="1 hop" tone="ok" />
+            <KpiCard label="Indirect Assets" value={indirect.length} sub="2–3 hops" tone="warn" />
+            <KpiCard label="Hazards Found" value={hazards.length} sub="from graph" tone="danger" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -93,27 +102,16 @@ export default function RiskAnalysis() {
               <div className="grid grid-cols-3 gap-2">
                 <div className="moc-glass-card rounded-2xl p-3 flex flex-col items-center">
                   <Gauge value={RISK_SCORE[r.overall_rating ?? ''] ?? 0}
-                    label="Risk Score" color="#4f8ef7" />
+                    label="Risk Score" tone={severityToken(r.overall_rating)} />
                 </div>
-                <div className="moc-glass-card rounded-2xl p-3 flex flex-col items-center justify-center gap-1"
-                  style={{ borderColor: r.hazop_triggered === 'Yes' ? '#fbbf2440' : '#34d39940' }}>
-                  <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">HAZOP</div>
-                  <div className="text-lg font-bold" style={{ color: r.hazop_triggered === 'Yes' ? '#fbbf24' : '#34d399' }}>
-                    {r.hazop_triggered === 'Yes' ? '⚠ Yes' : '✓ No'}
-                  </div>
-                </div>
-                <div className="moc-glass-card rounded-2xl p-3 flex flex-col items-center justify-center gap-1"
-                  style={{ borderColor: r.pssr_required === 'Yes' ? '#fbbf2440' : '#34d39940' }}>
-                  <div className="text-[10px] font-semibold uppercase tracking-widest text-white/50">PSSR</div>
-                  <div className="text-lg font-bold" style={{ color: r.pssr_required === 'Yes' ? '#fbbf24' : '#34d399' }}>
-                    {r.pssr_required === 'Yes' ? '⚠ Yes' : '✓ No'}
-                  </div>
-                </div>
+                <FlagTile label="HAZOP" value={r.hazop_triggered} compact />
+                <FlagTile label="PSSR" value={r.pssr_required} compact />
               </div>
 
               {r.reasoning && (
-                <div className="moc-glass-card rounded-xl border-[#4f8ef7]/25 p-3 text-sm text-white/80 leading-relaxed">
-                  🧠 {r.reasoning}
+                <div className="moc-glass-card rounded-xl border-accent/25 p-3 text-sm text-white/80 leading-relaxed flex gap-2.5">
+                  <Brain className="h-4 w-4 text-accent flex-shrink-0 mt-0.5" strokeWidth={1.75} aria-hidden />
+                  <span>{r.reasoning}</span>
                 </div>
               )}
 
@@ -122,9 +120,10 @@ export default function RiskAnalysis() {
                 {risks.map((risk: Record<string, unknown>, i: number) => {
                   const sev = String(risk.severity ?? 'Medium')
                   return (
-                    <div key={i} className="text-sm py-1.5 border-b border-white/5 last:border-0"
-                      style={{ color: SEV_COLOR[sev] ?? '#94a3b8' }}>
-                      ● {String(risk.description ?? '')}
+                    <div key={i} className="text-sm py-1.5 border-b border-white/5 last:border-0 flex items-start gap-2"
+                      style={{ color: cssVar(severityToken(sev)) }}>
+                      <Circle className="h-2.5 w-2.5 mt-1.5 flex-shrink-0 fill-current" strokeWidth={0} aria-label={`${sev} severity`} />
+                      <span>{String(risk.description ?? '')}</span>
                     </div>
                   )
                 })}
@@ -133,7 +132,7 @@ export default function RiskAnalysis() {
               <Card>
                 <SectionLabel>Mitigations</SectionLabel>
                 {mits.map((m: string, i: number) => (
-                  <div key={i} className="text-sm text-white/80 py-1.5 border-b border-white/5 last:border-0">✅ {m}</div>
+                  <div key={i} className="text-sm text-white/80 py-1.5 border-b border-white/5 last:border-0 flex items-start gap-2"><CircleCheck className="h-4 w-4 text-ok flex-shrink-0 mt-0.5" strokeWidth={1.75} aria-hidden /><span>{m}</span></div>
                 ))}
               </Card>
             </div>
@@ -149,15 +148,15 @@ export default function RiskAnalysis() {
                         { name: 'Direct (1 hop)', value: Math.max(direct.length, 1) },
                         { name: 'Indirect (2-3 hops)', value: Math.max(indirect.length, 1) },
                       ]} cx="50%" cy="50%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
-                        <Cell fill="#4f8ef7" />
-                        <Cell fill="#a78bfa" />
+                        <Cell fill={palette.accent} />
+                        <Cell fill={palette.accent2} />
                       </Pie>
-                      <Tooltip contentStyle={{ background: '#0d1220', border: '1px solid rgba(79,142,247,0.3)', borderRadius: 8, color: '#e8eeff', fontSize: 12 }} />
+                      <Tooltip contentStyle={chart.tooltip} itemStyle={chart.tooltipItem} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="flex gap-4 justify-center text-xs text-white/50">
-                    <span><span className="inline-block w-2 h-2 rounded-full bg-[#4f8ef7] mr-1" />Direct: {direct.length}</span>
-                    <span><span className="inline-block w-2 h-2 rounded-full bg-[#a78bfa] mr-1" />Indirect: {indirect.length}</span>
+                    <span><span className="inline-block w-2 h-2 rounded-full bg-accent mr-1" />Direct: {direct.length}</span>
+                    <span><span className="inline-block w-2 h-2 rounded-full bg-accent2 mr-1" />Indirect: {indirect.length}</span>
                   </div>
                 </Card>
               )}
@@ -166,8 +165,9 @@ export default function RiskAnalysis() {
                 <Card>
                   <SectionLabel>Direct Impact (1 hop)</SectionLabel>
                   {direct.slice(0, 6).map((a: Record<string, unknown>) => (
-                    <div key={String(a.node_id)} className="text-sm text-emerald-400 py-1 border-b border-white/5 last:border-0">
-                      ↳ <span className="font-mono">{String(a.node_id)}</span> {String(a.node_name ?? '')}
+                    <div key={String(a.node_id)} className="text-sm text-ok py-1 border-b border-white/5 last:border-0 flex items-center gap-1.5">
+                      <CornerDownRight className="h-3.5 w-3.5 flex-shrink-0" strokeWidth={1.75} aria-hidden />
+                      <span className="font-mono">{String(a.node_id)}</span> {String(a.node_name ?? '')}
                     </div>
                   ))}
                 </Card>
@@ -178,10 +178,10 @@ export default function RiskAnalysis() {
                   <SectionLabel>Hazard Severity</SectionLabel>
                   <ResponsiveContainer width="100%" height={120}>
                     <BarChart data={Object.entries(sevCounts).map(([k, v]) => ({ name: k, count: v }))}>
-                      <XAxis dataKey="name" tick={{ fill: '#94a3b8', fontSize: 11 }} axisLine={false} tickLine={false} />
-                      <Tooltip contentStyle={{ background: '#0d1220', border: '1px solid rgba(79,142,247,0.3)', borderRadius: 8, color: '#e8eeff', fontSize: 12 }} />
+                      <XAxis dataKey="name" tick={chart.tick} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={chart.tooltip} itemStyle={chart.tooltipItem} cursor={chart.cursor} />
                       <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                        {Object.keys(sevCounts).map((k, i) => <Cell key={i} fill={SEV_COLOR[k] ?? '#64748b'} />)}
+                        {Object.keys(sevCounts).map((k, i) => <Cell key={i} fill={severityColor(palette, k)} />)}
                       </Bar>
                     </BarChart>
                   </ResponsiveContainer>

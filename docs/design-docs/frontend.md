@@ -19,6 +19,18 @@ src/
 
 ## Conventions
 
+- **Light and dark mode.** The theme is `data-theme` on `<html>`, set before first paint by a
+  script in `index.html` (stored choice, else the operating-system setting) and switched by
+  `ThemeToggle` (landing header and app sidebar). `src/theme/ThemeProvider.tsx` keeps React in step.
+- **Colours live only in `src/index.css`.** Dark values in `@theme static`, light values under
+  `:root[data-theme='light']`. Use them as classes (`text-accent`, `bg-surface`, `border-ok/30`),
+  as CSS references in style props (`cssVar('ok')`, `tint('warn', 30)`), or, for charts and the
+  graph canvas, through `usePalette()`. In light mode `--color-white` points at dark ink, so the
+  existing `text-white/60`-style utilities read as "ink at 60 %" in both themes. No hex or rgba in
+  `.ts`/`.tsx` files (`tests/structure/test_frontend.py`).
+- **Icons, not emojis.** Every icon is from `lucide-react`; emoji and symbol characters are not
+  allowed in `frontend/src` (same test). Model replies are stripped of emojis before display
+  (`MarkdownMessage.stripEmoji`), and the chat and agent prompts ask for none.
 - **One logo component.** `components/SymmetraLogo.tsx` is the only place the Symmetra
   Systems logo is defined (icon from `assets/symmetra-mark.png`, wordmark as text). It is
   used in the landing-page header, hero and footer and in the sidebar of every app page.

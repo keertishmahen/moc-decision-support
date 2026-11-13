@@ -42,17 +42,17 @@ export function parsePath(pathname: string, onboardingSeen: boolean): AppRoute {
     return { view: 'app', tab: tabIdx }
   }
 
-  // Unknown → onboarding (app opens to onboarding by default)
+  // Unknown -> onboarding (app opens to onboarding by default)
   return { view: 'onboarding', tab: 0 }
 }
 
-/** Canonical path for a route (normalizes /app → smart-form). */
+/** Canonical path for a route (normalizes /app -> smart-form). */
 export function pathForRoute(route: AppRoute): string {
   if (route.view === 'onboarding') return PATH_ONBOARDING
   return pathForTab(route.tab)
 }
 
-/** Current route path, read from the URL hash ("#/app/risk" → "/app/risk"). */
+/** Current route path, read from the URL hash ("#/app/risk" -> "/app/risk"). */
 export function currentPath(): string {
   return window.location.hash.replace(/^#/, '') || '/'
 }
@@ -72,8 +72,8 @@ export function replace(path: string) {
 
 /**
  * Resolve path on load:
- * - / and unknown non-app paths → onboarding
- * - /app → /app/smart-form
+ * - / and unknown non-app paths -> onboarding
+ * - /app -> /app/smart-form
  * - /app/* tab paths stay as-is
  */
 export function resolveInitialPath(pathname: string, _onboardingSeen: boolean): string {

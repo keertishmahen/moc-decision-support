@@ -28,6 +28,7 @@ import {
   WHY_US,
 } from '../onboardingContent'
 import SymmetraLogo from './SymmetraLogo'
+import ThemeToggle from './ThemeToggle'
 
 type Props = {
   onEnter: () => void
@@ -218,7 +219,7 @@ export default function Onboarding({ onEnter }: Props) {
   return (
     <div
       ref={rootRef}
-      className="onboarding-root relative min-h-screen overflow-x-hidden text-[#e8eeff]"
+      className="onboarding-root relative min-h-screen overflow-x-hidden text-ink"
       style={{ fontFamily: 'Outfit, Inter, sans-serif' }}
     >
       {/* Atmosphere: layered drifting starfield + nebula */}
@@ -255,7 +256,10 @@ export default function Onboarding({ onEnter }: Props) {
             </button>
           ))}
         </nav>
-        <PrimaryCta onClick={onEnter} size="sm" />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <PrimaryCta onClick={onEnter} size="sm" />
+        </div>
       </header>
 
       {/* Hero */}
@@ -270,7 +274,7 @@ export default function Onboarding({ onEnter }: Props) {
             className="mb-8 flex justify-center"
             {...(reduce ? {} : { initial: { scale: 0.92, opacity: 0 }, animate: { scale: 1, opacity: 1 }, transition: { duration: 0.7, ease } })}
           >
-            <div className="moc-hero-brand inline-flex max-w-full flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-[#0b1020]/70 px-4 py-3 backdrop-blur-xl">
+            <div className="moc-hero-brand inline-flex max-w-full flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-surface-2/70 px-4 py-3 backdrop-blur-xl">
               <SymmetraLogo size={40} />
               <div className="text-left sm:border-l sm:border-white/15 sm:pl-3">
                 <div className="text-base font-semibold tracking-tight text-white">{HERO.brand}</div>
@@ -306,7 +310,7 @@ export default function Onboarding({ onEnter }: Props) {
               className="onboarding-stat moc-glass cursor-default rounded-2xl border border-white/10 px-4 py-4 text-center"
               {...cardMotion(reduce, 0.15 + i * 0.08)}
             >
-              <div className="text-2xl font-semibold tracking-tight text-[#93c5fd]">{s.value}</div>
+              <div className="text-2xl font-semibold tracking-tight text-accent-soft">{s.value}</div>
               <div className="mt-1 text-[11px] uppercase tracking-[0.12em] text-white/40">{s.label}</div>
             </motion.div>
           ))}
@@ -328,7 +332,7 @@ export default function Onboarding({ onEnter }: Props) {
               className="onboarding-card moc-glass group cursor-default rounded-2xl border border-white/10 p-6 text-left"
               {...cardMotion(reduce, i * 0.1)}
             >
-              <div className="mb-4 h-px w-10 bg-gradient-to-r from-[#F4A261] to-transparent" />
+              <div className="mb-4 h-px w-10 bg-gradient-to-r from-highlight to-transparent" />
               <h3 className="text-lg font-semibold text-white">{card.title}</h3>
               <p className="mt-3 text-sm leading-relaxed text-white/55">{card.body}</p>
             </motion.article>
@@ -374,11 +378,11 @@ export default function Onboarding({ onEnter }: Props) {
           </motion.div>
 
           <motion.div
-            className="onboarding-card moc-solution relative cursor-default overflow-hidden rounded-2xl border border-[#4f8ef7]/30 p-6 md:p-8"
+            className="onboarding-card moc-solution relative cursor-default overflow-hidden rounded-2xl border border-accent/30 p-6 md:p-8"
             {...cardMotion(reduce, 0.12, 'right')}
           >
-            <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-[#4f8ef7]/30 blur-3xl" aria-hidden />
-            <div className="pointer-events-none absolute -bottom-8 left-8 h-28 w-28 rounded-full bg-[#F4A261]/15 blur-3xl" aria-hidden />
+            <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-accent/30 blur-3xl" aria-hidden />
+            <div className="pointer-events-none absolute -bottom-8 left-8 h-28 w-28 rounded-full bg-highlight/15 blur-3xl" aria-hidden />
             <h3 className="relative text-lg font-semibold text-white">{WHY_US.solutions.title}</h3>
             <ul className="relative mt-5 space-y-3.5">
               {WHY_US.solutions.items.map((item, i) => (
@@ -394,8 +398,8 @@ export default function Onboarding({ onEnter }: Props) {
                         transition: { duration: 0.35, delay: 0.28 + i * 0.06, ease },
                       })}
                 >
-                  <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[#4f8ef7]/20">
-                    <Check className="h-3 w-3 text-[#93c5fd]" strokeWidth={2.5} />
+                  <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent/20">
+                    <Check className="h-3 w-3 text-accent-soft" strokeWidth={2.5} />
                   </span>
                   {item}
                 </motion.li>
@@ -421,7 +425,7 @@ export default function Onboarding({ onEnter }: Props) {
                 className="onboarding-card moc-glass cursor-default rounded-2xl border border-white/10 p-5"
                 {...cardMotion(reduce, i * 0.09)}
               >
-                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[#4f8ef7]/25 bg-[#4f8ef7]/10 text-[#93c5fd]">
+                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/25 bg-accent/10 text-accent-soft">
                   <Icon className="h-4 w-4" strokeWidth={1.75} />
                 </span>
                 <h3 className="text-[15px] font-semibold text-white">{cap.title}</h3>
@@ -440,14 +444,14 @@ export default function Onboarding({ onEnter }: Props) {
           <p className="mt-4 text-base leading-relaxed text-white/55">{PROCESS.subhead}</p>
         </motion.div>
         <div className="relative mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="pointer-events-none absolute left-[12%] right-[12%] top-8 hidden h-px bg-gradient-to-r from-transparent via-[#4f8ef7]/35 to-transparent lg:block" aria-hidden />
+          <div className="pointer-events-none absolute left-[12%] right-[12%] top-8 hidden h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent lg:block" aria-hidden />
           {PROCESS.steps.map((step, i) => (
             <motion.article
               key={step.step}
               className="onboarding-process-card moc-glass relative cursor-default rounded-2xl border border-white/10 p-5 text-left"
               {...cardMotion(reduce, i * 0.12)}
             >
-              <div className="text-xs font-semibold tracking-[0.18em] text-[#F4A261]">{step.step}</div>
+              <div className="text-xs font-semibold tracking-[0.18em] text-highlight">{step.step}</div>
               <h3 className="mt-3 text-base font-semibold text-white">{step.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-white/50">{step.body}</p>
             </motion.article>
@@ -457,7 +461,7 @@ export default function Onboarding({ onEnter }: Props) {
 
       {/* Values */}
       <section id="values" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4f8ef7]/10 blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl" aria-hidden />
         <motion.div className="relative mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
           <Pill>{VALUES.badge}</Pill>
           <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{VALUES.headline}</h2>
@@ -474,7 +478,7 @@ export default function Onboarding({ onEnter }: Props) {
                 {...cardMotion(reduce, i * 0.1)}
               >
                 <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-[#F4A261]">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-highlight">
                     <Icon className="h-4 w-4" strokeWidth={1.75} />
                   </span>
                   <h3 className="text-base font-semibold text-white">{card.title}</h3>
@@ -492,7 +496,7 @@ export default function Onboarding({ onEnter }: Props) {
           className="moc-footer-panel relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/10 px-6 py-14 text-center md:px-12"
           {...viewFade(reduce)}
         >
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0b1020]/80 to-black/90" aria-hidden />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-surface-2/80 to-black/90" aria-hidden />
           <div className="relative">
             <SymmetraLogo size={44} />
             <h2 className="mt-5 text-2xl font-semibold text-white md:text-3xl">{FOOTER.headline}</h2>

@@ -1,12 +1,14 @@
 import React, { useCallback, useMemo } from 'react'
 import ForceGraph2D from 'react-force-graph-2d'
+import { usePalette, type Token } from '../theme/palette'
 
-const NODE_COLORS: Record<string, string> = {
-  MoC: '#4f8ef7', Asset: '#34d399', Hazard: '#f87171',
-  WorkOrder: '#fbbf24', Personnel: '#a78bfa', RiskAssessment: '#fb923c',
-  LessonsLearned: '#38bdf8', HAZOP: '#e879f9', PSSR: '#4ade80',
-  DecisionCharacterisation: '#f472b6', AxisCategory: '#22d3ee', AllocationMode: '#facc15', Dimension: '#c084fc',
-  Query: '#94a3b8', default: '#64748b',
+/** Node type -> colour token (values for both themes live in src/index.css). */
+const NODE_TOKENS: Record<string, Token> = {
+  MoC: 'node-moc', Asset: 'node-asset', Hazard: 'node-hazard',
+  WorkOrder: 'node-workorder', Personnel: 'node-personnel', RiskAssessment: 'node-risk',
+  LessonsLearned: 'node-lesson', HAZOP: 'node-hazop', PSSR: 'node-pssr',
+  DecisionCharacterisation: 'node-characterisation', AxisCategory: 'node-category', AllocationMode: 'node-mode',
+  Dimension: 'node-dimension', Query: 'node-query',
 }
 
 const escapeHtml = (text: unknown) =>
@@ -144,15 +146,17 @@ function buildGraph(ctx: Record<string, unknown>, query: string) {
 
 export default function KnowledgeGraph({ context, query }: { context: Record<string, unknown>; query: string }) {
   const { nodes, links } = useMemo(() => buildGraph(context, query), [context, query])
+  const palette = usePalette()
+  const colorOf = useCallback((type: string) => palette[NODE_TOKENS[type] ?? 'node-default'], [palette])
 
   const legendTypes = useMemo(() => {
     const present = new Set(nodes.map(n => n.type))
-    return Object.entries(NODE_COLORS).filter(([k]) => k !== 'default' && present.has(k))
-  }, [nodes])
+    return Object.keys(NODE_TOKENS).filter(k => present.has(k)).map(k => [k, colorOf(k)] as const)
+  }, [nodes, colorOf])
 
   const nodeCanvasObject = useCallback((node: unknown, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const n = node as GraphNode & { x: number; y: number }
-    const color = NODE_COLORS[n.type] ?? NODE_COLORS.default
+    const color = colorOf(n.type)
     const r = n.type === 'Query' ? 10 : n.type === 'MoC' ? 8 : 6
     ctx.beginPath()
     ctx.arc(n.x, n.y, r, 0, 2 * Math.PI)
@@ -164,15 +168,15 @@ export default function KnowledgeGraph({ context, query }: { context: Record<str
     const label = n.label
     const fontSize = Math.max(10 / globalScale, 8)
     ctx.font = `${fontSize}px Inter`
-    ctx.fillStyle = '#e8eeff'
+    ctx.fillStyle = palette.ink
     ctx.textAlign = 'center'
     ctx.fillText(label, n.x, n.y + r + fontSize + 1)
-  }, [])
+  }, [colorOf, palette])
 
   if (nodes.length === 0) return null
 
   return (
-    <div className="graph-canvas rounded-xl overflow-hidden border border-white/10 bg-[#080c14]">
+    <div className="graph-canvas rounded-xl overflow-hidden border border-white/10 bg-canvas">
       <ForceGraph2D
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         graphData={{ nodes: nodes as any[], links: links as any[] }}
@@ -181,7 +185,7 @@ export default function KnowledgeGraph({ context, query }: { context: Record<str
         linkTarget="target"
         nodeCanvasObject={nodeCanvasObject}
         nodeCanvasObjectMode={() => 'replace'}
-        linkColor={() => 'rgba(79,142,247,0.3)'}
+        linkColor={() => `${palette.accent}4d`}
         linkWidth={1}
         linkDirectionalArrowLength={4}
         linkDirectionalArrowRelPos={1}
@@ -193,8 +197,8 @@ export default function KnowledgeGraph({ context, query }: { context: Record<str
         nodeLabel={(n: any) => {
           const node = n as GraphNode
           // The tooltip is rendered as HTML, and these strings come from the database: escape them.
-          return `<div style="background:#0d1220;border:1px solid rgba(79,142,247,0.3);border-radius:8px;padding:6px 10px;font-size:11px;color:#e8eeff;max-width:200px">
-            <b>${escapeHtml(node.label)}</b><br/><i style="color:#94a3b8">${escapeHtml(node.type)}</i><br/>${escapeHtml(node.detail).replace(/\n/g,'<br/>')}
+          return `<div style="background:${palette.surface};border:1px solid ${palette.accent}4d;border-radius:8px;padding:6px 10px;font-size:11px;color:${palette.ink};max-width:200px;box-shadow:0 6px 20px ${palette.canvas}66">
+            <b>${escapeHtml(node.label)}</b><br/><i style="color:${palette.slate}">${escapeHtml(node.type)}</i><br/>${escapeHtml(node.detail).replace(/\n/g,'<br/>')}
           </div>`
         }}
       />
