@@ -5,6 +5,7 @@
  * it is fetched from GET /api/allocation/model and every score comes from the backend engine.
  */
 import { api } from '../api'
+import type { Provenance } from '../case/api'
 
 export type AllocationCode = 'AI_LED' | 'AI_SUPPORTED' | 'HUMAN_LED'
 export type LevelCode = 'LOW' | 'MED' | 'HIGH'
@@ -57,6 +58,7 @@ export interface AllocationResult {
   escalated_by: string[]
   reasons: string[]
   flips: AllocationFlip[]
+  provenance?: Provenance       // on /allocation/score responses
 }
 
 export interface AxisSuggestion {
@@ -102,6 +104,7 @@ export interface AllocationAssessment {
   characterisation_status: string
   result: AllocationResult
   graph_status: 'ok' | 'unavailable'
+  provenance?: Provenance
 }
 
 export interface ReferenceCaseRow {

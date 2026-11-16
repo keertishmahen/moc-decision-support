@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import type { CaseRecord } from './case/api'
 
 export interface ChatMessage { role: 'user' | 'assistant'; content: string; intent?: string }
 
@@ -15,6 +16,9 @@ interface AppStore {
   // Change under assessment
   currentChange: CurrentChange
   setCurrentChange: (patch: Partial<CurrentChange>) => void
+  // Last multi-agent case (kept here so it survives switching tabs)
+  caseRecord: CaseRecord | null
+  setCaseRecord: (c: CaseRecord | null) => void
   // Set by another tab to open Decision Allocation on the proposed change
   allocationIntent: 'proposed' | null
   setAllocationIntent: (intent: 'proposed' | null) => void
@@ -34,6 +38,8 @@ interface AppStore {
 export const useStore = create<AppStore>(set => ({
   currentChange: { changeType: 'Mechanical', assetId: 'P-101', description: '', hazopRequired: null, pssrRequired: null },
   setCurrentChange: patch => set(s => ({ currentChange: { ...s.currentChange, ...patch } })),
+  caseRecord: null,
+  setCaseRecord: c => set({ caseRecord: c }),
   allocationIntent: null,
   setAllocationIntent: intent => set({ allocationIntent: intent }),
   messages: [{

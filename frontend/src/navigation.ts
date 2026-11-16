@@ -2,9 +2,12 @@
 
 export const PATH_ONBOARDING = '/'
 export const PATH_APP_ROOT = '/app'
-export const PATH_SMART_FORM = '/app/smart-form'
+export const PATH_CHANGE_CASE = '/app/case'
+/** Where "Enter Platform" lands: the guided Change Case. */
+export const PATH_LANDING = PATH_CHANGE_CASE
 
 export const TAB_PATHS = [
+  '/app/case',
   '/app/smart-form',
   '/app/risk',
   '/app/cost',
@@ -46,7 +49,7 @@ export function parsePath(pathname: string, onboardingSeen: boolean): AppRoute {
   return { view: 'onboarding', tab: 0 }
 }
 
-/** Canonical path for a route (normalizes /app -> smart-form). */
+/** Canonical path for a route (normalizes /app -> the landing tab). */
 export function pathForRoute(route: AppRoute): string {
   if (route.view === 'onboarding') return PATH_ONBOARDING
   return pathForTab(route.tab)
@@ -73,13 +76,13 @@ export function replace(path: string) {
 /**
  * Resolve path on load:
  * - / and unknown non-app paths -> onboarding
- * - /app -> /app/smart-form
+ * - /app -> the landing tab
  * - /app/* tab paths stay as-is
  */
 export function resolveInitialPath(pathname: string, _onboardingSeen: boolean): string {
   const path = pathname.replace(/\/+$/, '') || '/'
 
-  if (path === PATH_APP_ROOT) return PATH_SMART_FORM
+  if (path === PATH_APP_ROOT) return PATH_LANDING
 
   const tabIdx = TAB_PATHS.indexOf(path as (typeof TAB_PATHS)[number])
   if (tabIdx >= 0) return TAB_PATHS[tabIdx]

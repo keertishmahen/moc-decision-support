@@ -9,12 +9,13 @@ Pages under `/moc-decision-support/`.
 src/
   App.tsx            shell: sidebar, tab bar, panel area
   navigation.ts      hash routes (#/app/...), no router library
-  store.ts           zustand: chat, graph context, active tab, the change under assessment
+  store.ts           zustand: chat, graph context, active tab, the change under assessment, last case
   api.ts             axios client and functions for the original endpoints
   constants.ts       dropdown options
   components/ui.tsx  Card, KpiCard, Btn, Select, Textarea, Spinner, ErrorBox, ...
   tabs/              one file per tab
   allocation/        api.ts (typed client), theme.ts, components.tsx
+  case/              api.ts (typed client), components.tsx (Why panel, pipeline, checkpoints, review)
 ```
 
 ## Conventions
@@ -42,6 +43,10 @@ src/
 - **One change, shared.** Smart Form, Risk, Cost and Decision Allocation read and write
   `store.currentChange` (type, asset, description, HAZOP/PSSR findings), so the flow
   carries through the tabs. The Risk tab hands over to Decision Allocation.
+- **Change Case is the first tab and the landing tab.** "Enter Platform" opens `#/app/case`.
+  Its human review lives in `localStorage` per run id and goes out only in the JSON export.
+- **Print** uses the light theme (`printLight()`) and the `@media print` rules in `index.css`;
+  mark screen-only controls with `no-print`.
 - **Errors are shown.** Every mutation renders `ErrorBox`; a degraded answer
   (`llm_status: "unavailable"`) renders an amber notice.
 - **No model numbers in the frontend.** The allocation tab fetches the model from

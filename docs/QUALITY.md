@@ -10,6 +10,8 @@ known limits recorded · **C** works, thinly tested or carrying recorded debt ·
 | Area | Path | Grade | Why |
 |---|---|---|---|
 | Allocation model | `core/allocation/` | A | Pure; reproduces published results; exhaustively enumerated in tests |
+| Provenance vocabulary | `core/provenance/` | A | Pure, small, contract-tested |
+| Multi-agent Change Case | `modules/agents/`, `api/routes/case.py` | B | Offline tests for every agent, verifier rule and failure path; verifier does not read free text |
 | Allocation integration | `modules/decision_allocation/`, `api/routes/` | B | Tested offline on a file-backed graph; rules fitted to ten cases |
 | Model gateway and templating | `core/llm/` | A | Typed errors, schema validation, injection-safe templating, all tested |
 | Error handling | `api/errors.py` | B | Mapped and tested; no request tracing beyond a reference id |
@@ -22,6 +24,7 @@ known limits recorded · **C** works, thinly tested or carrying recorded debt ·
 | Downtime propagation | `core/downtime_propagator.py` | C | De-duplicated and tested; man-hours as downtime |
 | Graph content and loaders | `data/graph/`, `loaders/` | B | Canonical file, additive loader with dry-run, verification step |
 | Frontend: allocation tab | `frontend/src/allocation/`, `tabs/DecisionAllocation.tsx` | B | Typed; not browser-tested automatically |
+| Frontend: Change Case | `frontend/src/case/`, `tabs/ChangeCase.tsx` | B | Typed; checked by scripted screenshots, not by automated tests |
 | Frontend: other tabs | `frontend/src/tabs/` | C | Untyped responses; no tests |
 | Deployment | `.github/workflows/`, `render.yaml` | B | Automatic with a test gate; free-tier cold starts |
 | Documentation | `AGENTS.md`, `docs/` | B | Structured and link-checked; generated API doc verified in CI |

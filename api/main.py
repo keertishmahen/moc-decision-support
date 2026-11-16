@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from core.config import FRONTEND_DIST
 from api.errors import install_error_handlers, json_safe, to_http_error
 
-APP_VERSION = "3.0.0"
+APP_VERSION = "3.1.0"
 
 app = FastAPI(title="MoC Intelligence API", version=APP_VERSION)
 
@@ -84,8 +84,10 @@ install_error_handlers(app)
 
 # ── Routers ────────────────────────────────────────────────────────────────
 from api.routes.allocation import router as allocation_router  # noqa: E402
+from api.routes.case import router as case_router  # noqa: E402
 
 app.include_router(allocation_router)
+app.include_router(case_router)
 
 # ── Request models ─────────────────────────────────────────────────────────
 class FormRequest(BaseModel):

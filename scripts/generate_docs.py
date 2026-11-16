@@ -1,12 +1,12 @@
 """
 scripts/generate_docs.py — regenerate the documents under docs/generated/.
 
-    python scripts/generate_docs.py --api      # docs/generated/api-routes.md  (offline)
+    python scripts/generate_docs.py --api      # api-routes.md and agents.md (offline)
     python scripts/generate_docs.py --graph    # docs/generated/graph-schema.md (reads the live graph)
-    python scripts/generate_docs.py --check    # exit 1 if api-routes.md is out of date (used by tests/CI)
+    python scripts/generate_docs.py --check    # exit 1 if an offline document is out of date (used by tests/CI)
 
-Generated files are never edited by hand; tests/structure/test_docs.py fails if the API
-document no longer matches the application.
+Generated files are never edited by hand; tests/structure/test_docs.py fails if the API or
+agent document no longer matches the application.
 """
 from __future__ import annotations
 
@@ -42,6 +42,35 @@ def api_routes_markdown() -> str:
     return "\n".join(lines) + "\n"
 
 
+def agents_markdown() -> str:
+    from modules.agents import registry
+
+    reg = registry()
+    labels = {s["id"]: s["label"] for s in reg["source_kinds"]}
+    names = {a["id"]: a["name"] for a in [reg["supervisor"], *reg["agents"]]}
+    lines = [HEADER, "# Change Case agents", "",
+             "Source: `modules/agents/registry.py`. Design: "
+             "[multi-agent-trust.md](../design-docs/multi-agent-trust.md).", "",
+             "## Multi-agent patterns used", "", "| Pattern | Use |", "|---|---|"]
+    lines += [f"| {p['name']} | {p['use']} |" for p in reg["patterns"]]
+    lines += ["", "## Run order", ""]
+    lines += [f"{i}. " + " and ".join(names[a] for a in stage) + (" (in parallel)" if len(stage) > 1 else "")
+              for i, stage in enumerate(reg["stages"], 1)]
+    lines += ["", "## Agents", "", "| Agent | Stage | Basis | Role | Knowledge sources | Reuses | Uses results of |",
+              "|---|---|---|---|---|---|---|"]
+    for a in [reg["supervisor"], *reg["agents"]]:
+        uses = ", ".join(names[x] for x in [*a["needs"], *a["reads"]]) or "-"
+        lines.append(f"| {a['name']} | {a['stage']} | {a['basis']} | {a['role']} | "
+                     f"{', '.join(labels[s] for s in a['sources'])} | "
+                     f"{', '.join(f'`{c}`' for c in a['components'])} | {uses} |")
+    lines += ["", "## Knowledge source kinds", "", "| Id | Shown as |", "|---|---|"]
+    lines += [f"| `{s['id']}` | {s['label']} |" for s in reg["source_kinds"]]
+    return "\n".join(lines) + "\n"
+
+
+OFFLINE = {"api-routes.md": api_routes_markdown, "agents.md": agents_markdown}
+
+
 def graph_schema_markdown() -> str:
     from core.neo4j_client import Neo4jClient
 
@@ -73,14 +102,15 @@ def main() -> int:
     args = parser.parse_args()
     OUT.mkdir(parents=True, exist_ok=True)
     if args.check:
-        current = (OUT / "api-routes.md").read_text(encoding="utf-8") if (OUT / "api-routes.md").exists() else ""
-        if current != api_routes_markdown():
-            print("docs/generated/api-routes.md is out of date. Run: python scripts/generate_docs.py --api")
-            return 1
-        return 0
+        stale = [name for name, build in OFFLINE.items()
+                 if not (OUT / name).exists() or (OUT / name).read_text(encoding="utf-8") != build()]
+        for name in stale:
+            print(f"docs/generated/{name} is out of date. Run: python scripts/generate_docs.py --api")
+        return 1 if stale else 0
     if args.api:
-        (OUT / "api-routes.md").write_text(api_routes_markdown(), encoding="utf-8", newline="\n")
-        print("wrote docs/generated/api-routes.md")
+        for name, build in OFFLINE.items():
+            (OUT / name).write_text(build(), encoding="utf-8", newline="\n")
+            print(f"wrote docs/generated/{name}")
     if args.graph:
         (OUT / "graph-schema.md").write_text(graph_schema_markdown(), encoding="utf-8", newline="\n")
         print("wrote docs/generated/graph-schema.md")

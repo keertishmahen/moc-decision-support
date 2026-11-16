@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Scale,
   TriangleAlert,
+  Workflow,
   type LucideIcon,
 } from 'lucide-react'
 import { getHealth } from './api'
@@ -22,11 +23,12 @@ import {
   pathForTab,
   pathOnboarding,
   replace,
-  PATH_SMART_FORM,
+  PATH_LANDING,
 } from './navigation'
 import Onboarding from './components/Onboarding'
 import SymmetraLogo from './components/SymmetraLogo'
 import ThemeToggle from './components/ThemeToggle'
+import ChangeCase   from './tabs/ChangeCase'
 import SmartForm    from './tabs/SmartForm'
 import RiskAnalysis from './tabs/RiskAnalysis'
 import CostPredictor from './tabs/CostPredictor'
@@ -35,6 +37,7 @@ import ProcessIntelligence from './tabs/ProcessIntelligence'
 import DecisionAllocation from './tabs/DecisionAllocation'
 
 const TABS: { icon: LucideIcon; label: string }[] = [
+  { icon: Workflow, label: 'Change Case' },
   { icon: ClipboardList, label: 'Smart Form' },
   { icon: TriangleAlert, label: 'Risk & Impact' },
   { icon: CircleDollarSign, label: 'Cost Predictor' },
@@ -76,7 +79,7 @@ export default function App() {
   const { data: health, refetch, isError: healthError } = useQuery({ queryKey: ['health'], queryFn: getHealth, refetchInterval: 30_000 })
   const [showOnboarding, setShowOnboarding] = useState(true)
 
-  const panels = [<SmartForm />, <RiskAnalysis />, <CostPredictor />, <MoCBot />, <ProcessIntelligence />, <DecisionAllocation />]
+  const panels = [<ChangeCase />, <SmartForm />, <RiskAnalysis />, <CostPredictor />, <MoCBot />, <ProcessIntelligence />, <DecisionAllocation />]
 
   const syncFromLocation = useCallback(() => {
     const seen = readOnboardingSeen()
@@ -98,7 +101,7 @@ export default function App() {
     } catch { /* ignore */ }
     setActiveTab(0)
     setShowOnboarding(false)
-    navigate(PATH_SMART_FORM)
+    navigate(PATH_LANDING)
   }
 
   const reopenAbout = () => {
@@ -212,7 +215,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="px-6 pt-4 pb-0">
+            <div className="no-print px-6 pt-4 pb-0">
               <div className="moc-tab-rail flex flex-wrap">
                 {TABS.map((t, i) => {
                   const Icon = t.icon
@@ -233,7 +236,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-6 py-5">
+            <div className="moc-main-scroll flex-1 overflow-y-auto px-6 py-5">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}

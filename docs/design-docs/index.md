@@ -8,6 +8,7 @@ otherwise have to be re-argued; update it when the choice changes.
 | [core-beliefs.md](core-beliefs.md) | The principles every change is judged against |
 | [decision-allocation.md](decision-allocation.md) | How the Human–AI allocation model is implemented and integrated |
 | [llm-reliability.md](llm-reliability.md) | How the application uses the OpenAI API safely |
+| [multi-agent-trust.md](multi-agent-trust.md) | Agents over the existing components, and the provenance and verification layer |
 | [frontend.md](frontend.md) | Frontend structure and conventions |
 
 Related: product behaviour is in [../product-specs/](../product-specs/index.md); the

@@ -1,6 +1,6 @@
 # Architecture
 
-MoC Intelligence Platform, version 3.0. One FastAPI backend, one React frontend, one Neo4j
+MoC Intelligence Platform, version 3.1. One FastAPI backend, one React frontend, one Neo4j
 knowledge graph, one vector store, and the OpenAI API.
 
 ## System
@@ -9,7 +9,7 @@ knowledge graph, one vector store, and the OpenAI API.
 Browser (GitHub Pages)                    Render (Docker)
 ┌──────────────────────┐   HTTPS/JSON   ┌────────────────────────────────────────────┐
 │ React + Vite         │ ─────────────► │ FastAPI  api/                              │
-│ six tabs             │                │   ├─ modules/   form, risk, cost, chatbot, │
+│ seven tabs           │                │   ├─ modules/   form, risk, cost, chatbot, │
 └──────────────────────┘                │   │             decision_allocation        │
                                         │   └─ core/      graph, RAG, agent, llm,    │
                                         │                 allocation (pure model)    │
@@ -25,15 +25,16 @@ Imports point in one direction only. `tests/structure/test_architecture.py` enfo
 
 ```
 core.allocation  ──►  core  ──►  modules  ──►  api  ──►  (frontend, over HTTP)
-pure model            infra      services      HTTP
+core.provenance
+pure domain           infra      services      HTTP
 ```
 
 | Layer | Path | May import | Holds |
 |---|---|---|---|
-| Domain | `core/allocation/` | standard library only | Decision-allocation model: types, config loader, engine, analysis, reference cases |
+| Domain | `core/allocation/`, `core/provenance/` | standard library only | Decision-allocation model; provenance vocabulary and ledger |
 | Infrastructure | `core/` | domain, third-party | `neo4j_client`, `vector_store`, `rag_pipeline`, `moc_agent`, `downtime_propagator`, `llm/` gateway, `allocation_lookup` |
-| Services | `modules/` | core | `smart_forms`, `risk_engine`, `cost_predictor`, `nlp_chatbot`, `decision_allocation/` |
-| HTTP | `api/` | modules, core | `main.py` (routes), `routes/allocation.py`, `errors.py` |
+| Services | `modules/` | core | `smart_forms`, `risk_engine`, `cost_predictor`, `nlp_chatbot`, `decision_allocation/`, `agents/` |
+| HTTP | `api/` | modules, core | `main.py` (routes), `routes/allocation.py`, `routes/case.py`, `errors.py` |
 | Loaders | `loaders/` | core | `snapshot_loader`, `allocation_loader`, legacy `graph_loader` |
 
 Cross-cutting concerns enter through one interface each: model calls through
@@ -57,6 +58,19 @@ change ─► graph_store (facts, reach) ─► characteriser (8 axis suggestion
 
 No model call is involved in scoring. If the graph is down, scoring and the ten reference
 cases still work (`graph_status: "unavailable"`).
+
+**Change Case (multi-agent).** `POST /api/case/assess`. A deterministic supervisor runs
+seven agents in four stages; agents in a stage run in parallel and share a blackboard:
+
+```
+1 retrieval + impact  ->  2 risk + review  ->  3 cost + allocation  ->  4 verifier
+  RAG, graph, propagation  RiskEngine, SmartForms  CostPredictor, allocation  rules vs graph
+```
+
+Every agent wraps an existing module and writes findings, evidence and gaps to one
+`core.provenance.Ledger`; the verifier marks language-model claims verified or conflict and
+sets human checkpoints. A failing agent is isolated and listed as missing. Read-only.
+Details: [docs/design-docs/multi-agent-trust.md](docs/design-docs/multi-agent-trust.md).
 
 **MoCBot and the agent.** Keyword intent routing → graph and vector retrieval → model call.
 Chat memory is per browser session. The agent is an OpenAI tool-calling loop (11 tools,

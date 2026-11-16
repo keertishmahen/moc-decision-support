@@ -37,6 +37,10 @@ fixing now; remove it in the change that fixes it. Scheduled work is in
 | Keyword intent routing is order-dependent | "impact" matches the risk intent before the impact intent | `modules/nlp_chatbot.py` |
 | MoC-specific branches in query expansion | Hardcoded expansions for individual MoC ids | `core/vector_store.py` |
 | No answer-quality evaluation set | Reliability is tested; answer quality is not measured | — |
+| Retrieval runs three times per case | The Retrieval, Risk and Review agents each call the RAG pipeline; sharing one result would cut several seconds | `modules/agents/specialists.py`, `modules/risk_engine.py`, `modules/smart_forms.py` |
+| Verifier checks identifiers, not meaning | It checks named assets, P&ID tags, HAZOP/PSSR flags and the risk rating; free-text claims stay unverified | `modules/agents/verifier.py` |
+| Change Case review is browser-only | No server record of who reviewed what; storing it needs authentication first | `frontend/src/tabs/ChangeCase.tsx` |
+| Case progress is not streamed | The browser cannot tell which stage is running; agents show "In progress" until the case returns | `api/routes/case.py` |
 | Heavy chat turns | Cost/downtime questions build a new predictor (new clients, nested model call) | `modules/nlp_chatbot.py` |
 
 ## Code and tooling

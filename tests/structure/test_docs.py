@@ -22,7 +22,7 @@ KNOWLEDGE_BASE = [
 REQUIRED = [
     "AGENTS.md", "ARCHITECTURE.md", "docs/design-docs/index.md", "docs/design-docs/core-beliefs.md",
     "docs/product-specs/index.md", "docs/exec-plans/README.md", "docs/exec-plans/tech-debt-tracker.md",
-    "docs/references/decision-allocation-model.md", "docs/generated/api-routes.md",
+    "docs/references/decision-allocation-model.md", "docs/generated/api-routes.md", "docs/generated/agents.md",
     "docs/generated/graph-schema.md", "docs/QUALITY.md",
 ]
 _LINK = re.compile(r"(?<!\!)\[[^\]]*\]\(([^)\s]+)\)")

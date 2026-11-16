@@ -2,9 +2,10 @@
         snowflake-bootstrap dlt-bronze dbt-build pipeline graph-load
 
 # Code written since v3.0 is held to the stricter lint level.
-STRICT_PATHS = core/allocation core/llm core/allocation_lookup.py modules/decision_allocation api/routes api/errors.py \
+STRICT_PATHS = core/allocation core/llm core/provenance core/allocation_lookup.py modules/decision_allocation modules/agents \
+               api/routes api/errors.py \
                loaders/snapshot_loader.py loaders/allocation_loader.py scripts/generate_docs.py \
-               tests/allocation tests/api tests/llm tests/modules tests/structure tests/file_graph.py
+               tests/agents tests/allocation tests/api tests/llm tests/modules tests/structure tests/file_graph.py
 
 help:
 	@echo "Everyday:"

@@ -23,7 +23,7 @@ FORBIDDEN = {
 }
 
 # Third-party / infrastructure roots the pure domain package may not touch.
-PURE_PACKAGE = ROOT / "core" / "allocation"
+PURE_PACKAGES = {"core.allocation": ROOT / "core" / "allocation", "core.provenance": ROOT / "core" / "provenance"}
 STDLIB = set(sys.stdlib_module_names)
 
 
@@ -58,19 +58,20 @@ def test_layers_only_import_leftwards(layer):
     assert not violations, "\n".join(violations)
 
 
-def test_allocation_domain_is_pure():
-    """core/allocation is the model itself: standard library and its own modules only."""
+@pytest.mark.parametrize("package", sorted(PURE_PACKAGES))
+def test_domain_packages_are_pure(package):
+    """core/allocation (the model) and core/provenance (the trust vocabulary): standard library only."""
     violations = []
-    for path in _python_files(PURE_PACKAGE):
+    for path in _python_files(PURE_PACKAGES[package]):
         for line, top, full, level in _imports(path):
             if level > 0:
                 continue                                  # relative import inside the package
-            if top in STDLIB or full.startswith("core.allocation"):
+            if top in STDLIB or full.startswith(package):
                 continue
             violations.append(
                 f"{path.relative_to(ROOT).as_posix()}:{line} imports '{full}'. "
-                "core/allocation must stay pure (no database, network, LLM or third-party package) so the "
-                "model can be reproduced anywhere. Put I/O in modules/decision_allocation/ and pass plain "
+                f"{package} must stay pure (no database, network, LLM or third-party package) so it "
+                "can be reproduced and tested anywhere. Put I/O in modules/decision_allocation/ and pass plain "
                 "data into the engine. See ARCHITECTURE.md#layers."
             )
     assert not violations, "\n".join(violations)

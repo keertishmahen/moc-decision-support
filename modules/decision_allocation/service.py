@@ -32,6 +32,7 @@ from .characteriser import (
     facts_from_proposal,
     suggest,
 )
+from .provenance import allocation_provenance
 
 log = logging.getLogger(__name__)
 
@@ -137,7 +138,7 @@ class DecisionAllocationService:
         selection = confirmed or {a: s.value for a, s in suggestions.items()}
 
         title = (record or {}).get("moc", {}).get("title") if record else (reference.title if reference else "")
-        return {
+        return _with_provenance({
             "subject": {"kind": "moc", "moc_id": moc_id, "title": title or (reference.title if reference else ""),
                         "case_id": reference.case_id if reference else None,
                         "asset_id": facts.asset_id if facts else None,
@@ -149,7 +150,7 @@ class DecisionAllocationService:
             "characterisation_status": confirmed_status or "suggested",
             "result": self.score(selection),
             "graph_status": status,
-        }
+        })
 
     def assess_change(self, change_type: str, asset_id: Optional[str], description: str,
                       hazop_required: Optional[bool] = None, pssr_required: Optional[bool] = None,
@@ -163,7 +164,7 @@ class DecisionAllocationService:
                                     hazop_required, pssr_required, shutdown_required)
         suggestions = suggest(facts)
         selection = {a: s.value for a, s in suggestions.items()}
-        return {
+        return _with_provenance({
             "subject": {"kind": "proposed", "moc_id": None, "title": "Proposed change", "case_id": None,
                         "asset_id": asset_id, "change_type": change_type, "description": description},
             "impact_assessment": _impact_assessment(facts, None, asset_record, reach),
@@ -172,7 +173,12 @@ class DecisionAllocationService:
             "characterisation_status": "suggested",
             "result": self.score(selection),
             "graph_status": status,
-        }
+        })
+
+    def score_with_provenance(self, selection: Mapping[str, str]) -> Dict:
+        """Score a characterisation set by the user, with its "Why this recommendation?" record."""
+        result = self.score(selection)
+        return {**result, "provenance": allocation_provenance({"result": result})}
 
     def graph(self, moc_id: str) -> Dict:
         data, status = self._try_graph(graph_store.get_allocation_subgraph, moc_id)
@@ -231,3 +237,9 @@ def _impact_assessment(facts: ChangeFacts, record: Optional[Dict], asset_record:
                     "incidents_on_moc": (record or {}).get("incidents") if record else None,
                     "work_types": (record or {}).get("work_types") if record else None},
     }
+
+
+def _with_provenance(assessment: Dict) -> Dict:
+    """Attach the "Why this recommendation?" record (who produced it, from which sources, with which gaps)."""
+    assessment["provenance"] = allocation_provenance(assessment)
+    return assessment

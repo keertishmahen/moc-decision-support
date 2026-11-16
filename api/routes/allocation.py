@@ -59,7 +59,7 @@ def allocation_model():
 def allocation_score(req: ScoreRequest):
     """Score a full eight-axis characterisation. Deterministic; no database or LLM involved."""
     try:
-        return get_service().score(req.selection)
+        return get_service().score_with_provenance(req.selection)
     except SelectionError as e:
         raise HTTPException(status_code=422, detail=str(e)) from e
 

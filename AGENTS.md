@@ -9,7 +9,8 @@ repository does not exist for the next person or agent — record decisions in `
 MoC Intelligence Platform: decision support for Management of Change (MoC) on one Fluid
 Catalytic Cracking unit. A Neo4j knowledge graph + vector search + OpenAI models assess a
 proposed change (form prefill, risk, cost, downtime), and a deterministic model recommends
-who should decide it: AI-led, AI-supported or human-led. Research prototype on synthetic data.
+who should decide it: AI-led, AI-supported or human-led. A team of agents runs these on one
+change and records the provenance of every claim. Research prototype on synthetic data.
 
 ## Where things are
 
@@ -19,6 +20,7 @@ who should decide it: AI-led, AI-supported or human-led. Research prototype on s
 | Decision-allocation model (pure) | `core/allocation/` | [docs/design-docs/decision-allocation.md](docs/design-docs/decision-allocation.md) |
 | Model numbers (single source) | `core/allocation/config/*.json` | [docs/references/decision-allocation-model.md](docs/references/decision-allocation-model.md) |
 | Graph evidence → axis suggestions → service | `modules/decision_allocation/` | [docs/reports/input-mapping.md](docs/reports/input-mapping.md) |
+| Multi-agent Change Case, provenance | `modules/agents/`, `core/provenance/` | [docs/design-docs/multi-agent-trust.md](docs/design-docs/multi-agent-trust.md) |
 | OpenAI gateway, prompt templating | `core/llm/` | [docs/design-docs/llm-reliability.md](docs/design-docs/llm-reliability.md) |
 | Graph access, RAG, agent, propagation | `core/` | [ARCHITECTURE.md](ARCHITECTURE.md) |
 | Form prefill, risk, cost, chatbot | `modules/` | [ARCHITECTURE.md](ARCHITECTURE.md) |
@@ -50,20 +52,23 @@ These fail the build; the failure message says how to fix it.
 
 1. **Layers point one way**: `core.allocation` → `core` → `modules` → `api`. A layer never
    imports from one to its right. (`tests/structure/test_architecture.py`)
-2. **`core/allocation` is pure**: standard library only. No database, network or LLM.
+2. **`core/allocation` and `core/provenance` are pure**: standard library only. No database, network or LLM.
 3. **Model numbers live once**, in `core/allocation/config/`. Not in code, not in the frontend.
 4. **Published results stay reproduced**: thesis Table 2 and the 2,592-point enumeration.
    (`tests/allocation/`)
 5. **Frontend colours are tokens, icons are lucide**: no hex/rgba in `.ts`/`.tsx` and no emojis
    in `frontend/src`; every dark token has a light value. (`tests/structure/test_frontend.py`)
 6. **Docs stay true**: this file stays short, its links resolve, and
-   `docs/generated/api-routes.md` matches the app. (`tests/structure/test_docs.py`)
+   `docs/generated/api-routes.md` and `agents.md` match the app. (`tests/structure/test_docs.py`)
+7. **Agents state their provenance**: each has a role and sources; language-model findings are
+   labelled `llm`, allocation findings never are. (`tests/agents/`)
 
 ## Working principles
 
 Short form; the reasons are in [docs/design-docs/core-beliefs.md](docs/design-docs/core-beliefs.md).
 
 - AI suggests, a person confirms, a deterministic engine allocates. No model output decides an allocation.
+- Every claim shown to a user names its agent, its source kind and its evidence; conflicts go to a person.
 - Every model call goes through `core.llm.get_gateway()`. Structured replies are schema-validated.
 - When the AI service or the graph fails, degrade and say so (`llm_status`, `graph_status`); do not return a 500.
 - Validate at boundaries; never send raw exception text to a client (`api/errors.py`).

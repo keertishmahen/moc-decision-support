@@ -65,10 +65,11 @@ jobs:
       - name: Lint (strict, new code)
         run: >
           python -m ruff check
-          core/allocation core/llm core/allocation_lookup.py modules/decision_allocation
+          core/allocation core/llm core/provenance core/allocation_lookup.py
+          modules/decision_allocation modules/agents
           api/routes api/errors.py loaders/snapshot_loader.py loaders/allocation_loader.py
           scripts/generate_docs.py
-          tests/allocation tests/api tests/llm tests/modules tests/structure tests/file_graph.py
+          tests/agents tests/allocation tests/api tests/llm tests/modules tests/structure tests/file_graph.py
           --select E,F,W,B,I
 
       # Offline suite: model reproduction, service and API on a file-backed graph, layer rule,

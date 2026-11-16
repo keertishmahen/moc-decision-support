@@ -13,6 +13,8 @@ import {
   AllocationBanner, AxisField, Explanation, FactorMatrix, ImpactSummary, ModelCard,
   ReferenceCasesTable, ScoreTile,
 } from '../allocation/components'
+import { WhyToggle } from '../case/components'
+import type { Provenance } from '../case/api'
 
 type Mode = 'moc' | 'proposed'
 const HAZOP_OPTIONS = ['Not known', 'Required', 'Not required']
@@ -26,6 +28,7 @@ export default function DecisionAllocation() {
   const [assessment, setAssessment] = useState<AllocationAssessment | null>(null)
   const [selection, setSelection] = useState<AxisSelection | null>(null)
   const [result, setResult] = useState<AllocationResult | null>(null)
+  const [provenance, setProvenance] = useState<Provenance | null>(null)
 
   const model = useQuery({ queryKey: ['allocation-model'], queryFn: getAllocationModel, staleTime: Infinity })
   const mocs = useQuery({ queryKey: ['allocation-mocs'], queryFn: getAllocationMocs, staleTime: 5 * 60_000 })
@@ -36,6 +39,7 @@ export default function DecisionAllocation() {
     setAssessment(a)
     setSelection(a.selection)
     setResult(a.result)
+    setProvenance(a.provenance ?? null)
   }
 
   const assess = useMutation({
@@ -52,7 +56,10 @@ export default function DecisionAllocation() {
     onSuccess: accept,
   })
 
-  const rescore = useMutation({ mutationFn: scoreAllocation, onSuccess: setResult })
+  const rescore = useMutation({
+    mutationFn: scoreAllocation,
+    onSuccess: r => { setResult(r); setProvenance(r.provenance ?? null) },
+  })
 
   // Arriving from another tab assesses the change in hand; otherwise open on the thesis'
   // discriminating case (MoC-002) so the screen is never empty.
@@ -195,7 +202,7 @@ export default function DecisionAllocation() {
               <SectionLabel>Characterisation · eight axes</SectionLabel>
               {edited && (
                 <button type="button" className="text-xs text-accent hover:text-blue-300"
-                  onClick={() => { setSelection(assessment.selection); setResult(assessment.result) }}>
+                  onClick={() => { setSelection(assessment.selection); setResult(assessment.result); setProvenance(assessment.provenance ?? null) }}>
                   Reset all
                 </button>
               )}
@@ -217,6 +224,10 @@ export default function DecisionAllocation() {
           </div>
 
           <Explanation result={result} />
+
+          {provenance && (
+            <WhyToggle why={provenance} label="Why this recommendation?" button="Why this recommendation?" large />
+          )}
         </div>
       )}
 

@@ -598,3 +598,12 @@ body {
 /* Disclosure markers are drawn with icons; hide the browser's own triangle everywhere. */
 summary::-webkit-details-marker { display: none; }
 summary { list-style: none; }
+
+/* ── Print (Change Case "Print"): only the case, on as many pages as it needs ── */
+@media print {
+  .no-print, .moc-sidebar, .moc-hero-bar, .moc-dash-orb, .moc-dash-grid, .moc-dash-vignette { display: none !important; }
+  .moc-dash-root, .moc-main-scroll { display: block !important; overflow: visible !important; min-height: 0 !important; height: auto !important; }
+  .moc-dash-root, body { background: var(--color-canvas) !important; }
+  .moc-glass-card { break-inside: avoid; box-shadow: none !important; backdrop-filter: none !important; }
+  section { break-inside: auto; }
+}
