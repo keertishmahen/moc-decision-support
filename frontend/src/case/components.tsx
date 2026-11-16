@@ -15,6 +15,7 @@ import type {
   AgentRegistry, AgentStatus, Basis, Checkpoint, Contribution, Evidence, Finding, Gap, HumanReview,
   Provenance, SourceKind, Verification,
 } from './api'
+import { ago, shortName, type ActivityEntry, type CaseRun, type LiveStatus } from './run'
 
 const LABEL = 'text-[11px] font-semibold uppercase tracking-widest text-white/45'
 
@@ -84,38 +85,68 @@ export const StatusChip = ({ status }: { status: RunState }) => {
   )
 }
 
-// ── Agent pipeline ────────────────────────────────────────────────────────────
-/** The run order from the registry, with each agent's status once a case has run. */
-export function AgentPipeline({ registry, contributions, running }: {
-  registry: AgentRegistry; contributions?: Contribution[]; running: boolean
-}) {
-  const byId = new Map((contributions ?? []).map(c => [c.agent, c]))
+// ── Intelligence agents (live) ────────────────────────────────────────────────
+const LIVE_META: Record<LiveStatus, { label: string; tone: Token }> = {
+  waiting:  { label: 'Waiting', tone: 'slate' },
+  running:  { label: 'Analyzing…', tone: 'accent' },
+  ok:       { label: 'Complete', tone: 'ok' },
+  degraded: { label: 'Partial result', tone: 'warn' },
+  failed:   { label: 'Failed', tone: 'danger' },
+  skipped:  { label: 'Skipped', tone: 'slate' },
+}
+
+/** One card per agent in run order, updated live from the progress stream. */
+export function AgentPanel({ registry, run }: { registry: AgentRegistry; run: CaseRun }) {
   const specs = new Map(registry.agents.map(a => [a.id, a]))
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-      {registry.stages.map((stage, i) => (
-        <div key={i} className="moc-glass-card rounded-2xl p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className={LABEL}>Stage {i + 1}</span>
-            <span className="text-[10px] text-white/35">{stage.length > 1 ? 'in parallel' : i === registry.stages.length - 1 ? 'checks the others' : ''}</span>
-          </div>
-          {stage.map(id => {
-            const spec = specs.get(id)
-            const c = byId.get(id)
-            const status: RunState = c ? c.status : running ? 'running' : 'waiting'
-            return (
-              <div key={id} className="rounded-xl border border-white/8 bg-white/[0.03] p-2.5">
-                <div className="flex items-start justify-between gap-2">
-                  <span className="text-[13px] font-semibold text-white/90 leading-snug">{spec?.name ?? id}</span>
-                  <StatusChip status={status} />
-                </div>
-                <div className="mt-1 text-[11px] text-white/45 leading-snug">{c?.summary || spec?.role}</div>
-                {c && <div className="mt-1 text-[10px] text-white/30">{(c.duration_ms / 1000).toFixed(1)} s · {BASIS_LABEL[c.basis]}</div>}
+    <div>
+      <div className={`${LABEL} mb-3`}>Intelligence Agents</div>
+      <ul className="space-y-2.5" aria-live="polite">
+        {registry.stages.flat().map(id => {
+          const spec = specs.get(id)
+          const live = run.agents[id] ?? { status: 'waiting' as LiveStatus }
+          const m = LIVE_META[live.status]
+          const active = live.status === 'running'
+          const detail = live.durationMs !== undefined && live.status !== 'skipped'
+            ? `${m.label} · ${(live.durationMs / 1000).toFixed(1)} s` : m.label
+          return (
+            <li key={id} title={live.summary || spec?.role}
+              className={`rounded-xl border px-3.5 py-2.5 transition-colors duration-300 ${active ? '' : 'border-white/8'}`}
+              style={{
+                boxShadow: `inset 3px 0 0 ${cssVar(m.tone)}`,
+                background: tint(m.tone, active ? 9 : 4),
+                ...(active ? { borderColor: tint('accent', 55) } : {}),
+              }}>
+              <div className="flex items-center gap-2.5">
+                <span className={`h-2 w-2 shrink-0 rounded-full ${active ? 'animate-pulse' : ''}`} style={{ background: cssVar(m.tone) }} aria-hidden />
+                <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white/90">{shortName(spec?.name ?? id)}</span>
+                <span className="text-[10px] text-white/30">Stage {spec?.stage}</span>
               </div>
-            )
-          })}
-        </div>
-      ))}
+              <div className="mt-0.5 pl-[18px] text-[11px]" style={{ color: live.status === 'waiting' ? undefined : cssVar(m.tone) }}>
+                <span className={live.status === 'waiting' ? 'text-white/40' : ''}>{detail}</span>
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
+/** Timestamped progress events, newest first. */
+export function ActivityFeed({ entries, now }: { entries: ActivityEntry[]; now: number }) {
+  return (
+    <div>
+      <div className={`${LABEL} mb-3`}>Activity</div>
+      <ul className="max-h-[320px] space-y-2 overflow-y-auto pr-1" aria-live="polite">
+        {entries.map(e => (
+          <li key={e.id} className="flex items-start gap-2.5 text-[12px] leading-snug">
+            <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: cssVar(e.tone) }} aria-hidden />
+            <span className="min-w-0 flex-1 text-white/70">{e.text}</span>
+            <span className="shrink-0 text-[10px] text-white/35">{ago(e.at, now)}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

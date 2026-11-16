@@ -6,7 +6,7 @@
  * records the review. Nothing is decided here and nothing is stored on the server.
  */
 import React, { useEffect, useState } from 'react'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, BookOpen, FileJson, Printer, Workflow, X } from 'lucide-react'
 import { Btn, CIBar, Card, ErrorBox, FlagTile, KpiCard, RiskBadge, SectionLabel, Select, Spinner, Textarea } from '../components/ui'
 import { ASSET_IDS, CHANGE_TYPES } from '../constants'
@@ -14,9 +14,9 @@ import { navigate, pathForTab, TAB_PATHS } from '../navigation'
 import { useStore } from '../store'
 import { cssVar } from '../theme/palette'
 import { AllocationBanner } from '../allocation/components'
-import { assessCase, getCaseAgents, type CaseRecord, type HumanReview } from '../case/api'
+import { getCaseAgents, streamCase, type CaseRecord, type HumanReview } from '../case/api'
 import {
-  AgentPipeline, CheckpointList, ReviewForm, WhyPanel, WhyToggle, downloadJson, emptyReview, printLight,
+  ActivityFeed, AgentPanel, CheckpointList, ReviewForm, WhyPanel, WhyToggle, downloadJson, emptyReview, printLight,
 } from '../case/components'
 
 const ALLOCATION_TAB = TAB_PATHS.indexOf('/app/allocation')
@@ -49,28 +49,26 @@ function saveReview(runId: string, review: HumanReview) {
 const money = (n: number | null | undefined) => (n == null ? 'n/a' : `$${Math.round(n).toLocaleString()}`)
 
 export default function ChangeCase() {
-  const { currentChange, setCurrentChange, caseRecord, setCaseRecord, setActiveTab, setAllocationIntent } = useStore()
+  const {
+    currentChange, setCurrentChange, caseRecord, setActiveTab, setAllocationIntent, caseRun,
+  } = useStore()
   const [exampleMoc, setExampleMoc] = useState<string | null>(null)
   const [review, setReview] = useState<HumanReview>(() => (caseRecord ? loadReview(caseRecord.run_id) : emptyReview()))
-  const [elapsed, setElapsed] = useState(0)
+  const [now, setNow] = useState(() => Date.now())
 
   const registry = useQuery({ queryKey: ['case-agents'], queryFn: getCaseAgents, staleTime: Infinity })
+  const running = caseRun.phase === 'running'
 
-  const run = useMutation({
-    mutationFn: assessCase,
-    onSuccess: (c: CaseRecord) => {
-      setCaseRecord(c)
-      setReview(loadReview(c.run_id))
-    },
-  })
-
+  // Relative times in the activity feed and the elapsed counter.
   useEffect(() => {
-    if (!run.isPending) return
-    const t0 = Date.now()
-    setElapsed(0)
-    const id = window.setInterval(() => setElapsed(Math.round((Date.now() - t0) / 1000)), 1000)
+    const id = window.setInterval(() => setNow(Date.now()), 1000)
     return () => window.clearInterval(id)
-  }, [run.isPending])
+  }, [])
+
+  // A new case starts with its own (possibly saved) review.
+  useEffect(() => {
+    if (caseRecord) setReview(loadReview(caseRecord.run_id))
+  }, [caseRecord?.run_id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const edit = (patch: Partial<typeof currentChange>) => {
     setCurrentChange(patch)
@@ -82,12 +80,29 @@ export default function ChangeCase() {
     setExampleMoc(EXAMPLE.moc_id)
   }
 
-  const assess = () => run.mutate({
-    change_type: currentChange.changeType,
-    asset_id: currentChange.assetId,
-    description: currentChange.description.trim(),
-    moc_id: exampleMoc,
-  })
+  /** Runs through the store, so progress keeps arriving if the user switches tabs. */
+  const assess = async () => {
+    const reg = registry.data
+    if (!reg || running) return
+    const names = Object.fromEntries([reg.supervisor, ...reg.agents].map(a => [a.id, a.name]))
+    const store = useStore.getState()
+    store.startCaseRun(reg.stages.flat())
+    try {
+      const record = await streamCase(
+        {
+          change_type: currentChange.changeType,
+          asset_id: currentChange.assetId,
+          description: currentChange.description.trim(),
+          moc_id: exampleMoc,
+        },
+        e => useStore.getState().applyCaseEvent(e, names),
+        () => useStore.getState().caseRunFallback(),
+      )
+      useStore.getState().finishCaseRun(record)
+    } catch (err) {
+      useStore.getState().failCaseRun(err)
+    }
+  }
 
   const updateReview = (r: HumanReview) => {
     setReview(r)
@@ -125,20 +140,22 @@ export default function ChangeCase() {
   const why = c?.why_trust
   const names = Object.fromEntries((why?.contributions ?? []).map(x => [x.agent, x.name]))
   const agentsOk = why ? why.contributions.filter(x => x.status === 'ok').length : 0
+  const elapsed = caseRun.startedAt ? Math.max(0, Math.round((now - caseRun.startedAt) / 1000)) : 0
 
   return (
-    <div className="space-y-5">
-      <div>
-        <h2 className="text-lg font-bold text-white">Change Case</h2>
-        <p className="text-sm text-white/50 mt-1">
-          Describe one engineering change. Specialist agents reuse the platform&apos;s graph, risk, review, cost and allocation
-          analyses; a verification agent checks their claims; you review the result. Three questions are answered: what
-          happens, who should decide, and why the recommendation can be trusted.
-        </p>
-      </div>
+    <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-5">
+      {/* ── Main column, top: the change ── */}
+      <div className="min-w-0 space-y-5 xl:col-start-1 xl:row-start-1">
+        <div>
+          <h2 className="text-lg font-bold text-white">Change Case</h2>
+          <p className="text-sm text-white/50 mt-1">
+            Describe one engineering change. Specialist agents reuse the platform&apos;s graph, risk, review, cost and allocation
+            analyses; a verification agent checks their claims; you review the result. Three questions are answered: what
+            happens, who should decide, and why the recommendation can be trusted.
+          </p>
+        </div>
 
-      <div className="no-print grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <Card className="lg:col-span-2 space-y-3">
+        <Card className="no-print space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Select label="Change type" value={currentChange.changeType} onChange={v => edit({ changeType: v })} options={CHANGE_TYPES} />
             <Select label="Asset" value={currentChange.assetId} onChange={v => edit({ assetId: v })} options={ASSET_IDS} />
@@ -147,11 +164,11 @@ export default function ChangeCase() {
             onChange={v => edit({ description: v })}
             placeholder="e.g. Replace FV-103 with a smart control valve to improve temperature regulation…" />
           <div className="flex flex-wrap items-center gap-3">
-            <Btn onClick={assess} loading={run.isPending} disabled={tooShort}>
+            <Btn onClick={assess} loading={running} disabled={tooShort || !registry.data}>
               <Workflow className="h-4 w-4" strokeWidth={1.75} />
               Assess change
             </Btn>
-            <Btn variant="ghost" onClick={loadExample} disabled={run.isPending}>
+            <Btn variant="ghost" onClick={loadExample} disabled={running}>
               <BookOpen className="h-4 w-4" strokeWidth={1.75} />
               Load example (MoC-002)
             </Btn>
@@ -167,30 +184,39 @@ export default function ChangeCase() {
           </div>
         </Card>
 
-        <Card className="text-sm text-white/60 space-y-2">
-          <SectionLabel>How the agents work together</SectionLabel>
-          {(registry.data?.patterns ?? []).map(p => (
-            <p key={p.id}><b className="text-white/80">{p.name}.</b> {p.use}</p>
-          ))}
-          {registry.isLoading && <Spinner text="Loading the agent line-up…" />}
-        </Card>
+        <ErrorBox error={registry.error} title="Could not load the agent line-up" />
+        {caseRun.phase === 'error' && caseRun.error && <ErrorBox error={new Error(caseRun.error)} title="The assessment could not run" />}
+        {running && (
+          <div role="status" className="no-print rounded-xl border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-white/75">
+            The agents are working on this change ({elapsed} s). A full case usually takes 20 to 60 s; follow each agent on the right.
+          </div>
+        )}
       </div>
 
-      <ErrorBox error={registry.error} title="Could not load the agent line-up" />
+      {/* ── Side column: live agents and activity ── */}
+      <aside className="no-print moc-glass-card rounded-2xl p-4 space-y-5 self-start xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto xl:col-start-2 xl:row-start-1 xl:row-span-2">
+        {registry.data ? (
+          <AgentPanel registry={registry.data} run={caseRun} />
+        ) : registry.isLoading ? <Spinner text="Loading the agents…" /> : null}
+        <div className="h-px bg-white/10" />
+        <ActivityFeed entries={caseRun.activity} now={now} />
+        {registry.data && (
+          <details className="group">
+            <summary className="cursor-pointer list-none text-[11px] font-semibold uppercase tracking-widest text-white/45 hover:text-white/70">
+              How the agents work together
+            </summary>
+            <div className="mt-2 space-y-1.5 text-xs text-white/60">
+              {registry.data.patterns.map(p => (
+                <p key={p.id}><b className="text-white/80">{p.name}.</b> {p.use}</p>
+              ))}
+            </div>
+          </details>
+        )}
+      </aside>
 
-      {registry.data && (
-        <div className="no-print space-y-2">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <SectionLabel>Agent pipeline</SectionLabel>
-            {run.isPending && <span className="text-xs text-white/45">Running for {elapsed} s. A full case usually takes 20 to 60 s.</span>}
-          </div>
-          <AgentPipeline registry={registry.data} contributions={run.isPending ? undefined : why?.contributions} running={run.isPending} />
-        </div>
-      )}
-
-      <ErrorBox error={run.error} title="The assessment could not run" />
-
-      {c && why && !run.isPending && (
+      {/* ── Main column, below: the case ── */}
+      <div className="min-w-0 xl:col-start-1 xl:row-start-2">
+      {c && why && !running && (
         <div className="space-y-6">
           <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
@@ -266,6 +292,7 @@ export default function ChangeCase() {
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

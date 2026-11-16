@@ -1,6 +1,6 @@
 # Multi-agent change assessment and the trust layer
 
-Status: implemented (v3.1). Product behaviour: [../product-specs/change-case.md](../product-specs/change-case.md).
+Status: implemented (v3.1; live progress v3.2). Product behaviour: [../product-specs/change-case.md](../product-specs/change-case.md).
 Agent line-up (generated): [../generated/agents.md](../generated/agents.md).
 
 ## Decision
@@ -86,6 +86,23 @@ Each agent runs in isolation; an exception marks it `failed` with the exception 
 A case therefore degrades instead of failing. If OpenAI is down, the Risk and Review agents
 return graph-only results with status `degraded`.
 
+## Live progress
+
+`Supervisor.assess(request, on_event=...)` reports progress to an optional listener:
+`run_started`, `stage_started`, `agent_started`, `agent_finished` (status, duration, summary),
+`agent_skipped`, `run_finished` (counts). Agent events are emitted from the worker threads as
+each agent starts and ends, so they arrive in real time. A failing listener is ignored; it
+never changes the case.
+
+`POST /api/case/assess/stream` runs the supervisor in a worker thread and streams those
+events as NDJSON, then one `case` line (or an `error` line with the same safe message the
+plain endpoint would give). Input is validated before streaming, so bad input is still a 422.
+The response sets `Cache-Control: no-cache` and `X-Accel-Buffering: no` against proxy buffering.
+
+The browser reads the stream with `fetch` (`streamCase` in `frontend/src/case/api.ts`) and
+drives the "Intelligence Agents" cards and the "Activity" feed from it. If the stream cannot
+be read before the first event, it falls back to `POST /api/case/assess` and says so in the feed.
+
 ## Human review
 
 The Change Case screen records reviewer, role, decision (accept, accept with changes, reject,
@@ -109,4 +126,4 @@ write endpoint without it would let anyone sign off a change. The record is labe
 Recorded in [../exec-plans/tech-debt-tracker.md](../exec-plans/tech-debt-tracker.md): the
 Risk and Review agents each run their own retrieval; the verifier does not read free text;
 a full case takes 20 to 60 seconds with three model calls; review records are not kept on
-the server.
+the server. A run cannot be cancelled once started.

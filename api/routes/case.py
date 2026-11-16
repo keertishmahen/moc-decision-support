@@ -7,10 +7,13 @@ trusted (provenance). Read-only: nothing is written to the knowledge graph.
 """
 from __future__ import annotations
 
+import json
+import queue
 import threading
-from typing import Optional
+from typing import Iterator, Optional
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from api.errors import json_safe, to_http_error
@@ -84,15 +87,48 @@ def case_agents():
     return registry()
 
 
+def _change(req: CaseRequest) -> ChangeRequest:
+    return ChangeRequest(change_type=req.change_type.strip(), asset_id=req.asset_id.strip(),
+                         description=req.description.strip(), moc_id=(req.moc_id or "").strip() or None)
+
+
 @router.post("/assess")
 def case_assess(req: CaseRequest):
     """Run every agent on one proposed change and return the case record with its provenance."""
     try:
-        record = get_supervisor().assess(ChangeRequest(
-            change_type=req.change_type.strip(), asset_id=req.asset_id.strip(),
-            description=req.description.strip(), moc_id=(req.moc_id or "").strip() or None))
-        return json_safe(record)
+        return json_safe(get_supervisor().assess(_change(req)))
     except HTTPException:
         raise
     except Exception as e:                                       # noqa: BLE001 — mapped to a clean status
         raise to_http_error(e) from e
+
+
+_DONE = object()
+
+
+@router.post("/assess/stream")
+def case_assess_stream(req: CaseRequest):
+    """As /assess, streamed as NDJSON: one line per agent progress event, then the case record."""
+    change = _change(req)
+    supervisor = get_supervisor()
+    events: "queue.Queue[object]" = queue.Queue()
+
+    def work() -> None:
+        try:
+            events.put({"type": "case", "case": json_safe(supervisor.assess(change, on_event=events.put))})
+        except Exception as e:                                   # noqa: BLE001 — reported as a clean error line
+            err = to_http_error(e)
+            events.put({"type": "error", "status": err.status_code, "detail": err.detail})
+        finally:
+            events.put(_DONE)
+
+    def lines() -> Iterator[str]:
+        threading.Thread(target=work, name="case-stream", daemon=True).start()
+        while True:
+            item = events.get()
+            if item is _DONE:
+                return
+            yield json.dumps(json_safe(item), separators=(",", ":")) + "\n"
+
+    return StreamingResponse(lines(), media_type="application/x-ndjson",
+                             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

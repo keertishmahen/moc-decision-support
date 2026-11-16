@@ -1,6 +1,6 @@
 # Architecture
 
-MoC Intelligence Platform, version 3.1. One FastAPI backend, one React frontend, one Neo4j
+MoC Intelligence Platform, version 3.2. One FastAPI backend, one React frontend, one Neo4j
 knowledge graph, one vector store, and the OpenAI API.
 
 ## System
@@ -70,6 +70,8 @@ seven agents in four stages; agents in a stage run in parallel and share a black
 Every agent wraps an existing module and writes findings, evidence and gaps to one
 `core.provenance.Ledger`; the verifier marks language-model claims verified or conflict and
 sets human checkpoints. A failing agent is isolated and listed as missing. Read-only.
+`POST /api/case/assess/stream` returns the same case as NDJSON, preceded by one line per
+agent start and finish, so the browser shows progress live.
 Details: [docs/design-docs/multi-agent-trust.md](docs/design-docs/multi-agent-trust.md).
 
 **MoCBot and the agent.** Keyword intent routing → graph and vector retrieval → model call.

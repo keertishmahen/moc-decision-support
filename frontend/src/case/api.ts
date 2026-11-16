@@ -4,7 +4,7 @@
  * The agent line-up, patterns and source kinds come from GET /api/case/agents; nothing about
  * them is restated here beyond display names and icons.
  */
-import { api } from '../api'
+import { API_ORIGIN, api } from '../api'
 import type { AllocationAssessment } from '../allocation/api'
 
 export type SourceKind =
@@ -119,7 +119,68 @@ export interface HumanReview {
   recorded_at: string | null
 }
 
+/** Progress events streamed by POST /api/case/assess/stream (one JSON object per line). */
+export type CaseEvent =
+  | { type: 'run_started'; run_id: string; stages: string[][] }
+  | { type: 'stage_started'; stage: number; agents: string[] }
+  | { type: 'agent_started'; agent: string; name: string; stage: number }
+  | { type: 'agent_finished'; agent: string; name: string; status: AgentStatus; duration_ms: number; summary: string }
+  | { type: 'agent_skipped'; agent: string; name: string; reason: string }
+  | { type: 'run_finished'; duration_ms: number; counts: Provenance['counts']; checkpoints: number }
+
+type StreamLine = CaseEvent | { type: 'case'; case: CaseRecord } | { type: 'error'; status: number; detail: string }
+
 export const getCaseAgents = () => api.get<AgentRegistry>('/case/agents').then(r => r.data)
 
 export const assessCase = (body: CaseRequest) =>
   api.post<CaseRecord>('/case/assess', body, { timeout: 300_000 }).then(r => r.data)
+
+/** Raised for an answer from the server (bad input, failed run): not worth retrying without streaming. */
+class CaseServerError extends Error {}
+
+/**
+ * Run a case with live progress. Each progress event goes to `onEvent`; the promise resolves
+ * with the case record. If streaming is unavailable before any event arrives (network, a
+ * buffering proxy), it falls back to the plain endpoint and calls `onFallback`.
+ */
+export async function streamCase(
+  body: CaseRequest, onEvent: (e: CaseEvent) => void, onFallback: () => void,
+): Promise<CaseRecord> {
+  let received = false
+  try {
+    const res = await fetch(`${API_ORIGIN}/api/case/assess/stream`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    })
+    if (!res.ok) {
+      const data = await res.json().catch(() => null)
+      const detail = data?.detail
+      throw new CaseServerError(typeof detail === 'string' ? detail : detail ? JSON.stringify(detail) : `Request failed (${res.status})`)
+    }
+    if (!res.body) throw new Error('Streaming is not supported here')
+    const reader = res.body.getReader()
+    const decoder = new TextDecoder()
+    let buffer = ''
+    for (;;) {
+      const { value, done } = await reader.read()
+      if (value) buffer += decoder.decode(value, { stream: true })
+      let nl = buffer.indexOf('\n')
+      while (nl >= 0) {
+        const line = buffer.slice(0, nl).trim()
+        buffer = buffer.slice(nl + 1)
+        nl = buffer.indexOf('\n')
+        if (!line) continue
+        const msg = JSON.parse(line) as StreamLine
+        received = true
+        if (msg.type === 'case') return msg.case
+        if (msg.type === 'error') throw new CaseServerError(msg.detail)
+        onEvent(msg)
+      }
+      if (done) break
+    }
+    throw new Error('The progress stream ended before the case was ready')
+  } catch (err) {
+    if (err instanceof CaseServerError || received) throw err
+    onFallback()
+    return assessCase(body)
+  }
+}

@@ -138,3 +138,37 @@ class TestRegistry:
         reg = registry()
         verifiers = [a for a in reg["agents"] if a["pattern"] == "verifier"]
         assert len(verifiers) == 1 and reg["stages"][-1] == [verifiers[0]["id"]]
+
+
+class TestProgressEvents:
+    def test_events_follow_the_run_order(self, make_supervisor):
+        events = []
+        case = make_supervisor().assess(
+            ChangeRequest("Instrumentation", "FV-103", DESC), on_event=events.append)
+        types = [e["type"] for e in events]
+        assert types[0] == "run_started" and types[-1] == "run_finished"
+        assert events[0]["run_id"] == case["run_id"]
+        assert types.count("stage_started") == 4
+        finished = {e["agent"]: e for e in events if e["type"] == "agent_finished"}
+        assert set(finished) == {"retrieval", "impact", "risk", "review", "cost", "allocation", "verifier"}
+        assert all(e["status"] == "ok" and e["duration_ms"] >= 0 for e in finished.values())
+        # every agent starts before it finishes, and stage n finishes before stage n+1 starts
+        pos = {(e["type"], e.get("agent")): i for i, e in enumerate(events)}
+        for a in finished:
+            assert pos[("agent_started", a)] < pos[("agent_finished", a)]
+        assert pos[("agent_finished", "risk")] < pos[("agent_started", "cost")]
+        assert pos[("agent_finished", "allocation")] < pos[("agent_started", "verifier")]
+        assert events[-1]["counts"] == case["why_trust"]["counts"]
+
+    def test_a_failing_listener_does_not_affect_the_case(self, make_supervisor):
+        def broken(_event):
+            raise RuntimeError("listener down")
+        case = make_supervisor().assess(ChangeRequest("Instrumentation", "FV-103", DESC), on_event=broken)
+        assert all(c["status"] == "ok" for c in case["why_trust"]["contributions"])
+
+    def test_a_failed_agent_is_reported_without_its_error_text(self, make_supervisor):
+        events = []
+        make_supervisor(risk_engine=FakeRisk(fail=True)).assess(
+            ChangeRequest("Instrumentation", "FV-103", DESC), on_event=events.append)
+        risk = next(e for e in events if e["type"] == "agent_finished" and e["agent"] == "risk")
+        assert risk["status"] == "failed" and "exploded" not in str(events)

@@ -129,7 +129,7 @@ export default function App() {
       ) : (
         <motion.div
           key="dashboard"
-          className="moc-dash-root moc-dash-mesh relative flex min-h-screen overflow-hidden"
+          className="moc-dash-root moc-dash-mesh relative flex min-h-screen overflow-clip"
           style={{ fontFamily: 'Outfit, Inter, sans-serif' }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -236,7 +236,7 @@ export default function App() {
               </div>
             </div>
 
-            <div className="moc-main-scroll flex-1 overflow-y-auto px-6 py-5">
+            <div className="moc-main-scroll flex-1 min-w-0 px-6 py-5">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}

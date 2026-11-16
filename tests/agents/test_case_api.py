@@ -57,3 +57,37 @@ def test_ledger_deduplicates_evidence_and_orders_checkpoints():
     led.checkpoint(CheckpointKind.VERIFICATION, "verify", "w", "r", "x")
     led.checkpoint(CheckpointKind.VERIFICATION, "verify", "w", "r", "x")
     assert [c.what for c in led.checkpoints()] == ["verify", "approve"]
+
+
+def _lines(resp):
+    import json
+    return [json.loads(line) for line in resp.text.splitlines() if line.strip()]
+
+
+def test_stream_sends_progress_then_the_case(client):
+    r = client.post("/api/case/assess/stream", json={"change_type": "Instrumentation", "asset_id": "FV-103",
+                                                     "description": "Upgrade the valve positioner on FV-103"})
+    assert r.status_code == 200 and r.headers["content-type"].startswith("application/x-ndjson")
+    lines = _lines(r)
+    assert lines[0]["type"] == "run_started"
+    assert sum(1 for e in lines if e["type"] == "agent_finished") == 7
+    assert lines[-1]["type"] == "case" and lines[-1]["case"]["run_id"] == lines[0]["run_id"]
+
+
+def test_stream_rejects_incomplete_input(client):
+    r = client.post("/api/case/assess/stream", json={"change_type": "Mechanical", "asset_id": "P-101", "description": "x"})
+    assert r.status_code == 422
+
+
+def test_stream_reports_a_failed_run_without_internal_text(client):
+    from api.routes import case
+
+    class Exploding:
+        def assess(self, request, on_event=None):
+            raise RuntimeError("secret internal detail")
+
+    case.set_supervisor(Exploding())
+    r = client.post("/api/case/assess/stream", json={"change_type": "Mechanical", "asset_id": "P-101",
+                                                     "description": "Replace the seal on P-101"})
+    last = _lines(r)[-1]
+    assert last["type"] == "error" and last["status"] == 500 and "secret" not in r.text

@@ -44,6 +44,9 @@ src/
   `store.currentChange` (type, asset, description, HAZOP/PSSR findings), so the flow
   carries through the tabs. The Risk tab hands over to Decision Allocation.
 - **Change Case is the first tab and the landing tab.** "Enter Platform" opens `#/app/case`.
+  Live run state (agent statuses, activity feed) is in the store (`caseRun`, reduced by
+  `src/case/run.ts`) so a run survives switching tabs; `streamCase` falls back to the plain
+  endpoint when streaming is unavailable.
   Its human review lives in `localStorage` per run id and goes out only in the JSON export.
 - **Print** uses the light theme (`printLight()`) and the `@media print` rules in `index.css`;
   mark screen-only controls with `no-print`.

@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import type { CaseRecord } from './case/api'
+import type { CaseEvent, CaseRecord } from './case/api'
+import { applyEvent, failRun, fallbackRun, finishRun, idleRun, startRun, type CaseRun } from './case/run'
 
 export interface ChatMessage { role: 'user' | 'assistant'; content: string; intent?: string }
 
@@ -19,6 +20,13 @@ interface AppStore {
   // Last multi-agent case (kept here so it survives switching tabs)
   caseRecord: CaseRecord | null
   setCaseRecord: (c: CaseRecord | null) => void
+  // Live progress of the current run (agent cards + activity feed)
+  caseRun: CaseRun
+  startCaseRun: (agentIds: string[]) => void
+  applyCaseEvent: (e: CaseEvent, names: Record<string, string>) => void
+  caseRunFallback: () => void
+  finishCaseRun: (record: CaseRecord) => void
+  failCaseRun: (error: unknown) => void
   // Set by another tab to open Decision Allocation on the proposed change
   allocationIntent: 'proposed' | null
   setAllocationIntent: (intent: 'proposed' | null) => void
@@ -40,6 +48,12 @@ export const useStore = create<AppStore>(set => ({
   setCurrentChange: patch => set(s => ({ currentChange: { ...s.currentChange, ...patch } })),
   caseRecord: null,
   setCaseRecord: c => set({ caseRecord: c }),
+  caseRun: idleRun(),
+  startCaseRun: ids => set({ caseRun: startRun(ids) }),
+  applyCaseEvent: (e, names) => set(s => ({ caseRun: applyEvent(s.caseRun, e, names) })),
+  caseRunFallback: () => set(s => ({ caseRun: fallbackRun(s.caseRun) })),
+  finishCaseRun: record => set(s => ({ caseRecord: record, caseRun: finishRun(s.caseRun, record) })),
+  failCaseRun: error => set(s => ({ caseRun: failRun(s.caseRun, error) })),
   allocationIntent: null,
   setAllocationIntent: intent => set({ allocationIntent: intent }),
   messages: [{

@@ -39,3 +39,10 @@ trust it), reusing the existing components and without a new trust-scoring algor
 - Live (local backend, Neo4j + OpenAI): all agents OK, evidence from every source kind, the
   verifier flagged P&ID tags proposed by the model that are not in the graph.
 - Visual: Change Case and both Why panels in light and dark themes.
+
+## Follow-up (v3.2): live agent panel
+
+The four-column stage grid became an "Intelligence Agents" side panel with an "Activity"
+feed, fed by a streamed endpoint (`POST /api/case/assess/stream`) so each agent's status is
+shown as it happens. Tests cover event order, a failing listener, a failed agent, and the
+stream's first, last and error lines.

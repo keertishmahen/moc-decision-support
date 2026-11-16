@@ -17,7 +17,7 @@ import logging
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from core.provenance import AgentStatus, Gap, Ledger, SourceKind, summarise, to_jsonable
 
@@ -26,6 +26,9 @@ from .registry import SUPERVISOR, build_agents, stages
 
 log = logging.getLogger(__name__)
 
+# Progress events: run_started, stage_started, agent_started, agent_finished, agent_skipped, run_finished.
+Listener = Callable[[Dict[str, Any]], None]
+
 
 class Supervisor:
     def __init__(self, tools: Toolbox, agents: Optional[List[Agent]] = None, model_info: Optional[Dict] = None):
@@ -33,7 +36,10 @@ class Supervisor:
         self.agents = agents if agents is not None else build_agents()
         self.model_info = model_info or {}
 
-    def assess(self, request: ChangeRequest) -> Dict[str, Any]:
+    def assess(self, request: ChangeRequest, on_event: Optional[Listener] = None) -> Dict[str, Any]:
+        """Run every agent and return the case record. `on_event`, if given, receives progress
+        events as plain dicts (see `Listener` and docs/design-docs/multi-agent-trust.md); it is
+        called from worker threads and a failing listener never affects the case."""
         run_id = uuid.uuid4().hex[:12]
         started = time.perf_counter()
         ledger = Ledger()
@@ -41,9 +47,20 @@ class Supervisor:
         ledger.cite(SourceKind.USER_INPUT, "Input:change", f"{request.change_type} change to {request.asset_id}",
                     request.description[:300])
 
+        def emit(event: Dict[str, Any]) -> None:
+            if on_event is None:
+                return
+            try:
+                on_event(event)
+            except Exception:                                      # noqa: BLE001 — a listener never sinks the case
+                log.debug("case progress listener failed", exc_info=True)
+
         plan = stages(self.agents)
+        emit({"type": "run_started", "run_id": run_id, "stages": [[a.spec.id for a in s] for s in plan]})
         timeline: List[Dict[str, Any]] = []
         for stage_agents in plan:
+            emit({"type": "stage_started", "stage": stage_agents[0].spec.stage,
+                  "agents": [a.spec.id for a in stage_agents]})
             runnable, skipped = [], []
             for agent in stage_agents:
                 missing = [n for n in agent.spec.needs if not ctx.succeeded(n)]
@@ -52,8 +69,10 @@ class Supervisor:
                 ctx.contributions[agent.spec.id] = agent.spec.contribution(
                     status=AgentStatus.SKIPPED, summary=f"Skipped: needs {', '.join(missing)}.",
                     gaps=[Gap("missing", agent.spec.id, f"Not run because {', '.join(missing)} did not complete.")])
+                emit({"type": "agent_skipped", "agent": agent.spec.id, "name": agent.spec.name,
+                      "reason": f"needs {', '.join(missing)}"})
             with ThreadPoolExecutor(max_workers=max(1, len(runnable))) as pool:
-                futures = [(agent, pool.submit(self._run_one, agent, ctx)) for agent, _ in runnable]
+                futures = [(agent, pool.submit(self._run_one, agent, ctx, emit)) for agent, _ in runnable]
                 for agent, fut in futures:
                     contribution, result = fut.result()
                     ctx.contributions[agent.spec.id] = contribution
@@ -72,6 +91,8 @@ class Supervisor:
         contributions = [supervisor, *ordered]
         why = summarise(contributions, ledger)
         log.info("case run %s: %s in %d ms", run_id, supervisor.summary, total_ms)
+        emit({"type": "run_finished", "duration_ms": total_ms, "counts": why["counts"],
+              "checkpoints": len(why["checkpoints"])})
 
         return {
             "run_id": run_id,
@@ -92,8 +113,9 @@ class Supervisor:
 
     # ── helpers ─────────────────────────────────────────────────────────────────────────────────
     @staticmethod
-    def _run_one(agent: Agent, ctx: RunContext):
+    def _run_one(agent: Agent, ctx: RunContext, emit: Listener):
         t0 = time.perf_counter()
+        emit({"type": "agent_started", "agent": agent.spec.id, "name": agent.spec.name, "stage": agent.spec.stage})
         try:
             contribution, result = agent.run(ctx)
         except Exception as exc:                                   # noqa: BLE001 — one agent never sinks the case
@@ -104,6 +126,9 @@ class Supervisor:
                 gaps=[Gap("missing", agent.spec.id, f"{agent.spec.name} could not complete; its part is missing.")])
             result = None
         contribution.duration_ms = int((time.perf_counter() - t0) * 1000)
+        emit({"type": "agent_finished", "agent": agent.spec.id, "name": agent.spec.name,
+              "status": contribution.status.value, "duration_ms": contribution.duration_ms,
+              "summary": contribution.summary})
         return contribution, result
 
     @staticmethod

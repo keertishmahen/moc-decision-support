@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // VITE_API_URL is set at build time for GitHub Pages (backend on Render); unset = same-origin /api.
-const API_ORIGIN = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
+export const API_ORIGIN = (import.meta.env.VITE_API_URL ?? '').replace(/\/+$/, '')
 
 export const api = axios.create({ baseURL: `${API_ORIGIN}/api`, timeout: 180_000 })
 

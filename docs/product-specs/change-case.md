@@ -13,7 +13,7 @@ rely on the platform's assessment.
 | # | The user can | Acceptance |
 |---|---|---|
 | 1 | Describe a change (type, asset, description) or load the MoC-002 example | Assessment starts only with a description of at least 5 characters |
-| 2 | See the agents run in stages | Each agent shows waiting, running, OK, degraded, failed or skipped, with its time |
+| 2 | Watch the agents work, live | A side panel lists every agent as Waiting, Analyzing, Complete (with its time), Partial result, Failed or Skipped, updated as each one starts and ends; an Activity feed logs each event with a relative time; the run continues if the user switches tab |
 | 3 | Read **what happens**: assets reached, critical assets, propagated downtime, risks, HAZOP/PSSR, approvers, documents, cost and downtime with ranges, similar past changes | Each part has a "Why?" that shows only the agents behind it |
 | 4 | Read **who should decide**: AI-led, AI-supported or human-led, with the R/C/U signature | Same result as the Decision Allocation tab for the same input |
 | 5 | Open **Why this recommendation?** | Shows claims with their verification, evidence grouped by knowledge source, contributing agents and their roles, assumptions/uncertainties/missing information, and human checkpoints |

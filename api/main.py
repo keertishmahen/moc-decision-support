@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from core.config import FRONTEND_DIST
 from api.errors import install_error_handlers, json_safe, to_http_error
 
-APP_VERSION = "3.1.0"
+APP_VERSION = "3.2.0"
 
 app = FastAPI(title="MoC Intelligence API", version=APP_VERSION)
 
