@@ -143,7 +143,7 @@ export default function ChangeCase() {
   const elapsed = caseRun.startedAt ? Math.max(0, Math.round((now - caseRun.startedAt) / 1000)) : 0
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-5">
+    <div className="moc-case-grid grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_320px] gap-5">
       {/* ── Main column, top: the change ── */}
       <div className="min-w-0 space-y-5 xl:col-start-1 xl:row-start-1">
         <div>
@@ -194,7 +194,7 @@ export default function ChangeCase() {
       </div>
 
       {/* ── Side column: live agents and activity ── */}
-      <aside className="no-print moc-glass-card rounded-2xl p-4 space-y-5 self-start xl:sticky xl:top-4 xl:max-h-[calc(100vh-2rem)] xl:overflow-y-auto xl:col-start-2 xl:row-start-1 xl:row-span-2">
+      <aside className="no-print moc-glass-card rounded-2xl p-4 space-y-5 self-start xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto xl:col-start-2 xl:row-start-1 xl:row-span-2">
         {registry.data ? (
           <AgentPanel registry={registry.data} run={caseRun} />
         ) : registry.isLoading ? <Spinner text="Loading the agents…" /> : null}

@@ -50,7 +50,7 @@ fixing now; remove it in the change that fixes it. Scheduled work is in
 | Two expected-failure tests | Fixtures omit fields `_moc_to_text` needs; the stated reasons are inaccurate | `tests/conftest.py` |
 | Module tests need live services | Most pre-existing tests are marked `live` and skip in CI | `tests/test_rag_*.py` |
 | Lint is two-level | Older code is held only to syntax/unused-import rules | `pyproject.toml`, `Makefile` |
-| Frontend has no tests or linter | The only gate is the type-check | `frontend/` |
+| Frontend has no tests or linter | The only gate is the type-check; visual checks are scripted screenshots kept outside the repo | `frontend/` |
 | Original API client is untyped | Responses are `any` | `frontend/src/api.ts` |
 | Deep links reset to the landing page | The app always opens on onboarding | `frontend/src/App.tsx` |
 | Superseded code still present | Streamlit `app.py`, Azure files, Snowflake pipeline | repository root |

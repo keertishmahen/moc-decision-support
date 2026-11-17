@@ -1,19 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import React, { Suspense, useCallback, useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Bot,
-  ChevronRight,
-  CircleDollarSign,
-  ClipboardList,
-  GitBranch,
-  RefreshCw,
-  Scale,
-  TriangleAlert,
-  Workflow,
-  type LucideIcon,
-} from 'lucide-react'
-import { getHealth } from './api'
 import { useStore } from './store'
 import { ONBOARDING_STORAGE_KEY } from './onboardingContent'
 import {
@@ -23,44 +9,29 @@ import {
   pathForTab,
   pathOnboarding,
   replace,
+  tabIndex,
   PATH_LANDING,
 } from './navigation'
+import { PAGES } from './nav'
 import Onboarding from './components/Onboarding'
-import SymmetraLogo from './components/SymmetraLogo'
-import ThemeToggle from './components/ThemeToggle'
-import ChangeCase   from './tabs/ChangeCase'
-import SmartForm    from './tabs/SmartForm'
-import RiskAnalysis from './tabs/RiskAnalysis'
-import CostPredictor from './tabs/CostPredictor'
-import MoCBot       from './tabs/MoCBot'
-import ProcessIntelligence from './tabs/ProcessIntelligence'
-import DecisionAllocation from './tabs/DecisionAllocation'
+import Sidebar from './components/shell/Sidebar'
+import TopBar from './components/shell/TopBar'
+import { Spinner } from './components/ui'
 
-const TABS: { icon: LucideIcon; label: string }[] = [
-  { icon: Workflow, label: 'Change Case' },
-  { icon: ClipboardList, label: 'Smart Form' },
-  { icon: TriangleAlert, label: 'Risk & Impact' },
-  { icon: CircleDollarSign, label: 'Cost Predictor' },
-  { icon: Bot, label: 'MoCBot' },
-  { icon: GitBranch, label: 'Process Intelligence' },
-  { icon: Scale, label: 'Decision Allocation' },
-]
+const COLLAPSED_KEY = 'moc-sidebar-collapsed'
 
-const DATASET = [
-  { label: 'MoC Records', value: '10' },
-  { label: 'Assets', value: '22' },
-  { label: 'Work Orders', value: '21' },
-  { label: 'Incidents', value: '4' },
-]
-
-const STACK = ['Neo4j Knowledge Graph', 'GPT-4o · LangChain', 'ChromaDB · OpenAI Embeddings', 'GradientBoosting ML']
-
-function readOnboardingSeen() {
+function readFlag(key: string) {
   try {
-    return localStorage.getItem(ONBOARDING_STORAGE_KEY) === '1'
+    return localStorage.getItem(key) === '1'
   } catch {
     return false
   }
+}
+
+function writeFlag(key: string, value: boolean) {
+  try {
+    localStorage.setItem(key, value ? '1' : '0')
+  } catch { /* storage unavailable: the choice lasts for this visit only */ }
 }
 
 function applyRoute(
@@ -76,17 +47,18 @@ function applyRoute(
 
 export default function App() {
   const { activeTab, setActiveTab } = useStore()
-  const { data: health, refetch, isError: healthError } = useQuery({ queryKey: ['health'], queryFn: getHealth, refetchInterval: 30_000 })
   const [showOnboarding, setShowOnboarding] = useState(true)
+  const [collapsed, setCollapsed] = useState(() => readFlag(COLLAPSED_KEY))
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
-  const panels = [<ChangeCase />, <SmartForm />, <RiskAnalysis />, <CostPredictor />, <MoCBot />, <ProcessIntelligence />, <DecisionAllocation />]
+  const page = PAGES[activeTab] ?? PAGES[0]
+  const PageComponent = page.component
 
   const syncFromLocation = useCallback(() => {
-    const seen = readOnboardingSeen()
-    applyRoute(currentPath(), seen, setShowOnboarding, setActiveTab)
+    applyRoute(currentPath(), readFlag(ONBOARDING_STORAGE_KEY), setShowOnboarding, setActiveTab)
   }, [setActiveTab])
 
-  // Every fresh load opens onboarding; Enter Platform / tabs / Back–Forward update history after that
+  // Every fresh load opens onboarding; Enter Platform / navigation / Back–Forward update history after that
   useEffect(() => {
     replace(pathOnboarding())
     setShowOnboarding(true)
@@ -95,23 +67,39 @@ export default function App() {
     return () => window.removeEventListener('popstate', syncFromLocation)
   }, [syncFromLocation])
 
+  // Esc closes the navigation drawer on small screens.
+  useEffect(() => {
+    if (!drawerOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setDrawerOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [drawerOpen])
+
   const enterPlatform = () => {
-    try {
-      localStorage.setItem(ONBOARDING_STORAGE_KEY, '1')
-    } catch { /* ignore */ }
-    setActiveTab(0)
+    writeFlag(ONBOARDING_STORAGE_KEY, true)
+    setActiveTab(tabIndex(PATH_LANDING))
     setShowOnboarding(false)
     navigate(PATH_LANDING)
   }
 
   const reopenAbout = () => {
+    setDrawerOpen(false)
     setShowOnboarding(true)
     navigate(pathOnboarding())
   }
 
   const goToTab = (i: number) => {
     setActiveTab(i)
+    setDrawerOpen(false)
     navigate(pathForTab(i))
+    window.scrollTo({ top: 0 })
+  }
+
+  const toggleCollapsed = () => {
+    setCollapsed(c => {
+      writeFlag(COLLAPSED_KEY, !c)
+      return !c
+    })
   }
 
   return (
@@ -127,128 +115,54 @@ export default function App() {
           <Onboarding onEnter={enterPlatform} />
         </motion.div>
       ) : (
+        // Opacity only: a transform here would turn the fixed drawer and orbs into
+        // absolutely positioned boxes. No overflow container either, so sticky works.
         <motion.div
           key="dashboard"
-          className="moc-dash-root moc-dash-mesh relative flex min-h-screen overflow-clip"
+          className="moc-dash-root relative flex min-h-screen overflow-clip"
           style={{ fontFamily: 'Outfit, Inter, sans-serif' }}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.35 }}
         >
           <div className="moc-dash-orb moc-dash-orb-a" aria-hidden />
           <div className="moc-dash-orb moc-dash-orb-b" aria-hidden />
-          <div className="moc-dash-grid absolute inset-0 z-0" aria-hidden />
+          <div className="moc-dash-grid fixed inset-0 z-0" aria-hidden />
           <div className="moc-dash-vignette" aria-hidden />
 
-          {/* ── Sidebar ── */}
-          <aside className="moc-sidebar relative z-10 w-56 flex-shrink-0 flex flex-col p-4 gap-4">
-            <div className="pt-1">
-              <SymmetraLogo size={30} />
-              <div className="mt-2 text-[10px] text-white/40">MoC Intelligence Platform · FCC Unit</div>
-              <div className="mt-3 flex items-center justify-between gap-2">
-                <button
-                  type="button"
-                  onClick={reopenAbout}
-                  className="text-[11px] font-medium text-accent hover:text-accent-soft transition-colors"
-                >
-                  About
-                </button>
-                <ThemeToggle />
-              </div>
-            </div>
+          {drawerOpen && (
+            <div className="moc-drawer-overlay fixed inset-0 z-40 lg:hidden" onClick={() => setDrawerOpen(false)} aria-hidden />
+          )}
 
-            <div className="moc-sidebar-panel p-3">
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-2">System Status</div>
-              <button onClick={() => refetch()} className="mb-2 inline-flex items-center gap-1.5 text-[11px] text-accent hover:text-accent-soft transition-colors">
-                <RefreshCw className="h-3 w-3" strokeWidth={2} aria-hidden />
-                Refresh
-              </button>
-              {(['neo4j','openai'] as const).map(svc => {
-                // A failed health request means the backend itself is down or still waking up,
-                // not that Neo4j/OpenAI are at fault — say so instead of showing stale or blank status.
-                const info = healthError ? undefined : health?.[svc]
-                const ok = info?.ok ?? false
-                const fallback = healthError ? 'Backend unreachable — may be waking up, retrying' : 'Connecting…'
-                return (
-                  <div key={svc} className="moc-status-row flex items-center gap-2 p-2 rounded-xl mb-1.5 last:mb-0">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${ok ? 'bg-emerald-400 shadow-[0_0_6px_var(--color-ok)]' : 'bg-red-400 shadow-[0_0_6px_var(--color-danger)]'}`} />
-                    <span className="text-[11px] font-semibold text-white/80 w-12">{svc === 'neo4j' ? 'Neo4j' : 'OpenAI'}</span>
-                    <span className="text-[10px] text-white/40 truncate" title={info?.message ?? fallback}>{info?.message ?? fallback}</span>
-                  </div>
-                )
-              })}
-            </div>
+          <Sidebar
+            active={activeTab}
+            onSelect={goToTab}
+            collapsed={collapsed}
+            onToggleCollapsed={toggleCollapsed}
+            mobileOpen={drawerOpen}
+            onCloseMobile={() => setDrawerOpen(false)}
+            onAbout={reopenAbout}
+          />
 
-            <div className="moc-sidebar-panel p-3">
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-2">Tech Stack</div>
-              {STACK.map(s => (
-                <div key={s} className="text-[11px] text-white/60 py-1.5 border-b border-white/5 last:border-0 flex items-center gap-1.5">
-                  <ChevronRight className="h-3 w-3 text-accent flex-shrink-0" strokeWidth={2} aria-hidden />{s}
-                </div>
-              ))}
-            </div>
+          <div className="moc-shell-main relative z-10 flex min-w-0 flex-1 flex-col">
+            <TopBar page={page} onMenu={() => setDrawerOpen(true)} />
 
-            <div className="moc-sidebar-panel p-3">
-              <div className="text-[10px] font-semibold uppercase tracking-widest text-white/40 mb-2">Dataset</div>
-              {DATASET.map(d => (
-                <div key={d.label} className="flex justify-between py-1.5 border-b border-white/5 last:border-0">
-                  <span className="text-[11px] text-white/50">{d.label}</span>
-                  <span className="text-[11px] font-bold text-accent">{d.value}</span>
-                </div>
-              ))}
-            </div>
-          </aside>
-
-          {/* ── Main ── */}
-          <div className="relative z-10 flex-1 flex flex-col min-w-0">
-            <div className="moc-hero-bar relative overflow-hidden px-6 py-5">
-              <div className="shimmer absolute inset-0 pointer-events-none" />
-              <div className="relative">
-                <h1 className="text-xl font-semibold text-white tracking-tight">MoC Intelligence Platform</h1>
-                <p className="text-sm text-white/50 mt-1">Hybrid Neo4j + ChromaDB retrieval · GPT-4o reasoning · Engineering-grade decision support</p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {['Live Graph', 'RAG Pipeline', 'ML Prediction', 'Vector Search'].map(b => (
-                    <span key={b} className="moc-chip px-2.5 py-0.5 rounded-full text-[11px] font-semibold text-accent-soft">{b}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="no-print px-6 pt-4 pb-0">
-              <div className="moc-tab-rail flex flex-wrap">
-                {TABS.map((t, i) => {
-                  const Icon = t.icon
-                  return (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => goToTab(i)}
-                    className={`moc-tab inline-flex items-center gap-2 px-4 py-2 text-sm font-medium ${
-                      activeTab === i ? 'moc-tab-active' : 'moc-tab-idle'
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 shrink-0" strokeWidth={1.75} />
-                    {t.label}
-                  </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="moc-main-scroll flex-1 min-w-0 px-6 py-5">
+            <main className="moc-main-scroll min-w-0 flex-1 px-4 py-5 sm:px-6">
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={activeTab}
+                  key={page.id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.22 }}
                 >
-                  {panels[activeTab]}
+                  <Suspense fallback={<Spinner text={`Loading ${page.label}…`} />}>
+                    <PageComponent />
+                  </Suspense>
                 </motion.div>
               </AnimatePresence>
-            </div>
+            </main>
           </div>
         </motion.div>
       )}

@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { CircleCheck, CircleHelp, TriangleAlert } from 'lucide-react'
+import { CircleCheck, CircleHelp, TriangleAlert, type LucideIcon } from 'lucide-react'
 import { cssVar, ink, tint, type Token } from '../theme/palette'
 
 // ── Card ──────────────────────────────────────────────────────────────────
@@ -191,3 +191,44 @@ export const CIBar = ({ estimate, low, high, label, prefix = '', suffix = '' }: 
     </div>
   )
 }
+
+// ── Icon tile (frosted square with a coloured icon) ───────────────────────
+export const IconTile = ({ icon: Icon, tone = 'accent', size = 44, className = '' }: {
+  icon: LucideIcon; tone?: Token; size?: number; className?: string
+}) => (
+  <span className={`glass-tile ${className}`} style={{ width: size, height: size }}>
+    <Icon style={{ width: size * 0.48, height: size * 0.48, color: cssVar(tone) }} strokeWidth={1.75} aria-hidden />
+  </span>
+)
+
+// ── Stat tile (KPI with icon) ─────────────────────────────────────────────
+export const StatTile = ({ icon, label, value, sub, tone = 'accent', loading = false }: {
+  icon: LucideIcon; label: string; value: React.ReactNode; sub?: React.ReactNode; tone?: Token; loading?: boolean
+}) => (
+  <div className="moc-glass-card glass-hover rounded-2xl p-4 flex items-start gap-3.5 min-w-0">
+    <IconTile icon={icon} tone={tone} />
+    <div className="min-w-0">
+      <div className="text-[11px] font-semibold uppercase leading-tight tracking-widest text-white/50">{label}</div>
+      {loading
+        ? <div className="mt-2 h-6 w-16 rounded-md bg-white/10 animate-pulse" />
+        : <div className="mt-1 text-2xl font-bold leading-tight text-white truncate">{value}</div>}
+      {sub && <div className="mt-0.5 text-[12px] text-white/45 truncate">{sub}</div>}
+    </div>
+  </div>
+)
+
+// ── Panel (glass card with a title row) ───────────────────────────────────
+export const Panel = ({ title, icon: Icon, actions, children, className = '' }: {
+  title: string; icon?: LucideIcon; actions?: React.ReactNode; children: React.ReactNode; className?: string
+}) => (
+  <section className={`moc-glass-card rounded-2xl p-4 ${className}`} aria-label={title}>
+    <div className="mb-3 flex items-center justify-between gap-2">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-white/90">
+        {Icon && <Icon className="h-4 w-4 text-accent" strokeWidth={1.75} aria-hidden />}
+        {title}
+      </h3>
+      {actions}
+    </div>
+    {children}
+  </section>
+)

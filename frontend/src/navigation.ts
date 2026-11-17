@@ -2,19 +2,18 @@
 
 export const PATH_ONBOARDING = '/'
 export const PATH_APP_ROOT = '/app'
-export const PATH_CHANGE_CASE = '/app/case'
-/** Where "Enter Platform" lands: the guided Change Case. */
-export const PATH_LANDING = PATH_CHANGE_CASE
+import { PAGES } from './nav'
 
-export const TAB_PATHS = [
-  '/app/case',
-  '/app/smart-form',
-  '/app/risk',
-  '/app/cost',
-  '/app/mocbot',
-  '/app/process',
-  '/app/allocation',
-] as const
+export const PATH_OVERVIEW = '/app/overview'
+export const PATH_CHANGE_CASE = '/app/case'
+/** Where "Enter Platform" lands: the Overview home page. */
+export const PATH_LANDING = PATH_OVERVIEW
+
+/** Route of each page, in navigation order (from nav.ts). */
+export const TAB_PATHS: string[] = PAGES.map(p => p.path)
+
+/** Index of a page by its path, for setActiveTab. */
+export const tabIndex = (path: string) => Math.max(0, TAB_PATHS.indexOf(path))
 
 export type AppRoute =
   | { view: 'onboarding'; tab: number }
@@ -40,7 +39,7 @@ export function parsePath(pathname: string, onboardingSeen: boolean): AppRoute {
     return { view: 'app', tab: 0 }
   }
 
-  const tabIdx = TAB_PATHS.indexOf(path as (typeof TAB_PATHS)[number])
+  const tabIdx = TAB_PATHS.indexOf(path)
   if (tabIdx >= 0) {
     return { view: 'app', tab: tabIdx }
   }
@@ -84,7 +83,7 @@ export function resolveInitialPath(pathname: string, _onboardingSeen: boolean): 
 
   if (path === PATH_APP_ROOT) return PATH_LANDING
 
-  const tabIdx = TAB_PATHS.indexOf(path as (typeof TAB_PATHS)[number])
+  const tabIdx = TAB_PATHS.indexOf(path)
   if (tabIdx >= 0) return TAB_PATHS[tabIdx]
 
   return PATH_ONBOARDING

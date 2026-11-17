@@ -5,6 +5,7 @@ description) is shared across Smart Form, Risk and Cost.
 
 | Workspace | Input | Output | Depends on |
 |---|---|---|---|
+| **Overview** (home) | None | MoC and asset counts, recorded cost, allocation mix, thesis cases reproduced; charts by change type, cost per MoC, asset criticality; the latest Change Case; service status | Graph; allocation model (works without the graph) |
 | **Smart Form** | Change type, asset, description | Suggested approvers, documents, risk level, HAZOP / PSSR need, scope, P&ID tags, justification; similar historical MoCs | Graph, vector store, AI |
 | **Risk & Impact** | Same | Top risks with severity, directly and indirectly affected assets, conditions at risk, HAZOP / PSSR, mitigations, overall rating | Graph, vector store, AI |
 | **Cost Predictor** | Same + asset category, risk level | Cost and downtime estimates with ranges, feature values, AI explanation | Graph, model files, AI (explanation only) |

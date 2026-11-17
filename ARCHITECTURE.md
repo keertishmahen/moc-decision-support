@@ -1,6 +1,6 @@
 # Architecture
 
-MoC Intelligence Platform, version 3.2. One FastAPI backend, one React frontend, one Neo4j
+MoC Intelligence Platform, version 3.3. One FastAPI backend, one React frontend, one Neo4j
 knowledge graph, one vector store, and the OpenAI API.
 
 ## System
@@ -9,7 +9,7 @@ knowledge graph, one vector store, and the OpenAI API.
 Browser (GitHub Pages)                    Render (Docker)
 ┌──────────────────────┐   HTTPS/JSON   ┌────────────────────────────────────────────┐
 │ React + Vite         │ ─────────────► │ FastAPI  api/                              │
-│ seven tabs           │                │   ├─ modules/   form, risk, cost, chatbot, │
+│ eight pages, glass UI│                │   ├─ modules/   form, risk, cost, chatbot, │
 └──────────────────────┘                │   │             decision_allocation        │
                                         │   └─ core/      graph, RAG, agent, llm,    │
                                         │                 allocation (pure model)    │

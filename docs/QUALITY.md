@@ -25,6 +25,7 @@ known limits recorded · **C** works, thinly tested or carrying recorded debt ·
 | Graph content and loaders | `data/graph/`, `loaders/` | B | Canonical file, additive loader with dry-run, verification step |
 | Frontend: allocation tab | `frontend/src/allocation/`, `tabs/DecisionAllocation.tsx` | B | Typed; not browser-tested automatically |
 | Frontend: Change Case | `frontend/src/case/`, `tabs/ChangeCase.tsx` | B | Typed; live progress with a fallback; checked by scripted screenshots, not by automated tests |
+| Frontend: shell and design system | `frontend/src/components/shell/`, `nav.ts`, `index.css` | B | One page registry; glass variables and CSS pitfalls guarded by tests; checked by scripted screenshots |
 | Frontend: other tabs | `frontend/src/tabs/` | C | Untyped responses; no tests |
 | Deployment | `.github/workflows/`, `render.yaml` | B | Automatic with a test gate; free-tier cold starts |
 | Documentation | `AGENTS.md`, `docs/` | B | Structured and link-checked; generated API doc verified in CI |

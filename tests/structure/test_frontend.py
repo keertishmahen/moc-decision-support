@@ -72,3 +72,30 @@ def test_palette_reads_every_token():
     palette = (SRC / "theme" / "palette.ts").read_text(encoding="utf-8")
     listed = set(re.findall(r"'([a-z0-9-]+)'", palette[palette.index("TOKENS"):palette.index("] as const")]))
     assert dark == listed, f"palette.ts TOKENS and index.css tokens differ: {sorted(dark ^ listed)}"
+
+
+def test_every_glass_variable_has_a_light_value():
+    """Glass surfaces (--glass-*) are themed like colour tokens: each dark value needs a light one."""
+    css = (SRC / "index.css").read_text(encoding="utf-8")
+    var = re.compile(r"--(glass-[a-z0-9-]+)\s*:")
+
+    def blocks(selector):
+        out, start = set(), 0
+        while (i := css.find(selector, start)) >= 0:
+            body = css[i + len(selector):]
+            out |= set(var.findall(body[:body.index("}")]))
+            start = i + len(selector)
+        return out
+
+    dark, light = blocks(":root {"), blocks(":root[data-theme='light'] {")
+    assert dark, "No --glass-* variables found in a :root block of index.css"
+    missing = sorted(dark - light)
+    assert not missing, f"--glass-* variables with no light value: {missing}. Add them under :root[data-theme='light']."
+
+
+def test_backdrop_filter_is_written_unprefixed():
+    """The CSS build adds -webkit-backdrop-filter itself. Writing both lets it keep only the prefixed
+    one, which Chrome and Edge ignore, so every glass surface silently loses its blur."""
+    css = (SRC / "index.css").read_text(encoding="utf-8")
+    lines = [n for n, line in enumerate(css.splitlines(), 1) if line.strip().startswith("-webkit-backdrop-filter")]
+    assert not lines, f"index.css lines {lines}: write only `backdrop-filter`; the build adds the prefix."

@@ -57,7 +57,8 @@ These fail the build; the failure message says how to fix it.
 4. **Published results stay reproduced**: thesis Table 2 and the 2,592-point enumeration.
    (`tests/allocation/`)
 5. **Frontend colours are tokens, icons are lucide**: no hex/rgba in `.ts`/`.tsx` and no emojis
-   in `frontend/src`; every dark token has a light value. (`tests/structure/test_frontend.py`)
+   in `frontend/src`; every dark token and `--glass-*` variable has a light value; `backdrop-filter`
+   is written unprefixed. (`tests/structure/test_frontend.py`)
 6. **Docs stay true**: this file stays short, its links resolve, and
    `docs/generated/api-routes.md` and `agents.md` match the app. (`tests/structure/test_docs.py`)
 7. **Agents state their provenance**: each has a role and sources; language-model findings are

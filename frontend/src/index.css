@@ -265,71 +265,85 @@ body {
   }
 }
 
-/* ── Glass dashboard ── */
-.moc-dash-root {
-  position: relative;
-  background: #04070f;
-  isolation: isolate;
+/* ── Glass design system ──────────────────────────────────────────────────────
+ * Surfaces are defined once as --glass-* variables (dark here, light further down) and used
+ * by the classes below. Not colour tokens: components never read them from TypeScript.
+ *   .glass / .moc-glass-card  frosted card        .glass-strong  sidebar, top bar
+ *   .glass-tile               square icon tile    .glass-hover   lift on hover (small items only)
+ * tests/structure/test_frontend.py checks every --glass-* variable has a light value.
+ */
+:root {
+  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.075) 0%, rgba(255, 255, 255, 0.025) 100%);
+  --glass-bg-strong: linear-gradient(180deg, rgba(17, 25, 45, 0.72) 0%, rgba(9, 13, 25, 0.84) 100%);
+  --glass-opaque: rgba(13, 18, 32, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.11);
+  --glass-border-hover: rgba(79, 142, 247, 0.38);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 10px 34px rgba(0, 0, 0, 0.28);
+  --glass-shadow-hover: 0 16px 44px rgba(0, 0, 0, 0.34), 0 0 30px rgba(79, 142, 247, 0.1);
+  --glass-blur: 18px;
+  --glass-input: rgba(255, 255, 255, 0.05);
+  --glass-input-border: rgba(255, 255, 255, 0.12);
+  --glass-tile-bg: linear-gradient(150deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.04) 100%);
+  --glass-tile-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  --glass-nav-hover: rgba(255, 255, 255, 0.06);
+  --glass-nav-active: linear-gradient(135deg, rgba(79, 142, 247, 0.24) 0%, rgba(79, 142, 247, 0.08) 100%);
+  --glass-nav-ring: inset 0 0 0 1px rgba(79, 142, 247, 0.38), 0 6px 22px rgba(79, 142, 247, 0.18);
+  --glass-canvas:
+    radial-gradient(ellipse 55% 40% at 80% 6%, rgba(79, 142, 247, 0.34), transparent 60%),
+    radial-gradient(ellipse 45% 35% at 8% 40%, rgba(124, 106, 247, 0.14), transparent 55%),
+    radial-gradient(ellipse 50% 40% at 55% 100%, rgba(56, 189, 248, 0.12), transparent 55%),
+    #04070f;
+  --glass-orb-a: radial-gradient(circle, rgba(79, 142, 247, 0.42) 0%, rgba(79, 142, 247, 0.08) 45%, transparent 70%);
+  --glass-orb-b: radial-gradient(circle, rgba(124, 106, 247, 0.26) 0%, rgba(56, 189, 248, 0.06) 50%, transparent 72%);
 }
 
-.moc-dash-mesh {
-  background:
-    radial-gradient(ellipse 55% 40% at 78% 8%, rgba(79, 142, 247, 0.38), transparent 58%),
-    radial-gradient(ellipse 45% 35% at 12% 42%, rgba(56, 189, 248, 0.12), transparent 55%),
-    radial-gradient(ellipse 50% 40% at 55% 95%, rgba(79, 142, 247, 0.14), transparent 55%),
-    radial-gradient(ellipse 80% 60% at 50% 50%, rgba(8, 12, 22, 0.2), transparent 70%),
-    #04070f;
+.moc-dash-root {
+  position: relative;
+  isolation: isolate;
+  background: var(--glass-canvas);
+  background-attachment: fixed;
 }
 
 .moc-dash-grid {
   background-image:
-    radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 28px 28px, 64px 64px, 64px 64px;
-  background-position: 0 0, 0 0, 0 0;
   mask-image: radial-gradient(ellipse 75% 55% at 58% 28%, black 0%, transparent 72%);
   -webkit-mask-image: radial-gradient(ellipse 75% 55% at 58% 28%, black 0%, transparent 72%);
-  opacity: 0.55;
+  opacity: 0.5;
   pointer-events: none;
 }
 
 .moc-dash-orb {
-  position: absolute;
+  position: fixed;
   border-radius: 50%;
   pointer-events: none;
-  filter: blur(64px);
+  filter: blur(70px);
   z-index: 0;
   will-change: transform, opacity;
 }
-
 .moc-dash-orb-a {
-  width: min(52vw, 520px);
-  height: min(52vw, 520px);
-  top: -12%;
-  right: 4%;
-  background: radial-gradient(circle, rgba(79, 142, 247, 0.45) 0%, rgba(79, 142, 247, 0.08) 45%, transparent 70%);
-  animation: moc-orb-drift 14s ease-in-out infinite;
+  width: min(55vw, 600px); height: min(55vw, 600px); top: -14%; right: 2%;
+  background: var(--glass-orb-a);
+  animation: moc-orb-drift 16s ease-in-out infinite;
 }
-
 .moc-dash-orb-b {
-  width: min(42vw, 420px);
-  height: min(42vw, 420px);
-  bottom: 8%;
-  left: 18%;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.22) 0%, rgba(79, 142, 247, 0.06) 50%, transparent 72%);
-  animation: moc-orb-drift 18s ease-in-out infinite reverse;
-  animation-delay: -4s;
+  width: min(45vw, 480px); height: min(45vw, 480px); bottom: -6%; left: 14%;
+  background: var(--glass-orb-b);
+  animation: moc-orb-drift 20s ease-in-out infinite reverse;
+  animation-delay: -5s;
 }
-
 .moc-dash-vignette {
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse 90% 70% at 50% 40%, transparent 35%, rgba(2, 4, 10, 0.55) 100%),
-    linear-gradient(180deg, rgba(2, 4, 10, 0.15) 0%, transparent 18%, transparent 75%, rgba(2, 4, 10, 0.45) 100%);
+    radial-gradient(ellipse 90% 70% at 50% 40%, transparent 35%, rgba(2, 4, 10, 0.5) 100%),
+    linear-gradient(180deg, rgba(2, 4, 10, 0.12) 0%, transparent 18%, transparent 75%, rgba(2, 4, 10, 0.4) 100%);
 }
 
 @keyframes moc-orb-drift {
@@ -337,108 +351,102 @@ body {
   50% { transform: translate(-3%, 4%) scale(1.08); opacity: 1; }
 }
 
-.moc-sidebar {
-  background: linear-gradient(180deg, rgba(16, 24, 42, 0.72) 0%, rgba(10, 14, 26, 0.88) 100%);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border-right: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.25);
+/* Component classes live in the components layer so Tailwind utilities on the same element
+ * (hidden, lg:flex, border-accent/25 ...) win, as they would for any Tailwind component. */
+@layer components {
+  /* Surfaces */
+  .glass,
+  .moc-glass-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow), var(--glass-highlight);
+    backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
+  }
+  .moc-glass-card:hover {
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--glass-shadow-hover), var(--glass-highlight);
+  }
+  .glass-strong {
+    background: var(--glass-bg-strong);
+    border-color: var(--glass-border);
+    backdrop-filter: blur(22px) saturate(170%);
+  }
+  .glass-tile {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    border-radius: 18px;
+    background: var(--glass-tile-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-tile-shadow), var(--glass-highlight);
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .glass-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--glass-shadow-hover), var(--glass-highlight);
+  }
+  .moc-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+  }
+
+  /* Inputs, chips, status rows */
+  .moc-input-glass {
+    background: var(--glass-input);
+    border: 1px solid var(--glass-input-border);
+    backdrop-filter: blur(10px);
+  }
+  .moc-input-glass:focus {
+    border-color: rgba(79, 142, 247, 0.55);
+    box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.15);
+    outline: none;
+  }
+  .moc-chip {
+    background: rgba(79, 142, 247, 0.12);
+    border: 1px solid rgba(79, 142, 247, 0.32);
+    backdrop-filter: blur(8px);
+  }
+  .moc-status-row {
+    background: var(--glass-input);
+    border: 1px solid var(--glass-input-border);
+  }
+
+  .moc-btn-primary {
+    background: linear-gradient(135deg, #5b9af8 0%, #4f8ef7 50%, #3b78e7 100%);
+    box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.35), 0 8px 28px rgba(79, 142, 247, 0.35);
+    transition: box-shadow 0.2s ease, transform 0.15s ease;
+  }
+  .moc-btn-primary:hover:not(:disabled) {
+    box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.5), 0 12px 36px rgba(79, 142, 247, 0.5);
+  }
+
+  /* Shell: sidebar navigation and top bar */
+  .moc-shell-sidebar { border-right: 1px solid var(--glass-border); }
+  .moc-topbar { border-bottom: 1px solid var(--glass-border); }
+  .moc-nav-item {
+    border-radius: 12px;
+    color: color-mix(in srgb, var(--color-white) 62%, transparent);
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .moc-nav-item:hover { background: var(--glass-nav-hover); color: var(--color-white); }
+  .moc-nav-item-active,
+  .moc-nav-item-active:hover {
+    background: var(--glass-nav-active);
+    box-shadow: var(--glass-nav-ring);
+    color: var(--color-accent-soft);
+  }
+  .moc-drawer-overlay { background: rgba(2, 6, 18, 0.45); backdrop-filter: blur(4px); }
 }
 
-.moc-sidebar-panel {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  backdrop-filter: blur(10px);
+/* Without backdrop-filter, glass is too transparent to read: use an opaque surface. */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass, .moc-glass-card, .glass-strong, .glass-tile { background: var(--glass-opaque); }
 }
 
-.moc-hero-bar {
-  background: linear-gradient(135deg, rgba(79, 142, 247, 0.14) 0%, rgba(13, 18, 32, 0.55) 55%, rgba(79, 142, 247, 0.06) 100%);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 -1px 0 rgba(79, 142, 247, 0.12);
-}
-
-.moc-tab-rail {
-  display: inline-flex;
-  gap: 4px;
-  padding: 4px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-}
-
-.moc-tab {
-  border-radius: 12px;
-  border: 1px solid transparent;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.moc-tab-active {
-  background: rgba(79, 142, 247, 0.18);
-  border-color: rgba(79, 142, 247, 0.4);
-  color: #93c5fd;
-  box-shadow: 0 0 24px rgba(79, 142, 247, 0.2);
-}
-
-.moc-tab-idle {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.5);
-}
-
-.moc-tab-idle:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.85);
-}
-
-.moc-glass-card {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.025) 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
-}
-
-.moc-glass-card:hover {
-  border-color: rgba(79, 142, 247, 0.35);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28), 0 0 28px rgba(79, 142, 247, 0.08);
-}
-
-.moc-input-glass {
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(8px);
-}
-
-.moc-input-glass:focus {
-  border-color: rgba(79, 142, 247, 0.55);
-  box-shadow: 0 0 0 3px rgba(79, 142, 247, 0.15);
-  outline: none;
-}
-
-.moc-btn-primary {
-  background: linear-gradient(135deg, #5b9af8 0%, #4f8ef7 50%, #3b78e7 100%);
-  box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.35), 0 8px 28px rgba(79, 142, 247, 0.35);
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
-}
-
-.moc-btn-primary:hover:not(:disabled) {
-  box-shadow: 0 0 0 1px rgba(79, 142, 247, 0.5), 0 12px 36px rgba(79, 142, 247, 0.5);
-}
-
-.moc-chip {
-  background: rgba(79, 142, 247, 0.12);
-  border: 1px solid rgba(79, 142, 247, 0.32);
-  backdrop-filter: blur(8px);
-}
-
-.moc-status-row {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(8px);
+@media (prefers-reduced-motion: reduce) {
+  .glass-hover:hover, .moc-glass-card:hover { transform: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -534,66 +542,50 @@ body {
   box-shadow: 0 14px 36px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(37, 99, 235, 0.08);
 }
 
-/* Dashboard shell */
-:root[data-theme='light'] .moc-dash-root { background: #eef2f8; }
-:root[data-theme='light'] .moc-dash-mesh {
-  background:
-    radial-gradient(ellipse 55% 40% at 78% 8%, rgba(37, 99, 235, 0.12), transparent 58%),
-    radial-gradient(ellipse 45% 35% at 12% 42%, rgba(14, 165, 233, 0.07), transparent 55%),
-    #eef2f8;
+/* Dashboard shell: frosted white glass on a soft blue canvas */
+:root[data-theme='light'] {
+  --glass-bg: linear-gradient(160deg, rgba(255, 255, 255, 0.74) 0%, rgba(255, 255, 255, 0.46) 100%);
+  --glass-bg-strong: linear-gradient(180deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.55) 100%);
+  --glass-opaque: rgba(255, 255, 255, 0.96);
+  --glass-border: rgba(255, 255, 255, 0.78);
+  --glass-border-hover: rgba(37, 99, 235, 0.32);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --glass-shadow: 0 8px 30px rgba(30, 58, 138, 0.1), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --glass-shadow-hover: 0 16px 40px rgba(30, 58, 138, 0.16), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --glass-blur: 20px;
+  --glass-input: rgba(255, 255, 255, 0.62);
+  --glass-input-border: rgba(15, 23, 42, 0.12);
+  --glass-tile-bg: linear-gradient(150deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.55) 100%);
+  --glass-tile-shadow: 0 8px 20px rgba(30, 58, 138, 0.12);
+  --glass-nav-hover: rgba(255, 255, 255, 0.65);
+  --glass-nav-active: linear-gradient(135deg, rgba(37, 99, 235, 0.14) 0%, rgba(37, 99, 235, 0.05) 100%);
+  --glass-nav-ring: inset 0 0 0 1px rgba(37, 99, 235, 0.28), 0 6px 18px rgba(37, 99, 235, 0.14);
+  --glass-canvas:
+    radial-gradient(ellipse 55% 45% at 82% 4%, rgba(59, 130, 246, 0.26), transparent 62%),
+    radial-gradient(ellipse 45% 40% at 6% 38%, rgba(139, 92, 246, 0.14), transparent 58%),
+    radial-gradient(ellipse 55% 40% at 55% 100%, rgba(14, 165, 233, 0.16), transparent 58%),
+    linear-gradient(135deg, #e6eefb 0%, #f4f7fd 48%, #e2ebfa 100%);
+  --glass-orb-a: radial-gradient(circle, rgba(59, 130, 246, 0.3) 0%, rgba(59, 130, 246, 0.06) 48%, transparent 70%);
+  --glass-orb-b: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(14, 165, 233, 0.06) 50%, transparent 72%);
 }
 :root[data-theme='light'] .moc-dash-grid {
   background-image:
-    radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px),
-    linear-gradient(rgba(15, 23, 42, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.035) 1px, transparent 1px);
-  opacity: 0.6;
+    radial-gradient(rgba(30, 58, 138, 0.08) 1px, transparent 1px),
+    linear-gradient(rgba(30, 58, 138, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 58, 138, 0.03) 1px, transparent 1px);
+  opacity: 0.55;
 }
-:root[data-theme='light'] .moc-dash-orb-a { background: radial-gradient(circle, rgba(37, 99, 235, 0.14) 0%, transparent 70%); }
-:root[data-theme='light'] .moc-dash-orb-b { background: radial-gradient(circle, rgba(14, 165, 233, 0.1) 0%, transparent 72%); }
 :root[data-theme='light'] .moc-dash-vignette { display: none; }
-:root[data-theme='light'] .moc-sidebar {
-  background: rgba(255, 255, 255, 0.86);
-  border-right: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04);
-}
-:root[data-theme='light'] .moc-sidebar-panel,
-:root[data-theme='light'] .moc-status-row {
-  background: #ffffff;
-  border-color: rgba(15, 23, 42, 0.08);
-}
-:root[data-theme='light'] .moc-hero-bar {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(255, 255, 255, 0.85) 55%, rgba(37, 99, 235, 0.04) 100%);
-  border-bottom-color: rgba(15, 23, 42, 0.08);
-  box-shadow: none;
-}
-:root[data-theme='light'] .moc-tab-rail { background: rgba(255, 255, 255, 0.8); border-color: rgba(15, 23, 42, 0.08); }
-:root[data-theme='light'] .moc-tab-active {
-  background: rgba(37, 99, 235, 0.1);
-  border-color: rgba(37, 99, 235, 0.35);
-  color: #1d4ed8;
-  box-shadow: none;
-}
-:root[data-theme='light'] .moc-tab-idle { color: rgba(15, 23, 42, 0.6); }
-:root[data-theme='light'] .moc-tab-idle:hover { background: rgba(15, 23, 42, 0.05); color: #0f172a; }
-:root[data-theme='light'] .moc-glass-card {
-  background: #ffffff;
-  border-color: rgba(15, 23, 42, 0.09);
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 6px 20px rgba(15, 23, 42, 0.05);
-}
-:root[data-theme='light'] .moc-glass-card:hover {
-  border-color: rgba(37, 99, 235, 0.3);
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-}
-:root[data-theme='light'] .moc-input-glass { background: #ffffff; border-color: rgba(15, 23, 42, 0.16); }
 :root[data-theme='light'] .moc-input-glass:focus { border-color: rgba(37, 99, 235, 0.6); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); }
 :root[data-theme='light'] .moc-chip { background: rgba(37, 99, 235, 0.08); border-color: rgba(37, 99, 235, 0.25); }
+:root[data-theme='light'] .moc-nav-item-active,
+:root[data-theme='light'] .moc-nav-item-active:hover { color: #1d4ed8; }
+:root[data-theme='light'] .moc-drawer-overlay { background: rgba(15, 23, 42, 0.2); }
 :root[data-theme='light'] .moc-btn-primary,
 :root[data-theme='light'] .moc-cta {
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
   box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.3), 0 6px 18px rgba(37, 99, 235, 0.25);
 }
-:root[data-theme='light'] .shimmer { background: linear-gradient(90deg, transparent 0%, rgba(37, 99, 235, 0.05) 50%, transparent 100%); }
 
 /* Disclosure markers are drawn with icons; hide the browser's own triangle everywhere. */
 summary::-webkit-details-marker { display: none; }
@@ -601,9 +593,10 @@ summary { list-style: none; }
 
 /* ── Print (Change Case "Print"): only the case, on as many pages as it needs ── */
 @media print {
-  .no-print, .moc-sidebar, .moc-hero-bar, .moc-dash-orb, .moc-dash-grid, .moc-dash-vignette { display: none !important; }
+  .no-print, .moc-shell-sidebar, .moc-topbar, .moc-drawer-overlay, .moc-dash-orb, .moc-dash-grid, .moc-dash-vignette { display: none !important; }
   .moc-dash-root, .moc-main-scroll { display: block !important; overflow: visible !important; min-height: 0 !important; height: auto !important; }
   .moc-dash-root, body { background: var(--color-canvas) !important; }
+  .moc-shell-main, .moc-case-grid { display: block !important; }
   .moc-glass-card { break-inside: avoid; box-shadow: none !important; backdrop-filter: none !important; }
   section { break-inside: auto; }
 }
