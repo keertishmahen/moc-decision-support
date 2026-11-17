@@ -1,512 +1,441 @@
-import React, { useEffect, useRef, useState } from 'react'
+/**
+ * Landing page ("aurora" theme): a warm page with soft multicolour glows, a split hero with a
+ * preview of a real Change Case, the platform as a feature list, and a dark closing card.
+ * All copy is in onboardingContent.ts; colours come from index.css (onb-*, aurora-* and tokens).
+ */
+import React, { useMemo } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import {
-  ArrowUpRight,
-  Bot,
-  Check,
-  ClipboardList,
-  DollarSign,
-  GitBranch,
-  FileSearch,
-  FlaskConical,
-  Scale,
-  ShieldAlert,
-  ShieldCheck,
-  SlidersHorizontal,
-  UserCheck,
-  X,
+  ArrowRight, Bot, Check, CircleDollarSign, ClipboardList, FileSearch, FlaskConical, Gavel, GitBranch,
+  LayoutDashboard, Network, Scale, ShieldAlert, ShieldCheck, SlidersHorizontal, TriangleAlert, UserCheck,
+  Workflow, X, type LucideIcon,
 } from 'lucide-react'
 import {
-  CAPABILITIES,
-  CAPABILITIES_INTRO,
-  FOOTER,
-  HERO,
-  PROCESS,
-  STATS,
-  VALUES,
-  WHO_WE_ARE,
-  WHY_US,
+  CAPABILITIES, CAPABILITIES_INTRO, FOOTER, HERO, PREVIEW, PROCESS, STATS, VALUES, WHO_WE_ARE, WHY_US,
+  type CapabilityIcon,
 } from '../onboardingContent'
+import { cssVar, tint, type Token } from '../theme/palette'
 import SymmetraLogo from './SymmetraLogo'
 import ThemeToggle from './ThemeToggle'
 
-type Props = {
-  onEnter: () => void
+type Props = { onEnter: () => void }
+
+const CAP_ICONS: Record<CapabilityIcon, LucideIcon> = {
+  overview: LayoutDashboard, case: Workflow, form: ClipboardList, risk: ShieldAlert,
+  cost: CircleDollarSign, bot: Bot, process: GitBranch, allocation: Scale,
 }
 
 const VALUE_ICONS = {
-  shield: ShieldCheck,
-  authority: UserCheck,
-  synthetic: FlaskConical,
-  evidence: FileSearch,
-  calibration: SlidersHorizontal,
+  shield: ShieldCheck, authority: UserCheck, synthetic: FlaskConical, evidence: FileSearch, calibration: SlidersHorizontal,
 } as const
+const VALUE_TONES: Token[] = ['accent', 'accent2', 'node-lesson', 'ok', 'highlight']
+const ABOUT = [
+  { icon: Network, tone: 'node-category' as Token },
+  { icon: ClipboardList, tone: 'accent2' as Token },
+  { icon: Scale, tone: 'highlight' as Token },
+]
+const AGENT_DOTS: Token[] = ['node-category', 'accent', 'danger', 'node-hazop', 'highlight', 'ok', 'accent2', 'slate']
 
-const CAP_ICONS = {
-  form: ClipboardList,
-  risk: ShieldAlert,
-  cost: DollarSign,
-  bot: Bot,
-  process: GitBranch,
-  allocation: Scale,
-} as const
+const NAV = [
+  ['who', 'About'], ['why', 'Problem'], ['capabilities', 'Platform'], ['process', 'Journey'], ['values', 'Safeguards'],
+] as const
 
 const ease = [0.22, 1, 0.36, 1] as const
 
 const fadeUp = (reduce: boolean | null, delay = 0) =>
   reduce
-    ? { initial: false, animate: { opacity: 1 }, transition: { duration: 0 } }
-    : {
-        initial: { opacity: 0, y: 22 },
-        animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.6, ease, delay },
-      }
+    ? {}
+    : { initial: { opacity: 0, y: 22 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.65, ease, delay } }
 
-const viewFade = (reduce: boolean | null, delay = 0) =>
+const inView = (reduce: boolean | null, delay = 0) =>
   reduce
     ? {}
     : {
-        initial: { opacity: 0, y: 28 },
+        initial: { opacity: 0, y: 26 },
         whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-72px' },
+        viewport: { once: true, margin: '-60px' },
         transition: { duration: 0.55, ease, delay },
       }
 
-/** Scroll-in + hover for onboarding cards */
-const cardMotion = (reduce: boolean | null, delay = 0, from: 'up' | 'left' | 'right' = 'up') => {
-  if (reduce) return {}
-  const offset =
-    from === 'left' ? { x: -28, y: 12 } : from === 'right' ? { x: 28, y: 12 } : { x: 0, y: 40 }
-  return {
-    initial: { opacity: 0, scale: 0.94, ...offset },
-    whileInView: { opacity: 1, scale: 1, x: 0, y: 0 },
-    viewport: { once: true, amount: 0.35 },
-    transition: { duration: 0.6, ease, delay },
-    whileHover: {
-      y: -8,
-      scale: 1.02,
-      transition: { duration: 0.28, ease },
-    },
-  }
+/** Gentle vertical float for the hero chips. */
+const float = (reduce: boolean | null, delay: number) =>
+  reduce ? {} : { animate: { y: [0, -7, 0] }, transition: { duration: 5.5, repeat: Infinity, ease: 'easeInOut' as const, delay } }
+
+function IconCircle({ icon: Icon, tone, size = 40 }: { icon: LucideIcon; tone: Token; size?: number }) {
+  return (
+    <span className="inline-flex shrink-0 items-center justify-center rounded-full"
+      style={{ width: size, height: size, background: tint(tone, 14), color: cssVar(tone) }}>
+      <Icon style={{ width: size * 0.45, height: size * 0.45 }} strokeWidth={1.75} aria-hidden />
+    </span>
+  )
 }
 
-function BrandLockup({ compact = false }: { compact?: boolean }) {
+function SectionHead({ badge, title, sub }: { badge: string; title: string; sub?: string }) {
   return (
-    <div className="flex items-center gap-3">
-      <SymmetraLogo size={compact ? 30 : 36} />
-      {/* Product name beside the company logo; hidden on very narrow screens to keep the header on one line */}
-      <div className="hidden border-l border-white/15 pl-3 text-left leading-tight sm:block">
-        <div
-          className={`font-medium tracking-tight text-white/85 ${compact ? 'text-[12px]' : 'text-[13px]'}`}
-          style={{ fontFamily: 'Outfit, Inter, sans-serif' }}
-        >
-          {HERO.brand}
+    <div className="max-w-2xl">
+      <div className="text-[12px] font-semibold uppercase tracking-[0.2em] text-accent">{badge}</div>
+      <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white md:text-[2.6rem] md:leading-[1.1]">{title}</h2>
+      {sub && <p className="mt-4 text-base leading-relaxed text-white/55 md:text-[17px]">{sub}</p>}
+    </div>
+  )
+}
+
+function Stars({ count, seed, className = '' }: { count: number; seed: number; className?: string }) {
+  const stars = useMemo(() => Array.from({ length: count }, (_, i) => {
+    const n = i + seed
+    return {
+      left: `${((n * 47 + 13) * 7) % 100}%`, top: `${((n * 31 + 19) * 11) % 100}%`,
+      size: 1 + (n % 5 === 0 ? 1 : 0), delay: (n % 11) * 0.45, dur: `${3.2 + (n % 8) * 0.55}s`,
+    }
+  }), [count, seed])
+  return (
+    <div className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`} aria-hidden>
+      {stars.map((s, i) => (
+        <span key={i} className="onb-star" style={{
+          left: s.left, top: s.top, width: s.size, height: s.size, animationDelay: `${s.delay}s`,
+          ['--twinkle-dur' as string]: s.dur,
+        }} />
+      ))}
+    </div>
+  )
+}
+
+/** A faint glow behind a section, so the colour carries down the page. */
+function SectionGlow({ side, colours }: { side: 'left' | 'right'; colours: ('cyan' | 'violet' | 'pink' | 'orange')[] }) {
+  return (
+    <div className={`onb-aurora -z-10 top-0 h-[70%] w-[55%] opacity-60 ${side === 'left' ? '-left-[15%]' : '-right-[15%]'}`} aria-hidden>
+      {colours.map((c, i) => (
+        <div key={c} className={`onb-blob onb-blob-${c} h-[70%] w-[70%]`} style={{ left: `${i * 25}%`, top: `${i * 20}%` }} />
+      ))}
+    </div>
+  )
+}
+
+function HeroPreview({ reduce }: { reduce: boolean | null }) {
+  return (
+    <div className="relative mx-auto w-full max-w-[560px] lg:h-[500px]">
+      {/* glow behind the preview */}
+      <div className="onb-aurora -inset-16 lg:-inset-24" aria-hidden>
+        <div className="onb-blob onb-blob-cyan left-[8%] top-[2%] h-[55%] w-[55%]" />
+        <div className="onb-blob onb-blob-violet left-[20%] top-[38%] h-[60%] w-[60%]" />
+        <div className="onb-blob onb-blob-pink left-[38%] top-[48%] h-[55%] w-[55%]" />
+        <div className="onb-blob onb-blob-orange right-[0%] top-[8%] h-[58%] w-[52%]" />
+      </div>
+
+      <div className="relative flex flex-col items-center gap-3 lg:block lg:h-full">
+        <motion.div className="lg:absolute lg:right-0 lg:top-4" {...float(reduce, 0)}>
+          <span className="onb-chip"><ShieldCheck className="h-4 w-4" strokeWidth={2} aria-hidden />{PREVIEW.chips.verified}</span>
+        </motion.div>
+        <motion.div className="lg:absolute lg:left-0 lg:top-[92px]" {...float(reduce, 1.2)}>
+          <span className="onb-chip"><Scale className="h-4 w-4" strokeWidth={2} aria-hidden />{PREVIEW.chips.allocation}</span>
+        </motion.div>
+
+        <div className="onb-preview relative w-full max-w-[400px] lg:absolute lg:left-1/2 lg:top-[150px] lg:-translate-x-1/2">
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="flex items-center gap-2 text-[13px] text-white/70">
+              <Workflow className="h-4 w-4 text-accent" strokeWidth={1.75} aria-hidden />
+              <span className="font-semibold text-white/85">{PREVIEW.label}</span>
+            </div>
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: cssVar('ok') }}>
+              <span className="h-1.5 w-1.5 rounded-full" style={{ background: cssVar('ok') }} aria-hidden />{PREVIEW.example}
+            </span>
+          </div>
+          <div className="px-4 py-3">
+            <div className="text-[12px] text-white/45"><span className="font-mono text-accent">{PREVIEW.asset}</span> · {PREVIEW.changeType}</div>
+            <div className="mt-0.5 text-[15px] font-semibold text-white">{PREVIEW.title}</div>
+          </div>
+          <ul className="space-y-2 border-t border-white/10 px-4 py-3 text-[13px] text-white/70">
+            {PREVIEW.rows.map(r => (
+              <li key={r.text} className="flex items-center gap-2">
+                {r.icon === 'reach'
+                  ? <Network className="h-3.5 w-3.5 shrink-0" style={{ color: cssVar('node-category') }} strokeWidth={2} aria-hidden />
+                  : <TriangleAlert className="h-3.5 w-3.5 shrink-0" style={{ color: cssVar('warn') }} strokeWidth={2} aria-hidden />}
+                {r.text}
+              </li>
+            ))}
+            <li className="flex items-center gap-2">
+              <span className="flex gap-1" aria-hidden>
+                {AGENT_DOTS.map((t, i) => <span key={i} className="h-2 w-2 rounded-full" style={{ background: cssVar(t) }} />)}
+              </span>
+              <span className="text-white/55">{PREVIEW.agents}</span>
+            </li>
+          </ul>
         </div>
-        <div className="text-[10px] text-white/45">{HERO.tagline}</div>
+
+        <div className="flex gap-2 lg:absolute lg:left-[4%] lg:top-[372px]">
+          {PREVIEW.scores.map(s => (
+            <span key={s.label} className="onb-preview rounded-full px-3 py-1.5 text-[12px] font-semibold" style={{ color: cssVar(s.tone) }}>
+              {s.label}
+            </span>
+          ))}
+        </div>
+        <motion.div className="lg:absolute lg:bottom-6 lg:right-0" {...float(reduce, 2.4)}>
+          <span className="onb-chip onb-chip-violet"><Gavel className="h-4 w-4" strokeWidth={2} aria-hidden />{PREVIEW.chips.approval}</span>
+        </motion.div>
       </div>
     </div>
   )
 }
 
-function Pill({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1 text-[11px] font-medium tracking-[0.04em] text-white/75 backdrop-blur-sm">
-      {children}
-    </span>
-  )
-}
-
-function PrimaryCta({
-  onClick,
-  label = HERO.cta,
-  size = 'md',
-}: {
-  onClick: () => void
-  label?: string
-  size?: 'sm' | 'md'
-}) {
-  const pad = size === 'sm' ? 'px-4 py-2.5 text-[13px]' : 'px-7 py-3.5 text-sm'
-  return (
-    <motion.button
-      type="button"
-      onClick={onClick}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.98 }}
-      className={`moc-cta inline-flex items-center gap-2 rounded-xl font-semibold text-white ${pad}`}
-    >
-      {label}
-      <ArrowUpRight className="h-4 w-4" strokeWidth={2.25} />
-    </motion.button>
-  )
-}
-
 export default function Onboarding({ onEnter }: Props) {
   const reduce = useReducedMotion()
-  const rootRef = useRef<HTMLDivElement>(null)
-  type Star = {
-    left: string
-    top: string
-    size: number
-    delay: number
-    o: number
-    dur: string
-  }
-  const [starLayers, setStarLayers] = useState<{
-    far: Star[]
-    mid: Star[]
-    near: Star[]
-  }>({ far: [], mid: [], near: [] })
-
-  useEffect(() => {
-    const make = (count: number, seed: number, sizeBase: number, opacityBase: number): Star[] =>
-      Array.from({ length: count }, (_, i) => {
-        const n = i + seed
-        return {
-          left: `${((n * 47 + 13) * 7) % 100}%`,
-          top: `${((n * 31 + 19) * 11) % 100}%`,
-          size: sizeBase + (n % 5 === 0 ? 1 : 0),
-          delay: (n % 11) * 0.45,
-          o: opacityBase + (n % 6) * 0.08,
-          dur: `${3.2 + (n % 8) * 0.55}s`,
-        }
-      })
-
-    setStarLayers({
-      far: make(40, 0, 1, 0.12),
-      mid: make(40, 41, 1.5, 0.22),
-      near: make(30, 82, 2, 0.35),
-    })
-  }, [])
-
-  useEffect(() => {
-    if (reduce) return
-    const el = rootRef.current
-    if (!el) return
-
-    const onMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect()
-      const x = ((e.clientX - rect.left) / rect.width - 0.5) * 24
-      const y = ((e.clientY - rect.top) / rect.height - 0.5) * 18
-      el.style.setProperty('--mx', `${x.toFixed(2)}px`)
-      el.style.setProperty('--my', `${y.toFixed(2)}px`)
-    }
-
-    el.addEventListener('mousemove', onMove)
-    return () => el.removeEventListener('mousemove', onMove)
-  }, [reduce])
-
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' })
-  }
-
-  const renderStars = (stars: Star[], keyPrefix: string) =>
-    stars.map((s, i) => (
-      <span
-        key={`${keyPrefix}-${i}`}
-        className="onboarding-star absolute rounded-full bg-white"
-        style={{
-          left: s.left,
-          top: s.top,
-          width: s.size,
-          height: s.size,
-          opacity: s.o,
-          animationDelay: `${s.delay}s`,
-          ['--twinkle-dur' as string]: s.dur,
-        }}
-      />
-    ))
+  const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' })
 
   return (
-    <div
-      ref={rootRef}
-      className="onboarding-root relative min-h-screen overflow-x-hidden text-ink"
-      style={{ fontFamily: 'Outfit, Inter, sans-serif' }}
-    >
-      {/* Atmosphere: layered drifting starfield + nebula */}
-      <div className="onboarding-stars pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden>
-        <div className="onboarding-star-layer onboarding-star-layer--far">
-          {renderStars(starLayers.far, 'far')}
-        </div>
-        <div className="onboarding-star-layer onboarding-star-layer--mid">
-          {renderStars(starLayers.mid, 'mid')}
-        </div>
-        <div className="onboarding-star-layer onboarding-star-layer--near">
-          {renderStars(starLayers.near, 'near')}
-        </div>
-      </div>
+    <div className="onb-root relative min-h-screen overflow-x-clip text-ink" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>
+      <Stars count={70} seed={0} className="onb-page-stars" />
 
-      {/* Header */}
-      <header className="relative z-20 mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-5 md:px-8">
-        <BrandLockup compact />
-        <nav className="hidden items-center gap-1 rounded-full border border-white/10 bg-white/[0.03] px-1.5 py-1.5 text-[13px] text-white/55 backdrop-blur-md md:flex">
-          {[
-            ['who', 'About'],
-            ['why', 'Problem'],
-            ['capabilities', 'Platform'],
-            ['process', 'Journey'],
-            ['values', 'Safeguards'],
-          ].map(([id, label]) => (
-            <button
-              key={id}
-              type="button"
-              className="rounded-full px-3.5 py-1.5 transition-colors hover:bg-white/[0.06] hover:text-white"
-              onClick={() => scrollTo(id)}
-            >
-              {label}
-            </button>
+      {/* ── Header ── */}
+      <header className="relative z-20 mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 md:px-8">
+        <div className="flex items-center gap-3">
+          <SymmetraLogo size={32} />
+          <div className="hidden border-l border-white/15 pl-3 leading-tight sm:block">
+            <div className="text-[13px] font-medium text-white/85">{HERO.brand}</div>
+            <div className="text-[10px] text-white/45">{HERO.tagline}</div>
+          </div>
+        </div>
+        <nav className="hidden items-center gap-7 text-[15px] text-white/60 lg:flex" aria-label="Sections">
+          {NAV.map(([id, label]) => (
+            <button key={id} type="button" onClick={() => scrollTo(id)} className="transition-colors hover:text-white">{label}</button>
           ))}
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <ThemeToggle />
-          <PrimaryCta onClick={onEnter} size="sm" />
+          <button type="button" onClick={onEnter} className="onb-pill-btn px-4 py-2.5 text-[14px]">{HERO.cta}</button>
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative z-10 flex min-h-[88vh] flex-col items-center justify-center px-5 pb-16 pt-8 text-center md:px-8">
-        <div className="onboarding-nebula-layer absolute inset-0 overflow-hidden" aria-hidden>
-          <div className="onboarding-glow absolute left-1/2 top-[42%] h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full md:h-[720px] md:w-[720px]" />
-          <div className="onboarding-glow-soft absolute left-[46%] top-[48%] h-[380px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full md:h-[520px] md:w-[580px]" />
-        </div>
-
-        <motion.div className="relative max-w-4xl" {...fadeUp(reduce, 0.04)}>
-          <motion.div
-            className="mb-8 flex justify-center"
-            {...(reduce ? {} : { initial: { scale: 0.92, opacity: 0 }, animate: { scale: 1, opacity: 1 }, transition: { duration: 0.7, ease } })}
-          >
-            <div className="moc-hero-brand inline-flex max-w-full flex-wrap items-center justify-center gap-3 rounded-2xl border border-white/10 bg-surface-2/70 px-4 py-3 backdrop-blur-xl">
-              <SymmetraLogo size={40} />
-              <div className="text-left sm:border-l sm:border-white/15 sm:pl-3">
-                <div className="text-base font-semibold tracking-tight text-white">{HERO.brand}</div>
-                <div className="text-xs text-white/45">{HERO.tagline}</div>
-              </div>
-            </div>
-          </motion.div>
-
-          <h1 className="text-[2rem] font-semibold leading-[1.15] tracking-tight text-white sm:text-[2.6rem] lg:text-5xl">
-            {HERO.headline}
+      {/* ── Hero ── */}
+      <section className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-5 pb-16 pt-10 md:px-8 lg:grid-cols-[1.12fr_1fr] lg:pb-24 lg:pt-16">
+        <motion.div {...fadeUp(reduce, 0.05)}>
+          <div className="text-[12px] font-semibold uppercase tracking-[0.22em] text-accent">{HERO.eyebrow}</div>
+          <h1 className="mt-5 text-[2.4rem] font-semibold leading-[1.06] tracking-[-0.02em] text-white sm:text-5xl lg:text-[3.2rem] xl:text-[3.55rem]">
+            {HERO.headline.lead}<br />
+            <span className="onb-gradient-text">{HERO.headline.accent}</span><br />
+            {HERO.headline.tail}
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-white/55 md:text-lg">
-            {HERO.subhead}
+          <p className="mt-6 flex max-w-xl items-start gap-2 text-[15px] text-white/55">
+            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" style={{ color: cssVar('accent2') }} strokeWidth={2} aria-hidden />
+            <span><b className="font-semibold text-white/85">{HERO.proof.strong}</b>{HERO.proof.rest}</span>
           </p>
-          <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <PrimaryCta onClick={onEnter} />
-            <button
-              type="button"
-              onClick={() => scrollTo('who')}
-              className="rounded-xl border border-white/12 bg-white/[0.03] px-5 py-3.5 text-sm text-white/65 transition-colors hover:border-white/25 hover:text-white"
-            >
-              Explore the platform
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/55">{HERO.subhead}</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <button type="button" onClick={onEnter} className="onb-pill-btn px-6 py-3.5 text-[15px]">
+              {HERO.cta}<ArrowRight className="h-4 w-4" strokeWidth={2.25} aria-hidden />
+            </button>
+            <button type="button" onClick={() => scrollTo('process')} className="onb-ghost-btn px-6 py-3.5 text-[15px] text-white/80">
+              {HERO.secondary}
             </button>
           </div>
-          <p className="mt-6 text-xs tracking-wide text-white/35">{HERO.trust}</p>
+          <ul className="mt-7 flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-white/50">
+            {HERO.points.map(p => (
+              <li key={p} className="flex items-center gap-1.5">
+                <Check className="h-3.5 w-3.5" style={{ color: cssVar('ok') }} strokeWidth={2.5} aria-hidden />{p}
+              </li>
+            ))}
+          </ul>
         </motion.div>
 
-        {/* Stats ribbon */}
-        <div className="relative z-10 mt-16 grid w-full max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
-          {STATS.map((s, i) => (
-            <motion.div
-              key={s.label}
-              className="onboarding-stat moc-glass cursor-default rounded-2xl border border-white/10 px-4 py-4 text-center"
-              {...cardMotion(reduce, 0.15 + i * 0.08)}
-            >
-              <div className="text-2xl font-semibold tracking-tight text-accent-soft">{s.value}</div>
-              <div className="mt-1 text-[11px] uppercase tracking-[0.12em] text-white/40">{s.label}</div>
-            </motion.div>
+        <motion.div {...fadeUp(reduce, 0.2)}>
+          <HeroPreview reduce={reduce} />
+        </motion.div>
+      </section>
+
+      {/* ── Stats ── */}
+      <section className="relative z-10 mx-auto max-w-7xl px-5 md:px-8">
+        <div className="onb-card grid grid-cols-2 divide-white/10 md:grid-cols-4 md:divide-x">
+          {STATS.map(s => (
+            <div key={s.label} className="px-6 py-6 text-center">
+              <div className="onb-gradient-text text-4xl font-semibold tracking-tight">{s.value}</div>
+              <div className="mt-1 text-[11px] uppercase tracking-[0.14em] text-white/45">{s.label}</div>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Who We Are */}
-      <section id="who" className="relative z-10 mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-24">
-        <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
-          <Pill>{WHO_WE_ARE.badge}</Pill>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{WHO_WE_ARE.headline}</h2>
-          <p className="mt-4 text-base leading-relaxed text-white/55 md:text-[17px]">{WHO_WE_ARE.subhead}</p>
+      {/* ── About ── */}
+      <section id="who" className="relative z-10 mx-auto max-w-7xl scroll-mt-6 px-5 py-20 md:px-8 md:py-28">
+        <SectionGlow side="left" colours={['cyan', 'violet']} />
+        <motion.div {...inView(reduce)}>
+          <SectionHead badge={WHO_WE_ARE.badge} title={WHO_WE_ARE.headline} sub={WHO_WE_ARE.subhead} />
         </motion.div>
-
-        <div className="mt-12 grid gap-4 md:grid-cols-3">
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
           {WHO_WE_ARE.cards.map((card, i) => (
-            <motion.article
-              key={card.title}
-              className="onboarding-card moc-glass group cursor-default rounded-2xl border border-white/10 p-6 text-left"
-              {...cardMotion(reduce, i * 0.1)}
-            >
-              <div className="mb-4 h-px w-10 bg-gradient-to-r from-highlight to-transparent" />
-              <h3 className="text-lg font-semibold text-white">{card.title}</h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/55">{card.body}</p>
+            <motion.article key={card.title} className="onb-card onb-card-hover p-6" {...inView(reduce, i * 0.08)}>
+              <IconCircle icon={ABOUT[i % ABOUT.length].icon} tone={ABOUT[i % ABOUT.length].tone} />
+              <h3 className="mt-4 text-lg font-semibold text-white">{card.title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-white/55">{card.body}</p>
+              <div className="mt-5 h-1 w-14 rounded-full" style={{ background: `linear-gradient(90deg, ${cssVar(ABOUT[i % ABOUT.length].tone)}, transparent)` }} aria-hidden />
             </motion.article>
           ))}
         </div>
       </section>
 
-      {/* Problems and response */}
-      <section id="why" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
-        <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
-          <Pill>{WHY_US.badge}</Pill>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{WHY_US.headline}</h2>
-          <p className="mt-4 text-base leading-relaxed text-white/55">{WHY_US.subhead}</p>
+      {/* ── Problem and response ── */}
+      <section id="why" className="relative z-10 mx-auto max-w-7xl scroll-mt-6 px-5 py-12 md:px-8 md:py-20">
+        <motion.div {...inView(reduce)}>
+          <SectionHead badge={WHY_US.badge} title={WHY_US.headline} sub={WHY_US.subhead} />
         </motion.div>
-
-        <div className="mt-12 grid gap-4 lg:grid-cols-2">
-          <motion.div
-            className="onboarding-card moc-glass cursor-default rounded-2xl border border-white/10 p-6 md:p-8"
-            {...cardMotion(reduce, 0, 'left')}
-          >
+        <div className="mt-12 grid gap-5 lg:grid-cols-2">
+          <motion.div className="onb-card p-7" {...inView(reduce)}>
             <h3 className="text-lg font-semibold text-white">{WHY_US.problems.title}</h3>
-            <ul className="mt-5 space-y-3.5">
-              {WHY_US.problems.items.map((item, i) => (
-                <motion.li
-                  key={item}
-                  className="flex items-start gap-3 text-sm text-white/55"
-                  {...(reduce
-                    ? {}
-                    : {
-                        initial: { opacity: 0, x: -10 },
-                        whileInView: { opacity: 1, x: 0 },
-                        viewport: { once: true },
-                        transition: { duration: 0.35, delay: 0.2 + i * 0.06, ease },
-                      })}
-                >
-                  <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-white/5">
-                    <X className="h-3 w-3 text-white/65" strokeWidth={2.5} />
+            <ul className="mt-5 space-y-4">
+              {WHY_US.problems.items.map(item => (
+                <li key={item} className="flex items-start gap-3 text-[15px] text-white/60">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/[0.06]">
+                    <X className="h-3.5 w-3.5 text-white/55" strokeWidth={2.5} aria-hidden />
                   </span>
                   {item}
-                </motion.li>
+                </li>
               ))}
             </ul>
           </motion.div>
-
-          <motion.div
-            className="onboarding-card moc-solution relative cursor-default overflow-hidden rounded-2xl border border-accent/30 p-6 md:p-8"
-            {...cardMotion(reduce, 0.12, 'right')}
-          >
-            <div className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-accent/30 blur-3xl" aria-hidden />
-            <div className="pointer-events-none absolute -bottom-8 left-8 h-28 w-28 rounded-full bg-highlight/15 blur-3xl" aria-hidden />
+          <motion.div className="onb-card relative overflow-hidden p-7" {...inView(reduce, 0.1)}>
+            <div className="onb-aurora -right-20 -top-20 h-72 w-72" aria-hidden>
+              <div className="onb-blob onb-blob-violet inset-0" />
+            </div>
+            <div className="onb-aurora -bottom-24 left-10 h-64 w-64" aria-hidden>
+              <div className="onb-blob onb-blob-cyan inset-0" />
+            </div>
             <h3 className="relative text-lg font-semibold text-white">{WHY_US.solutions.title}</h3>
-            <ul className="relative mt-5 space-y-3.5">
-              {WHY_US.solutions.items.map((item, i) => (
-                <motion.li
-                  key={item}
-                  className="flex items-start gap-3 text-sm text-white/75"
-                  {...(reduce
-                    ? {}
-                    : {
-                        initial: { opacity: 0, x: 10 },
-                        whileInView: { opacity: 1, x: 0 },
-                        viewport: { once: true },
-                        transition: { duration: 0.35, delay: 0.28 + i * 0.06, ease },
-                      })}
-                >
-                  <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-accent/20">
-                    <Check className="h-3 w-3 text-accent-soft" strokeWidth={2.5} />
+            <ul className="relative mt-5 space-y-4">
+              {WHY_US.solutions.items.map(item => (
+                <li key={item} className="flex items-start gap-3 text-[15px] text-white/80">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full" style={{ background: tint('ok', 16) }}>
+                    <Check className="h-3.5 w-3.5" style={{ color: cssVar('ok') }} strokeWidth={2.5} aria-hidden />
                   </span>
                   {item}
-                </motion.li>
+                </li>
               ))}
             </ul>
           </motion.div>
         </div>
       </section>
 
-      {/* Capabilities */}
-      <section id="capabilities" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-20">
-        <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
-          <Pill>{CAPABILITIES_INTRO.badge}</Pill>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{CAPABILITIES_INTRO.headline}</h2>
-          <p className="mt-4 text-base leading-relaxed text-white/55">{CAPABILITIES_INTRO.subhead}</p>
+      {/* ── Platform ── */}
+      <section id="capabilities" className="relative z-10 mx-auto max-w-7xl scroll-mt-6 px-5 py-12 md:px-8 md:py-20">
+        <SectionGlow side="right" colours={['pink', 'orange']} />
+        <motion.div {...inView(reduce)}>
+          <SectionHead badge={CAPABILITIES_INTRO.badge} title={CAPABILITIES_INTRO.headline} sub={CAPABILITIES_INTRO.subhead} />
         </motion.div>
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-x-12 md:grid-cols-2">
           {CAPABILITIES.map((cap, i) => {
             const Icon = CAP_ICONS[cap.icon]
             return (
-              <motion.article
-                key={cap.title}
-                className="onboarding-card moc-glass cursor-default rounded-2xl border border-white/10 p-5"
-                {...cardMotion(reduce, i * 0.09)}
-              >
-                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-xl border border-accent/25 bg-accent/10 text-accent-soft">
-                  <Icon className="h-4 w-4" strokeWidth={1.75} />
-                </span>
-                <h3 className="text-[15px] font-semibold text-white">{cap.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/50">{cap.body}</p>
+              <motion.article key={cap.title} className="onb-feature py-7" {...inView(reduce, (i % 2) * 0.06)}>
+                <div className="flex items-center gap-3">
+                  <IconCircle icon={Icon} tone={cap.tone} size={38} />
+                  <h3 className="text-[17px] font-semibold text-white">{cap.title}</h3>
+                </div>
+                <p className="mt-3 text-[15px] leading-relaxed text-white/55">{cap.body}</p>
+                {cap.proof?.kind === 'source' && (
+                  <div className="onb-card mt-4 px-4 py-3 text-[13px]">
+                    <div className="text-white/45">&ldquo;{cap.proof.question}&rdquo;</div>
+                    <div className="mt-1 text-white/85">{cap.proof.answer}</div>
+                    <div className="mt-1.5 flex items-center gap-1.5 text-[12px] font-medium text-accent">
+                      <Network className="h-3.5 w-3.5" strokeWidth={2} aria-hidden />{cap.proof.source}
+                    </div>
+                  </div>
+                )}
+                {cap.proof?.kind === 'scores' && (
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {cap.proof.scores.map(s => (
+                      <span key={s} className="rounded-full px-3 py-1 text-[12px] font-semibold"
+                        style={{ color: cssVar('ok'), background: tint('ok', 12), border: `1px solid ${tint('ok', 30)}` }}>
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </motion.article>
             )
           })}
         </div>
       </section>
 
-      {/* Process */}
-      <section id="process" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
-        <motion.div className="mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
-          <Pill>{PROCESS.badge}</Pill>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{PROCESS.headline}</h2>
-          <p className="mt-4 text-base leading-relaxed text-white/55">{PROCESS.subhead}</p>
+      {/* ── Journey ── */}
+      <section id="process" className="relative z-10 mx-auto max-w-7xl scroll-mt-6 px-5 py-12 md:px-8 md:py-20">
+        <SectionGlow side="left" colours={['violet', 'cyan']} />
+        <motion.div {...inView(reduce)}>
+          <SectionHead badge={PROCESS.badge} title={PROCESS.headline} sub={PROCESS.subhead} />
         </motion.div>
-        <div className="relative mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="pointer-events-none absolute left-[12%] right-[12%] top-8 hidden h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent lg:block" aria-hidden />
+        <div className="relative mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="pointer-events-none absolute left-[8%] right-[8%] top-[34px] hidden h-0.5 rounded-full lg:block"
+            style={{ background: 'var(--aurora-text)', opacity: 0.5 }} aria-hidden />
           {PROCESS.steps.map((step, i) => (
-            <motion.article
-              key={step.step}
-              className="onboarding-process-card moc-glass relative cursor-default rounded-2xl border border-white/10 p-5 text-left"
-              {...cardMotion(reduce, i * 0.12)}
-            >
-              <div className="text-xs font-semibold tracking-[0.18em] text-highlight">{step.step}</div>
+            <motion.article key={step.step} className="onb-card onb-card-hover relative p-5" {...inView(reduce, i * 0.08)}>
+              <div className="onb-gradient-text text-3xl font-semibold">{step.step}</div>
               <h3 className="mt-3 text-base font-semibold text-white">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-white/50">{step.body}</p>
+              <p className="mt-2 text-sm leading-relaxed text-white/55">{step.body}</p>
             </motion.article>
           ))}
         </div>
       </section>
 
-      {/* Values */}
-      <section id="values" className="relative z-10 mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl" aria-hidden />
-        <motion.div className="relative mx-auto max-w-2xl text-center" {...viewFade(reduce)}>
-          <Pill>{VALUES.badge}</Pill>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white md:text-4xl">{VALUES.headline}</h2>
-          <p className="mt-4 text-base leading-relaxed text-white/55">{VALUES.subhead}</p>
+      {/* ── Safeguards ── */}
+      <section id="values" className="relative z-10 mx-auto max-w-7xl scroll-mt-6 px-5 py-12 md:px-8 md:py-20">
+        <motion.div {...inView(reduce)}>
+          <SectionHead badge={VALUES.badge} title={VALUES.headline} sub={VALUES.subhead} />
         </motion.div>
-
-        <div className="relative mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {VALUES.cards.map((card, i) => {
-            const Icon = VALUE_ICONS[card.icon]
-            return (
-              <motion.article
-                key={card.title}
-                className="onboarding-card moc-glass cursor-default rounded-2xl border border-white/10 p-6"
-                {...cardMotion(reduce, i * 0.1)}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-highlight">
-                    <Icon className="h-4 w-4" strokeWidth={1.75} />
-                  </span>
-                  <h3 className="text-base font-semibold text-white">{card.title}</h3>
-                </div>
-                <p className="mt-3 text-sm leading-relaxed text-white/55">{card.body}</p>
-              </motion.article>
-            )
-          })}
+        <div className="mt-10 grid gap-x-12 md:grid-cols-2">
+          {VALUES.cards.map((card, i) => (
+            <motion.article key={card.title} className="onb-feature py-7" {...inView(reduce, (i % 2) * 0.06)}>
+              <div className="flex items-center gap-3">
+                <IconCircle icon={VALUE_ICONS[card.icon]} tone={VALUE_TONES[i % VALUE_TONES.length]} size={38} />
+                <h3 className="text-[17px] font-semibold text-white">{card.title}</h3>
+              </div>
+              <p className="mt-3 text-[15px] leading-relaxed text-white/55">{card.body}</p>
+            </motion.article>
+          ))}
         </div>
       </section>
 
-      {/* Footer CTA */}
-      <footer className="relative z-10 px-5 pb-20 pt-8 md:px-8">
-        <motion.div
-          className="moc-footer-panel relative mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/10 px-6 py-14 text-center md:px-12"
-          {...viewFade(reduce)}
-        >
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-surface-2/80 to-black/90" aria-hidden />
+      {/* ── Closing call to action ── */}
+      <section className="relative z-10 mx-auto max-w-5xl px-5 py-16 md:px-8 md:py-24">
+        <motion.div className="onb-cta-card px-6 py-16 text-center md:px-12 md:py-20" {...inView(reduce)}>
+          <Stars count={36} seed={200} />
           <div className="relative">
-            <SymmetraLogo size={44} />
-            <h2 className="mt-5 text-2xl font-semibold text-white md:text-3xl">{FOOTER.headline}</h2>
-            <p className="mx-auto mt-3 max-w-lg text-sm text-white/50">{FOOTER.body}</p>
-            <div className="mt-8">
-              <PrimaryCta onClick={onEnter} />
-            </div>
+            <h2 className="mx-auto max-w-2xl text-4xl font-semibold leading-[1.08] tracking-tight text-white md:text-6xl">{FOOTER.headline}</h2>
+            <p className="mx-auto mt-5 max-w-lg text-[15px] text-white/70">{FOOTER.body}</p>
+            <button type="button" onClick={onEnter} className="onb-cta-btn mt-8 px-6 py-3 text-[15px]">
+              {HERO.cta}<ArrowRight className="h-4 w-4" strokeWidth={2.25} aria-hidden />
+            </button>
           </div>
         </motion.div>
-        <p className="mt-8 text-center text-[11px] text-white/25">{FOOTER.line}</p>
+      </section>
+
+      {/* ── Footer ── */}
+      <footer className="relative z-10 border-t border-white/10">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:px-8">
+          <div>
+            <SymmetraLogo size={32} />
+            <p className="mt-4 max-w-sm text-[15px] leading-relaxed text-white/50">{FOOTER.blurb}</p>
+          </div>
+          <div>
+            <div className="text-[12px] font-semibold uppercase tracking-[0.18em] text-white/80">Explore</div>
+            <ul className="mt-4 space-y-2.5 text-[15px] text-white/55">
+              {NAV.map(([id, label]) => (
+                <li key={id}><button type="button" onClick={() => scrollTo(id)} className="hover:text-white">{label}</button></li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <div className="text-[12px] font-semibold uppercase tracking-[0.18em] text-white/80">Workspaces</div>
+            <ul className="mt-4 space-y-2.5 text-[15px] text-white/55">
+              {CAPABILITIES.map(c => <li key={c.title}>{c.title}</li>)}
+            </ul>
+          </div>
+          <div>
+            <div className="text-[12px] font-semibold uppercase tracking-[0.18em] text-white/80">Safeguards</div>
+            <ul className="mt-4 space-y-2.5 text-[15px] text-white/55">
+              {FOOTER.safeguards.map(s => <li key={s}>{s}</li>)}
+            </ul>
+            <button type="button" onClick={onEnter} className="mt-6 inline-flex items-center gap-1.5 text-[15px] font-semibold text-accent hover:text-accent-soft">
+              {HERO.cta}<ArrowRight className="h-4 w-4" strokeWidth={2} aria-hidden />
+            </button>
+          </div>
+        </div>
+        <p className="pb-10 text-center text-[12px] text-white/35">{FOOTER.line}</p>
       </footer>
     </div>
   )

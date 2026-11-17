@@ -1,6 +1,6 @@
 # Architecture
 
-MoC Intelligence Platform, version 3.3. One FastAPI backend, one React frontend, one Neo4j
+MoC Intelligence Platform, version 3.4. One FastAPI backend, one React frontend, one Neo4j
 knowledge graph, one vector store, and the OpenAI API.
 
 ## System

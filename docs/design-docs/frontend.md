@@ -52,6 +52,20 @@ noted here:
   is `position: fixed`; an `overflow` other than `visible`/`clip` or a transform on an ancestor
   breaks them. The root uses `overflow-clip`, and the shell animates opacity only.
 
+## Landing page
+
+`components/Onboarding.tsx` with all copy in `onboardingContent.ts`. A colourful "aurora"
+theme: a warm page (cream in light, deep night with faint stars in dark) with soft cyan,
+violet, pink and orange glows, a gradient phrase in the headline, a split hero with a preview
+of a real Change Case (example MoC-002, figures from a live run), the platform as a two-column
+feature list, and a dark closing card. Inspired by reference screenshots the user supplied;
+no text, names or layout were copied.
+
+Its variables are `--aurora-*` and `--onb-*` (dark under `:root`, light under
+`:root[data-theme='light']`; the same test as the glass variables checks both) and its classes
+start with `onb-` (`onb-blob-*`, `onb-gradient-text`, `onb-chip`, `onb-preview`, `onb-feature`,
+`onb-pill-btn`, `onb-cta-card`). Glows and stars stop under reduced motion.
+
 ## Conventions
 
 - **Light and dark mode.** The theme is `data-theme` on `<html>`, set before first paint by a

@@ -74,10 +74,10 @@ def test_palette_reads_every_token():
     assert dark == listed, f"palette.ts TOKENS and index.css tokens differ: {sorted(dark ^ listed)}"
 
 
-def test_every_glass_variable_has_a_light_value():
-    """Glass surfaces (--glass-*) are themed like colour tokens: each dark value needs a light one."""
+def test_every_theme_variable_has_a_light_value():
+    """Theme variables (--glass-*, --aurora-*, --onb-*) work like colour tokens: each dark value needs a light one."""
     css = (SRC / "index.css").read_text(encoding="utf-8")
-    var = re.compile(r"--(glass-[a-z0-9-]+)\s*:")
+    var = re.compile(r"--((?:glass|aurora|onb)-[a-z0-9-]+)\s*:")
 
     def blocks(selector):
         out, start = set(), 0
@@ -88,9 +88,9 @@ def test_every_glass_variable_has_a_light_value():
         return out
 
     dark, light = blocks(":root {"), blocks(":root[data-theme='light'] {")
-    assert dark, "No --glass-* variables found in a :root block of index.css"
+    assert dark, "No theme variables found in a :root block of index.css"
     missing = sorted(dark - light)
-    assert not missing, f"--glass-* variables with no light value: {missing}. Add them under :root[data-theme='light']."
+    assert not missing, f"Theme variables with no light value: {missing}. Add them under :root[data-theme='light']."
 
 
 def test_backdrop_filter_is_written_unprefixed():

@@ -1,3 +1,5 @@
+import type { Token } from './theme/palette'
+
 export const ONBOARDING_STORAGE_KEY = 'moc-onboarding-seen'
 
 /**
@@ -8,11 +10,45 @@ export const ONBOARDING_STORAGE_KEY = 'moc-onboarding-seen'
 export const HERO = {
   brand: 'MoC Intelligence Platform',
   tagline: 'SRG – Symmetra Systems Design Studio',
-  headline: 'Understand what an engineering change affects, identify who should decide, and keep a defensible record',
+  eyebrow: 'Change intelligence, end to end',
+  headline: {
+    lead: 'Know what a change affects.',
+    accent: 'Know who should decide.',
+    tail: 'Keep a defensible record.',
+  },
+  proof: {
+    strong: 'Every recommendation shows its evidence',
+    rest: ': the sources behind it, what was checked, and where a person must sign.',
+  },
   subhead:
-    'Ontology-driven Management of Change joined with a computable human–AI decision-allocation model: connected engineering knowledge, structured assessment and a transparent recommendation for every change.',
+    'Ontology-driven Management of Change joined with a computable human–AI decision-allocation model: connected engineering knowledge, a structured assessment and a transparent recommendation for every change.',
   cta: 'Enter Platform',
+  secondary: 'See how it works',
+  points: ['Synthetic FCC demonstration data', 'Advice, not decision authority', 'Every claim traced to its source'],
   trust: 'Decision-support prototype · Synthetic FCC demonstration data',
+}
+
+/** The hero preview: figures from a real run of the MoC-002 example case. */
+export const PREVIEW = {
+  label: 'Change Case',
+  example: 'Example · MoC-002',
+  asset: 'FV-103',
+  changeType: 'Instrumentation',
+  title: 'Replace FV-103 with a smart control valve',
+  rows: [
+    { icon: 'reach' as const, text: '11 assets reached · critical R-201' },
+    { icon: 'risk' as const, text: 'Risk Medium · HAZOP and PSSR required' },
+  ],
+  agents: '8 agents · 47 evidence items',
+  chips: {
+    allocation: 'AI-supported · II/II/II',
+    verified: 'Checked against the knowledge graph',
+    approval: 'Approval checkpoint · accountable approver',
+  },
+  scores: [
+    { label: '1 conflict', tone: 'danger' as Token },
+    { label: '5 checkpoints', tone: 'accent2' as Token },
+  ],
 }
 
 export const STATS = [
@@ -71,16 +107,31 @@ export const WHY_US = {
 export const CAPABILITIES_INTRO = {
   badge: 'Platform',
   headline: 'Change intelligence and decision allocation in one place',
-  subhead: 'Six connected workspaces, each grounded in the same FCC unit knowledge graph.',
+  subhead: 'Eight connected workspaces, each grounded in the same FCC unit knowledge graph.',
 }
 
-export const CAPABILITIES = [
-  { icon: 'form' as const, title: 'Smart Form', body: 'Describe a change and get suggested approvers, documents and review needs, drawn from matching historical changes.' },
-  { icon: 'risk' as const, title: 'Risk & Impact', body: 'See the hazards, the directly and indirectly affected assets, and the mitigations for a proposed change.' },
-  { icon: 'cost' as const, title: 'Cost Predictor', body: 'Indicative cost and downtime estimates with their ranges. Illustrative until benchmarked.' },
-  { icon: 'bot' as const, title: 'MoCBot', body: 'Ask questions across change records, HAZOP, PSSR and lessons learned, answered from the knowledge graph.' },
-  { icon: 'process' as const, title: 'Process Intelligence', body: 'Trace asset connectivity and see how downtime propagates through the unit.' },
-  { icon: 'allocation' as const, title: 'Decision Allocation', body: 'Eight characteristics scored for risk, complexity, uncertainty and impact, giving an AI-led, AI-supported or human-led recommendation.' },
+export type CapabilityIcon = 'overview' | 'case' | 'form' | 'risk' | 'cost' | 'bot' | 'process' | 'allocation'
+
+export const CAPABILITIES: {
+  icon: CapabilityIcon; tone: Token; title: string; body: string
+  proof?: { kind: 'source'; question: string; answer: string; source: string } | { kind: 'scores'; scores: string[] }
+}[] = [
+  { icon: 'overview', tone: 'accent', title: 'Overview', body: 'The unit at a glance: recorded changes, assets, costs and how decisions are allocated, live from the knowledge graph.' },
+  {
+    icon: 'case', tone: 'accent2', title: 'Change Case',
+    body: 'Seven agents assess one change: what it affects, who should decide, and why to trust it. A verifier checks the language-model claims against the graph.',
+    proof: { kind: 'source', question: 'Which equipment does FV-103 reach?', answer: '11 assets, including R-201, SV-204 and CTL-205.', source: 'Sourced from the knowledge graph' },
+  },
+  { icon: 'form', tone: 'node-lesson', title: 'Smart Form', body: 'Describe a change and get suggested approvers, documents and review needs, drawn from matching historical changes.' },
+  { icon: 'risk', tone: 'danger', title: 'Risk & Impact', body: 'See the hazards, the directly and indirectly affected assets, and the mitigations for a proposed change.' },
+  { icon: 'cost', tone: 'highlight', title: 'Cost Predictor', body: 'Indicative cost and downtime estimates with their ranges. Illustrative until benchmarked.' },
+  { icon: 'bot', tone: 'node-hazop', title: 'MoCBot', body: 'Ask questions across change records, HAZOP, PSSR and lessons learned, answered from the knowledge graph.' },
+  { icon: 'process', tone: 'node-category', title: 'Process Intelligence', body: 'Trace asset connectivity and see how downtime propagates through the unit.' },
+  {
+    icon: 'allocation', tone: 'ok', title: 'Decision Allocation',
+    body: 'Eight characteristics scored for risk, complexity, uncertainty and impact, giving an AI-led, AI-supported or human-led recommendation.',
+    proof: { kind: 'scores', scores: ['Risk 2', 'Complexity 1.5', 'Uncertainty 0.5', 'Impact 2.5'] },
+  },
 ]
 
 export const PROCESS = {
@@ -130,7 +181,9 @@ export const VALUES = {
 }
 
 export const FOOTER = {
-  headline: 'Ready to explore the platform?',
-  body: 'Smart Form, Risk & Impact, Cost Predictor, MoCBot, Process Intelligence and Decision Allocation, all grounded in one FCC unit knowledge graph.',
+  headline: 'Ready to assess your first change?',
+  body: 'Open the platform and run the MoC-002 example, or describe a change of your own.',
+  blurb: 'Change intelligence for one FCC unit: a knowledge graph, specialist agents and a transparent decision-allocation model, with a person deciding.',
+  safeguards: ['Synthetic demonstration data', 'Advice, not decision authority', 'Evidence and assumptions shown', 'Model not yet calibrated'],
   line: 'MoC Intelligence Platform · SRG – Symmetra Systems Design Studio',
 }
