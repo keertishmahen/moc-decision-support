@@ -120,7 +120,6 @@ export default function App() {
         <motion.div
           key="dashboard"
           className="moc-dash-root relative flex min-h-screen overflow-clip"
-          style={{ fontFamily: 'Outfit, Inter, sans-serif' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

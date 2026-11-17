@@ -91,7 +91,7 @@ export default function SmartForm() {
             <Card>
               <SectionLabel>P&ID Tags to Review</SectionLabel>
               {(s.pid_tags ?? []).map((t: string) => (
-                <div key={t} className="text-sm font-mono text-white/80 py-1 border-b border-white/5 last:border-0 flex items-center gap-2"><Wrench className="h-3.5 w-3.5 text-accent flex-shrink-0" strokeWidth={1.75} aria-hidden />{t}</div>
+                <div key={t} className="text-sm tabular-nums text-white/80 py-1 border-b border-white/5 last:border-0 flex items-center gap-2"><Wrench className="h-3.5 w-3.5 text-accent flex-shrink-0" strokeWidth={1.75} aria-hidden />{t}</div>
               ))}
               {s.scope && <p className="text-xs text-white/50 mt-2"><b>Scope:</b> {s.scope}</p>}
             </Card>

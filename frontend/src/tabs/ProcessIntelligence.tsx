@@ -91,7 +91,7 @@ function TopologyPanel() {
                   {(conn.downstream_nodes as Record<string, unknown>[]).map((n, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs py-1 border-b border-white/5 last:border-0">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
-                      <span className="font-mono text-emerald-400 w-16 flex-shrink-0">{String(n.asset_id)}</span>
+                      <span className="tabular-nums text-emerald-400 w-16 flex-shrink-0">{String(n.asset_id)}</span>
                       <span className="text-white/60 flex-1 truncate">{String(n.name)}</span>
                       <span className="text-white/30 text-[10px] flex-shrink-0">{String(n.rel_type)}</span>
                     </div>
@@ -108,7 +108,7 @@ function TopologyPanel() {
                   {(conn.upstream_nodes as Record<string, unknown>[]).map((n, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs py-1 border-b border-white/5 last:border-0">
                       <span className="w-2 h-2 rounded-full bg-purple-400 flex-shrink-0" />
-                      <span className="font-mono text-purple-400 w-16 flex-shrink-0">{String(n.asset_id)}</span>
+                      <span className="tabular-nums text-purple-400 w-16 flex-shrink-0">{String(n.asset_id)}</span>
                       <span className="text-white/60 flex-1 truncate">{String(n.name)}</span>
                       <span className="text-white/30 text-[10px] flex-shrink-0">{String(n.rel_type)}</span>
                     </div>
@@ -234,7 +234,7 @@ function DowntimePanel() {
                 <div className="space-y-1.5 max-h-64 overflow-y-auto">
                   {affected.map((a, i) => (
                     <div key={i} className="grid grid-cols-12 gap-2 text-xs py-1.5 border-b border-white/5 last:border-0 items-center">
-                      <span className="col-span-2 font-mono text-accent">{String(a.asset_id)}</span>
+                      <span className="col-span-2 tabular-nums text-accent">{String(a.asset_id)}</span>
                       <span className="col-span-3 text-white/60 truncate">{String(a.asset_name)}</span>
                       <span className="col-span-1 text-center text-white/40">{String(a.hop_distance)}h</span>
                       <span className="col-span-2 font-bold text-amber-400">{Number(a.propagated_hours).toFixed(1)}h</span>
@@ -267,7 +267,7 @@ function DowntimePanel() {
               const pct = Math.min(100, (Number(row.total_propagated_hours) / 200) * 100)
               return (
                 <div key={i} className="flex items-center gap-3 text-xs">
-                  <span className="font-mono text-accent w-16 flex-shrink-0">{String(row.source_asset_id)}</span>
+                  <span className="tabular-nums text-accent w-16 flex-shrink-0">{String(row.source_asset_id)}</span>
                   <div className="flex-1 h-2 rounded-full bg-white/8">
                     <div className="h-full rounded-full bg-gradient-to-r from-accent to-danger"
                       style={{ width: `${pct}%` }} />
@@ -374,7 +374,7 @@ function AgentPanel() {
                         {JSON.stringify(tc.args).slice(0, 80)}
                       </span>
                     </div>
-                    <div className="text-[10px] text-white/40 font-mono truncate flex items-center gap-1">
+                    <div className="text-[10px] text-white/40 tabular-nums truncate flex items-center gap-1">
                       <ArrowRight className="h-3 w-3 flex-shrink-0" strokeWidth={2} aria-hidden />
                       <span className="truncate">{JSON.stringify(tc.result).slice(0, 120)}…</span>
                     </div>

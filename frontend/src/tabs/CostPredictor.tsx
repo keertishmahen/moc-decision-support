@@ -101,7 +101,7 @@ export default function CostPredictor() {
               {Object.entries(r.features ?? {}).map(([k, v]) => (
                 <div key={k} className="moc-glass-card rounded-xl p-3">
                   <div className="text-[11px] text-white/40 mb-1">{k}</div>
-                  <div className="text-base font-bold font-mono text-accent">{String(v)}</div>
+                  <div className="text-base font-bold tabular-nums text-accent">{String(v)}</div>
                 </div>
               ))}
             </div>

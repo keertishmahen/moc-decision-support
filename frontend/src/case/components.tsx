@@ -308,7 +308,7 @@ export function WhyPanel({ why, focus, title = 'Why this recommendation?', onClo
                     <li key={e.id} className="px-3 py-2 text-xs">
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
                         <span className="font-semibold text-white/85">{e.label}</span>
-                        <span className="font-mono text-[10px] text-white/35">{e.reference}</span>
+                        <span className="tabular-nums text-[10px] text-white/35">{e.reference}</span>
                       </div>
                       {e.detail && <div className="mt-0.5 text-white/50">{e.detail}</div>}
                       {view.citedBy.get(e.id) && <div className="mt-0.5 text-[10px] text-white/30">Supports {view.citedBy.get(e.id)!.join(', ')}</div>}
@@ -369,7 +369,7 @@ function FindingRow({ f, names, evidence, hidden = false }: {
         <div className="min-w-0 flex-1 space-y-1">
           <div className="text-sm text-white/85">{f.statement}</div>
           <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-white/45">
-            <span className="font-mono text-white/30">{f.id}</span>
+            <span className="tabular-nums text-white/30">{f.id}</span>
             <span>{names[f.agent] ?? f.agent}</span>
             <BasisChip basis={f.basis} />
             <Chip tone={v.tone}>{v.label}</Chip>

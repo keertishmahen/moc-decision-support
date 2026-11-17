@@ -180,7 +180,7 @@ export default function DecisionAllocation() {
 
           <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
             <h3 className="font-bold text-white">
-              {assessment.subject.moc_id ? <span className="font-mono text-accent mr-2">{assessment.subject.moc_id}</span> : null}
+              {assessment.subject.moc_id ? <span className="tabular-nums text-accent mr-2">{assessment.subject.moc_id}</span> : null}
               {assessment.subject.title}
             </h3>
             {assessment.subject.case_id && <span className="text-xs text-white/40">thesis case {assessment.subject.case_id}</span>}

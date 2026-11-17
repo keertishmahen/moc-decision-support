@@ -141,7 +141,7 @@ function HeroPreview({ reduce }: { reduce: boolean | null }) {
             </span>
           </div>
           <div className="px-4 py-3">
-            <div className="text-[12px] text-white/45"><span className="font-mono text-accent">{PREVIEW.asset}</span> · {PREVIEW.changeType}</div>
+            <div className="text-[12px] text-white/45"><span className="tabular-nums text-accent">{PREVIEW.asset}</span> · {PREVIEW.changeType}</div>
             <div className="mt-0.5 text-[15px] font-semibold text-white">{PREVIEW.title}</div>
           </div>
           <ul className="space-y-2 border-t border-white/10 px-4 py-3 text-[13px] text-white/70">
@@ -182,7 +182,7 @@ export default function Onboarding({ onEnter }: Props) {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' })
 
   return (
-    <div className="onb-root relative min-h-screen overflow-x-clip text-ink" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>
+    <div className="onb-root relative min-h-screen overflow-x-clip text-ink">
       <Stars count={70} seed={0} className="onb-page-stars" />
 
       {/* ── Header ── */}

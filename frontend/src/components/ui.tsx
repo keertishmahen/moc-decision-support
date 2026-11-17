@@ -136,7 +136,7 @@ export const Gauge = ({ value, max = 100, label, tone = 'accent', prefix = '', s
       <svg width="128" height="100" viewBox="0 0 128 100">
         <path d={arcPath(startAngle, endAngle)} fill="none" style={{ stroke: ink(8) }} strokeWidth="8" strokeLinecap="round" />
         {pct > 0 && <path d={arcPath(startAngle, angle)} fill="none" style={{ stroke: cssVar(tone) }} strokeWidth="8" strokeLinecap="round" />}
-        <text x={cx} y={cy + 8} textAnchor="middle" style={{ fill: cssVar('ink') }} fontSize="16" fontWeight="700" fontFamily="Inter">
+        <text x={cx} y={cy + 8} textAnchor="middle" style={{ fill: cssVar('ink') }} fontSize="16" fontWeight="700">
           {prefix}{typeof value === 'number' ? value.toLocaleString(undefined, { maximumFractionDigits: 0 }) : value}{suffix}
         </text>
       </svg>

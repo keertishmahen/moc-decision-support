@@ -77,6 +77,8 @@ start with `onb-` (`onb-blob-*`, `onb-gradient-text`, `onb-chip`, `onb-preview`,
   graph canvas, through `usePalette()`. In light mode `--color-white` points at dark ink, so the
   existing `text-white/60`-style utilities read as "ink at 60 %" in both themes. No hex or rgba in
   `.ts`/`.tsx` files (`tests/structure/test_frontend.py`).
+- **One typeface: Outfit.** Set once as `--font-sans`; ids, scores and levels use `tabular-nums`
+  (table cells get it automatically). Monospace is for code only (tested).
 - **Icons, not emojis.** Every icon is from `lucide-react`; emoji and symbol characters are not
   allowed in `frontend/src` (same test). Model replies are stripped of emojis before display
   (`MarkdownMessage.stripEmoji`), and the chat and agent prompts ask for none.

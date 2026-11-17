@@ -71,7 +71,7 @@ function PropagationPanel({ assetId, hours }: { assetId: string; hours: number }
           const pct = Math.min(100, (Number(a.propagated_hours) / source) * 100)
           return (
             <div key={i} className="flex items-center gap-2 text-[11px]">
-              <span className="font-mono text-accent w-14 flex-shrink-0">{String(a.asset_id)}</span>
+              <span className="tabular-nums text-accent w-14 flex-shrink-0">{String(a.asset_id)}</span>
               <div className="flex-1 h-1.5 rounded-full bg-white/8">
                 <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
               </div>
@@ -376,7 +376,7 @@ export default function MoCBot() {
                   <SectionLabel>Retrieved MoC</SectionLabel>
                   <div className="text-sm font-semibold text-white">{String(d.moc_id)} — {String(d.title ?? '').slice(0, 45)}</div>
                   <div className="flex flex-wrap items-center gap-2 mt-2 text-xs text-white/50">
-                    <span>Asset: <span className="text-emerald-400 font-mono">{String(d.asset_id)}</span></span>
+                    <span>Asset: <span className="text-emerald-400 tabular-nums">{String(d.asset_id)}</span></span>
                     <RiskBadge rating={String(d.risk_category ?? 'Unknown')} />
                     <span>Score: <span className="text-red-400">{String(d.risk_score ?? '?')}</span></span>
                     <span>Cost: <span className="text-accent">${Number(d.actual_cost ?? 0).toLocaleString()}</span></span>
@@ -403,7 +403,7 @@ export default function MoCBot() {
                             <CornerDownRight key={k} className="h-3 w-3" strokeWidth={1.75} aria-hidden />
                           ))}
                         </span>
-                        <span className="font-mono font-semibold">{String(n.node_id)}</span>
+                        <span className="tabular-nums font-semibold">{String(n.node_id)}</span>
                         <span className="text-white/40">{String(n.node_name ?? '')}</span>
                         <span className="ml-auto text-[10px] text-white/30">crit={crit}</span>
                       </div>
@@ -437,7 +437,7 @@ export default function MoCBot() {
                   </div>
                 </div>
                 <div className="text-[11px] text-white/40 mb-2">
-                  From <span className="text-emerald-400 font-mono">{propAsset}</span>
+                  From <span className="text-emerald-400 tabular-nums">{propAsset}</span>
                 </div>
                 <PropagationPanel assetId={propAsset} hours={propHours} />
               </Card>
@@ -451,7 +451,7 @@ export default function MoCBot() {
                   const sim = Number(h.similarity ?? 0)
                   return (
                     <div key={String(h.moc_id)} className="flex items-center gap-2 py-1.5 border-b border-white/5 last:border-0">
-                      <span className="text-xs font-mono text-accent w-16">{String(h.moc_id)}</span>
+                      <span className="text-xs tabular-nums text-accent w-16">{String(h.moc_id)}</span>
                       <div className="flex-1 h-1.5 rounded-full bg-white/8">
                         <div className="h-full rounded-full" style={{ width: `${sim * 100}%`, background: `linear-gradient(90deg, ${cssVar('accent')}, ${cssVar('accent2')})` }} />
                       </div>
@@ -476,7 +476,7 @@ export default function MoCBot() {
                       <div className="text-[10px] text-white/40 mb-1 flex items-center gap-1"><ArrowUp className="h-3 w-3" strokeWidth={2} aria-hidden />Upstream (feeds in)</div>
                       {up.slice(0, 4).map((n, i) => (
                         <div key={i} className="flex items-center gap-2 text-[11px] py-0.5">
-                          <span className="font-mono text-purple-400 w-14">{String(n.asset_id)}</span>
+                          <span className="tabular-nums text-purple-400 w-14">{String(n.asset_id)}</span>
                           <span className="text-white/50 flex-1 truncate">{String(n.name)}</span>
                           <span className="text-white/25 text-[10px]">{String(n.rel_type)}</span>
                         </div>
@@ -488,7 +488,7 @@ export default function MoCBot() {
                       <div className="text-[10px] text-white/40 mb-1 flex items-center gap-1"><ArrowDown className="h-3 w-3" strokeWidth={2} aria-hidden />Downstream (feeds out)</div>
                       {down.slice(0, 4).map((n, i) => (
                         <div key={i} className="flex items-center gap-2 text-[11px] py-0.5">
-                          <span className="font-mono text-emerald-400 w-14">{String(n.asset_id)}</span>
+                          <span className="tabular-nums text-emerald-400 w-14">{String(n.asset_id)}</span>
                           <span className="text-white/50 flex-1 truncate">{String(n.name)}</span>
                           <span className="text-white/25 text-[10px]">{String(n.rel_type)}</span>
                         </div>

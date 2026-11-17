@@ -23,7 +23,7 @@ export default function SymmetraLogo({ size = 36, wordmark = true, className = '
         draggable={false}
       />
       {wordmark && (
-        <span className="text-left leading-none" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>
+        <span className="text-left leading-none">
           <span className="block font-semibold tracking-tight text-white" style={{ fontSize: size * 0.5 }}>
             Symmetra
           </span>

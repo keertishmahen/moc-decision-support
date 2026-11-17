@@ -224,7 +224,7 @@ export default function ChangeCase() {
             <div>
               <div className="text-xs text-white/40">Case {c.run_id}{c.request.moc_id ? ` · example ${c.request.moc_id}` : ''}</div>
               <h3 className="font-bold text-white">
-                <span className="font-mono text-accent mr-2">{c.request.asset_id}</span>{c.request.change_type}
+                <span className="tabular-nums text-accent mr-2">{c.request.asset_id}</span>{c.request.change_type}
               </h3>
               <p className="text-sm text-white/55 mt-0.5">{c.request.description}</p>
             </div>
@@ -308,7 +308,7 @@ function WhatHappens({ c }: { c: CaseRecord }) {
           <SectionLabel>Equipment and dependencies</SectionLabel>
           {w.asset ? (
             <div className="text-sm text-white/75">
-              <span className="font-mono text-accent">{w.asset.asset_id}</span> · {w.asset.equipment_type ?? 'type not recorded'}
+              <span className="tabular-nums text-accent">{w.asset.asset_id}</span> · {w.asset.equipment_type ?? 'type not recorded'}
               {w.asset.criticality != null && <> · criticality {w.asset.criticality}</>}
               {w.areas?.length ? <> · {w.areas.join(', ')}</> : null}
               {w.esd_target && <span style={{ color: cssVar('warn') }}> · ESD target</span>}
@@ -317,8 +317,8 @@ function WhatHappens({ c }: { c: CaseRecord }) {
           {reach && (
             <ul className="text-sm text-white/65 space-y-1">
               <li><b className="text-white/85">{reach.asset_count}</b> assets reachable through process and control links{reach.areas.length ? `, across ${reach.areas.join(', ')}` : ''}.</li>
-              {reach.direct.length > 0 && <li>Directly affected: <span className="font-mono text-white/80">{reach.direct.join(', ')}</span></li>}
-              {reach.critical_assets.length > 0 && <li>Critical assets reached: <span className="font-mono text-white/80">{reach.critical_assets.join(', ')}</span></li>}
+              {reach.direct.length > 0 && <li>Directly affected: <span className="tabular-nums text-white/80">{reach.direct.join(', ')}</span></li>}
+              {reach.critical_assets.length > 0 && <li>Critical assets reached: <span className="tabular-nums text-white/80">{reach.critical_assets.join(', ')}</span></li>}
             </ul>
           )}
           {w.propagation.total_propagated_hours != null && (
@@ -356,7 +356,7 @@ function WhatHappens({ c }: { c: CaseRecord }) {
           </div>
           {w.review.approvers?.length ? <div className="text-xs text-white/60"><b className="text-white/75">Approvers:</b> {w.review.approvers.join(', ')}</div> : null}
           {w.review.documents?.length ? <div className="text-xs text-white/60"><b className="text-white/75">Documents:</b> {w.review.documents.join(', ')}</div> : null}
-          {w.review.pid_tags?.length ? <div className="text-xs text-white/60"><b className="text-white/75">P&amp;IDs:</b> <span className="font-mono">{w.review.pid_tags.join(', ')}</span></div> : null}
+          {w.review.pid_tags?.length ? <div className="text-xs text-white/60"><b className="text-white/75">P&amp;IDs:</b> <span className="tabular-nums">{w.review.pid_tags.join(', ')}</span></div> : null}
           <WhyToggle why={why} focus={['review']} label="Why these review needs?" />
         </Card>
 
@@ -383,7 +383,7 @@ function WhatHappens({ c }: { c: CaseRecord }) {
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-1">
             {w.similar_changes.map(s => (
               <li key={s.moc_id} className="flex items-baseline justify-between gap-2 text-sm border-b border-white/5 py-1">
-                <span className="text-white/70"><span className="font-mono text-accent mr-2">{s.moc_id}</span>{s.title}</span>
+                <span className="text-white/70"><span className="tabular-nums text-accent mr-2">{s.moc_id}</span>{s.title}</span>
                 {s.similarity != null && <span className="text-[11px] text-white/40">{Math.round(s.similarity * 100)}% similar</span>}
               </li>
             ))}

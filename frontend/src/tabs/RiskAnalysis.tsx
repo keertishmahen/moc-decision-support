@@ -167,7 +167,7 @@ export default function RiskAnalysis() {
                   {direct.slice(0, 6).map((a: Record<string, unknown>) => (
                     <div key={String(a.node_id)} className="text-sm text-ok py-1 border-b border-white/5 last:border-0 flex items-center gap-1.5">
                       <CornerDownRight className="h-3.5 w-3.5 flex-shrink-0" strokeWidth={1.75} aria-hidden />
-                      <span className="font-mono">{String(a.node_id)}</span> {String(a.node_name ?? '')}
+                      <span className="tabular-nums">{String(a.node_id)}</span> {String(a.node_name ?? '')}
                     </div>
                   ))}
                 </Card>

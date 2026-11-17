@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: 'Outfit', 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
 
@@ -50,11 +50,14 @@
 
 * { box-sizing: border-box; }
 
+/* One typeface everywhere; numbers in tables line up without a monospace font. */
+td, th { font-variant-numeric: tabular-nums; }
+
 :root { color-scheme: dark; }
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-sans);
   background: var(--color-canvas);
   color: var(--color-ink);
   min-height: 100vh;

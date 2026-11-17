@@ -239,13 +239,13 @@ export default function Overview() {
             <div className="space-y-3">
               <div>
                 <div className="text-sm text-white/80">
-                  <span className="font-mono text-accent mr-1.5">{caseRecord.request.asset_id}</span>{caseRecord.request.change_type}
+                  <span className="tabular-nums text-accent mr-1.5">{caseRecord.request.asset_id}</span>{caseRecord.request.change_type}
                 </div>
                 <p className="mt-0.5 line-clamp-2 text-xs text-white/50">{caseRecord.request.description}</p>
               </div>
               {alloc && (
                 <div className="text-lg font-bold" style={{ color: cssVar(ALLOCATION_TONE[alloc.allocation]) }}>
-                  {ALLOCATION_LABEL[alloc.allocation]} <span className="font-mono text-sm text-white/40">{alloc.signature}</span>
+                  {ALLOCATION_LABEL[alloc.allocation]} <span className="tabular-nums text-sm text-white/40">{alloc.signature}</span>
                 </div>
               )}
               <div className="grid grid-cols-3 gap-2 text-center">

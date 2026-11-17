@@ -99,3 +99,17 @@ def test_backdrop_filter_is_written_unprefixed():
     css = (SRC / "index.css").read_text(encoding="utf-8")
     lines = [n for n, line in enumerate(css.splitlines(), 1) if line.strip().startswith("-webkit-backdrop-filter")]
     assert not lines, f"index.css lines {lines}: write only `backdrop-filter`; the build adds the prefix."
+
+
+def test_monospace_only_for_code():
+    """One typeface across the app. Ids, scores and levels use the page font with `tabular-nums`;
+    monospace is kept for code only (Markdown code, module paths, the chat's debug intent line)."""
+    found = []
+    for path in SRC.rglob("*.tsx"):
+        for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if "font-mono" not in line:
+                continue
+            if path.name == "MarkdownMessage.tsx" or "Reuses " in line or "intent:" in line:
+                continue
+            found.append(f"{path.relative_to(SRC).as_posix()}:{n}")
+    assert not found, f"font-mono on display text: {found}. Use the page font with `tabular-nums` instead."
